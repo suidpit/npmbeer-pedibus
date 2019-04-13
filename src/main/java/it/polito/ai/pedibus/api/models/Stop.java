@@ -11,7 +11,7 @@ public class Stop {
     private ObjectId _id;
     private Integer line_id;
     private String name;
-    private Integer time;
+    private String time;
     private String position;
     private Boolean up_down;
 }
