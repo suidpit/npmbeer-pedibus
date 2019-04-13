@@ -1,7 +1,6 @@
 package it.polito.ai.pedibus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.mongobee.Mongobee;
 import it.polito.ai.pedibus.api.models.Line;
 import it.polito.ai.pedibus.api.repositories.LinesRepository;
 import org.slf4j.Logger;
@@ -33,9 +32,6 @@ public class PedibusApplication {
         List<Line> lines = mapper.readValue(new File(pathToTest),
                 mapper.getTypeFactory().constructCollectionType(List.class, Line.class));
 
-        for(Line l : lines){
-            logger.info(l.toString());
-        }
         // Automagically inserting all the lines data
         linesRepository.insert(lines);
         return mapper;
