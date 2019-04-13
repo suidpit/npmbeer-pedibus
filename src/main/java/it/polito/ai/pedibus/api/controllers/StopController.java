@@ -24,6 +24,6 @@ public class StopController {
 
     @RequestMapping(value= "/{id}", method = RequestMethod.GET)
     public Stop getStopById(@PathVariable("id") ObjectId id) {
-        return repo.findBy_id(id);
+        return repo.findById(id);
     }
 }
