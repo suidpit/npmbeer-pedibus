@@ -3,8 +3,6 @@ package it.polito.ai.pedibus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polito.ai.pedibus.api.models.Line;
 import it.polito.ai.pedibus.api.repositories.LinesRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,18 +16,14 @@ import java.util.List;
 public class PedibusApplication {
 
     private static String testDataFileName = "test_data_init.json";
-    private static String rootDir;
-    private static Logger logger = LoggerFactory.getLogger(PedibusApplication.class);
-
+    
     @Bean
     @Autowired
     public ObjectMapper objectMapper(LinesRepository linesRepository) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        // Construct path to test data init file
-        String pathToTest = rootDir+"\\"+testDataFileName;
 
         // Read lines from .json using the mapper (second argument returns a TypeReference to List<Line> type
-        List<Line> lines = mapper.readValue(new File(pathToTest),
+        List<Line> lines = mapper.readValue(new File(testDataFileName),
                 mapper.getTypeFactory().constructCollectionType(List.class, Line.class));
 
         // Automagically inserting all the lines data
@@ -39,10 +33,6 @@ public class PedibusApplication {
 
 
     public static void main(String[] args) {
-        PedibusApplication.rootDir = System.getProperty("user.dir");
         SpringApplication.run(PedibusApplication.class, args);
     }
-
-    public static String getRootDir(){ return PedibusApplication.rootDir; }
-    public static String getTestDataFileName() { return testDataFileName; }
 }
