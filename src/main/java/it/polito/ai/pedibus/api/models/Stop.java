@@ -2,16 +2,22 @@ package it.polito.ai.pedibus.api.models;
 
 import lombok.Data;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 
 @Data
 public class Stop {
 
     @Id
-    private ObjectId _id;
-    private Integer line_id;
+    private ObjectId id;
+
     private String name;
-    private Integer time;
+    private String time;
     private String position;
+
+    @Transient
+    private Integer line_id;
+    @Transient
     private Boolean up_down;
 }
