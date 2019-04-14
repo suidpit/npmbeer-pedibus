@@ -1,0 +1,12 @@
+[
+  {
+    "res_name":"res1",
+    "data":"data1",
+	"line_name":"linea1"
+  },
+  {
+    "res_name":"res2",
+    "data":"data2",
+	"line_name":"linea2"
+  }
+] 
