@@ -58,12 +58,22 @@ public class ReservationController {
 //   public void delete(@PathVariable("id") ObjectId id){
 //        this.reservationRepository.deleteById(id);
 //   }
-    @RequestMapping(value = "/{line_name}/{data}/{id}",method = RequestMethod.DELETE)
+   /* @RequestMapping(value = "/{line_name}/{data}/{id}",method = RequestMethod.DELETE)
     public void delete(@PathVariable("line_name") String line_name,
                        @PathVariable("data")String data,
                        @PathVariable("id")ObjectId id)
     {
-        this.reservationRepository.deleteById(id);    //FUNZIONA!
+       // this.reservationRepository.deleteById(id);//FUNZIONA!
+        reservationRepository.deleteByIdLineData(id,line_name,data);
+    }*/
+    @RequestMapping(value = "/{line_name}/{data}/{id}", method = RequestMethod.DELETE)
+    public void delete(@PathVariable("line_name") String line_name,
+                                      @PathVariable("data")String data,
+                                      @PathVariable("id")ObjectId id)
+    {
+        // this.reservationRepository.deleteById(id);//FUNZIONA!
+       this.reservationRepository.deleteByIdLineData(id,line_name,data);
+
     }
 
 /*
