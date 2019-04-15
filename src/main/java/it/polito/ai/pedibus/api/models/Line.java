@@ -13,7 +13,6 @@ import java.util.List;
 public class Line {
     @Id
     private ObjectId id;
-
     private String line_name;
     private List<List<Stop>> goings;    // See below
     private List<List<Stop>> returns;   // Sorry for the plural, but return is a reserved word

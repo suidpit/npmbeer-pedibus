@@ -5,6 +5,7 @@ import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.repositories.ReservationRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class ReservationController {
     private ReservationRepository reservationRepository;
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public List<Reservation> getLines(){
+    public List<Reservation> getReservaions(){
         return reservationRepository.findAll();
     }
 
@@ -57,13 +58,32 @@ public class ReservationController {
 //   public void delete(@PathVariable("id") ObjectId id){
 //        this.reservationRepository.deleteById(id);
 //   }
-
     @RequestMapping(value = "/{line_name}/{data}/{id}",method = RequestMethod.DELETE)
     public void delete(@PathVariable("line_name") String line_name,
                        @PathVariable("data")String data,
                        @PathVariable("id")ObjectId id)
     {
-        this.reservationRepository.deleteById(id);
+        this.reservationRepository.deleteById(id);    //FUNZIONA!
     }
+
+/*
+    GET /reservations/{nome_linea}/{data}/{reservation_id} – restituisce la prenotazione
+*/
+    /*@RequestMapping(value = "/{line_name}/{data}/{id}", method = RequestMethod.GET)
+    public Reservation getReservation(@PathVariable("line_name") String line_name,
+                                      @PathVariable("data")String data,
+                                      @PathVariable("id")ObjectId id)
+    {
+        Reservation res = this.reservationRepository.findReservationByLineDataId(id,line_name,data);
+        return res;
+    }
+*/
+
+ //___________MIA PROVA_________________
+ @RequestMapping(value = "/{data}", method = RequestMethod.GET)
+ public List<Reservation> getDatas(@PathVariable("data") String data){
+    // return reservationRepository.findByData(data);
+     return reservationRepository.findReservationByData(data);
+ }
 
 }
