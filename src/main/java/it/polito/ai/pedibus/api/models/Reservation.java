@@ -14,5 +14,6 @@ public class Reservation {
     private String res_name;
     private String data;
     private String line_name;
+    private String child;
 
 }

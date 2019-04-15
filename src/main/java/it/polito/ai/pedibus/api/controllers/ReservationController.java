@@ -4,10 +4,13 @@ package it.polito.ai.pedibus.api.controllers;
 import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.repositories.ReservationRepository;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -47,25 +50,21 @@ public class ReservationController {
 //    permette di aggiornare i dati relativi alla prenotazione indicata*/
 //    //@PutMapping(value = "/reservations/{nome_linea}/{data}/{reservation_id}")
 //
-//    @PutMapping
-//    public void insert(@RequestBody Reservation reservation){
-//        this.reservationRepository.insert(reservation);
-//    }
-//
+    @RequestMapping(value = "/{line_name}/{data}/{id}", method = RequestMethod.PUT)
+        public void update(@PathVariable("line_name") String line_name,
+                           @PathVariable("data")String data,
+                           @PathVariable("id")ObjectId id,
+                           @Valid @RequestBody Reservation reservation){
+        Logger logger = LoggerFactory.getLogger(this.getClass());
+        Reservation res = reservationRepository.findReservationByLineDataId(id,line_name,data);
+        logger.info(reservation.toString());
+
+        if(res!=null)
+            this.reservationRepository.save(reservation);
+    }
+
 //   /* DELETE /reservations/{nome_linea}/{data}/{reservation_id} – elimina la prenotazione
 //            indicata*/
-//   @RequestMapping(value = "/{id}",method = RequestMethod.DELETE)
-//   public void delete(@PathVariable("id") ObjectId id){
-//        this.reservationRepository.deleteById(id);
-//   }
-   /* @RequestMapping(value = "/{line_name}/{data}/{id}",method = RequestMethod.DELETE)
-    public void delete(@PathVariable("line_name") String line_name,
-                       @PathVariable("data")String data,
-                       @PathVariable("id")ObjectId id)
-    {
-       // this.reservationRepository.deleteById(id);//FUNZIONA!
-        reservationRepository.deleteByIdLineData(id,line_name,data);
-    }*/
     @RequestMapping(value = "/{line_name}/{data}/{id}", method = RequestMethod.DELETE)
     public void delete(@PathVariable("line_name") String line_name,
                                       @PathVariable("data")String data,
