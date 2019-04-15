@@ -69,15 +69,16 @@ public class ReservationController {
 /*
     GET /reservations/{nome_linea}/{data}/{reservation_id} – restituisce la prenotazione
 */
-    /*@RequestMapping(value = "/{line_name}/{data}/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{line_name}/{data}/{id}", method = RequestMethod.GET)
     public Reservation getReservation(@PathVariable("line_name") String line_name,
                                       @PathVariable("data")String data,
                                       @PathVariable("id")ObjectId id)
     {
+        //Should be one element
         Reservation res = this.reservationRepository.findReservationByLineDataId(id,line_name,data);
         return res;
     }
-*/
+
 
  //___________MIA PROVA_________________
  @RequestMapping(value = "/{data}", method = RequestMethod.GET)
