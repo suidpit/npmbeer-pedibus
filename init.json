@@ -1,0 +1,48 @@
+[
+  {
+    "name":"linea1",
+    "admin_email":"admin@me.com",
+    "outward":[
+      [
+        {"name":"P.za Solferino", "position":"46°24'12''", "time":"8:00"},
+        {"name":"P.za Castello", "position":"46°24'12''", "time":"8:15"},
+        {"name":"Sansa", "position":"46°24'12''", "time":"8:30"}
+      ]
+    ],
+    "back":[
+      [
+        {"name":"Sansa", "position":"46°24'12''", "time":"12:30"},
+        {"name":"P.za Castello", "position":"46°24'12''", "time":"12:45"},
+        {"name":"P.za Solferino", "position":"46°24'12''", "time":"13:00"}
+      ],
+      [
+        {"name":"Sansa", "position":"46°24'12''", "time":"16:00"},
+        {"name":"P.za Castello", "position":"46°24'12''", "time":"16:15"},
+        {"name":"P.za Solferino", "position":"46°24'12''", "time":"16:30"}
+      ]
+    ]
+  },
+  {
+    "name":"linea2",
+    "admin_email":"n@palm.beer",
+    "outward":[
+      [
+        {"name":"P.ta Susa", "position":"46°24'12''", "time":"8:00"},
+        {"name":"Vinzaglio", "position":"46°24'12''", "time":"8:15"},
+        {"name":"Poli", "position":"46°24'12''", "time":"8:30"}
+      ]
+    ],
+    "back":[
+      [
+        {"name":"Poli", "position":"46°24'12''", "time":"12:30"},
+        {"name":"Vinzaglio", "position":"46°24'12''", "time":"12:45"},
+        {"name":"P.ta Susa", "position":"46°24'12''", "time":"13:00"}
+      ],
+      [
+        {"name":"Poli", "position":"46°24'12''", "time":"16:00"},
+        {"name":"Vinzaglio", "position":"46°24'12''", "time":"16:15"},
+        {"name":"P.ta Susa", "position":"46°24'12''", "time":"16:30"}
+      ]
+    ]
+  }
+]

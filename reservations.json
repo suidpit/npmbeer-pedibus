@@ -1,42 +1,34 @@
 [
   {
-    "res_name":"res1",
-    "data":"data2",
-	"line_name":"linea2",
-	"child":"Napalm",
-	"stopUpOrDawn":{	
-		"name":"P.za Solferino", 
-		"position":"46°24'12''", 
-		"time":"8:00",
-		"line_id":"null",
-		"up_down":true
-	}
+    "date": "data2",
+    "lineName": "linea2",
+    "childs": "Napalm",
+    "direction": 0,
+    "stop_name": "P.za Solferino",
+    "tripIndex": 0
   },
   {
-    "res_name":"res2",
-    "data":"data2",
-	"line_name":"linea2",
-	"child":"Beer",
-	"stopUpOrDawn":{
-		"name":"P.za Castello", 
-		"position":"46°24'12''", 
-		"time":"8:15",
-		"line_id":"null",
-		"up_down":true
-	}
+    "date": "data2",
+    "lineName": "linea2",
+    "child": "Beer",
+    "direction": 0,
+    "stop_name": "P.za Castello",
+    "tripIndex": 0
   },
   {
-    "res_name":"res3",
-    "data":"data2",
-	"line_name":"linea2",
-	"child":"tizio",
-	"stopUpOrDawn":{"name":"Sansa", "position":"46°24'12''", "time":"8:30","line_id":"null","up_down":true}
+    "date": "data2",
+    "lineName": "linea2",
+    "child": "tizio",
+    "direction": 0,
+    "stop_name": "Sansa",
+    "tripIndex": 0
   },
   {
-    "res_name":"res4",
-    "data":"data2",
-	"line_name":"linea2",
-	"child":"caio",
-	"stopUpOrDawn":{"name":"P.za Bellini", "position":"46°24'12''", "time":"13:00","line_id":"null","up_down":false}
+    "date": "data2",
+    "lineName": "linea2",
+    "child": "caio",
+    "direction": 1,
+    "stop_name": "P.za Bellini",
+    "tripIndex": 0
   }
 ] 
