@@ -39,28 +39,35 @@ public class ReservationController {
     dell’alunno da trasportare, l’identificatore della fermata a cui sale/scende e il verso di
     percorrenza (andata/ritorno); restituisce un identificatore univoco della prenotazione
     creata*/
-
-    //@PostMapping(value = "/reservations/{nome_linea}/{data}")
-//    @PostMapping
-//    public void update(@RequestBody Reservation reservation){
-//        this.reservationRepository.save(reservation);
-//   }
+    @RequestMapping(value = "/{line_name}/{data}", method = RequestMethod.POST)
+            public ObjectId insert(@PathVariable("line_name") String line_name,
+                               @PathVariable("data")String data,
+                               @RequestBody Reservation reservation){
+                reservation.setData(data);
+                reservation.setLine_name(line_name);
+                this.reservationRepository.insert(reservation);
+                return  reservation.getId();
+        }
 //
 //   /* PUT /reservations/{nome_linea}/{data}/{reservation_id} – invia un oggetto JSON che
 //    permette di aggiornare i dati relativi alla prenotazione indicata*/
 //    //@PutMapping(value = "/reservations/{nome_linea}/{data}/{reservation_id}")
 //
+    //NB Insert also ID in JSON
+    //Issues: If I put wrong parameters it save anyway and add a field in db called :"_class"
+    //2019-04-16 08:50:09.192 DEBUG 14804 --- [nio-8080-exec-1] o.s.data.mongodb.core.MongoTemplate      : Saving Document containing fields: [_id, res_name, data, line_name, child, _class]
     @RequestMapping(value = "/{line_name}/{data}/{id}", method = RequestMethod.PUT)
         public void update(@PathVariable("line_name") String line_name,
                            @PathVariable("data")String data,
                            @PathVariable("id")ObjectId id,
                            @Valid @RequestBody Reservation reservation){
-        Logger logger = LoggerFactory.getLogger(this.getClass());
-        Reservation res = reservationRepository.findReservationByLineDataId(id,line_name,data);
-        logger.info(reservation.toString());
-
-        if(res!=null)
-            this.reservationRepository.save(reservation);
+            Reservation resToEdit = reservationRepository.findReservationByLineDataId(id,line_name,data);
+            try {
+                if(resToEdit.getId().equals(reservation.getId()))
+                    this.reservationRepository.save(reservation);
+            } catch (Exception e) { //In this case there isn't a match -> NULL POINTER EXC
+                e.printStackTrace();
+            }
     }
 
 //   /* DELETE /reservations/{nome_linea}/{data}/{reservation_id} – elimina la prenotazione

@@ -10,12 +10,14 @@ import java.util.List;
 public interface ReservationRepository extends MongoRepository<Reservation,String> {
     //void deleteByLineDataId(String line_name, String data, ObjectId id);
 
+    Reservation findById(ObjectId id);
+
     List<Reservation> findByData(String data);
 
     @Query("{'id' : ?0 , 'line_name' : ?1 , 'data' : ?2}")
     Reservation findReservationByLineDataId(ObjectId id, String line_name, String data);
-
     //PUT
+
     @Query(value = "{'id' : ?0 , 'line_name' : ?1 , 'data' : ?2}")
     void updateByIdLineData(ObjectId id, String line_name, String data);
 
