@@ -1,14 +1,42 @@
 [
   {
     "res_name":"res1",
-    "data":"data1",
-	"line_name":"linea1",
-	"child":"Napalm"
+    "data":"data2",
+	"line_name":"linea2",
+	"child":"Napalm",
+	"stopUpOrDawn":{	
+		"name":"P.za Solferino", 
+		"position":"46°24'12''", 
+		"time":"8:00",
+		"line_id":"null",
+		"up_down":true
+	}
   },
   {
     "res_name":"res2",
     "data":"data2",
 	"line_name":"linea2",
-	"child":"Beer"
+	"child":"Beer",
+	"stopUpOrDawn":{
+		"name":"P.za Castello", 
+		"position":"46°24'12''", 
+		"time":"8:15",
+		"line_id":"null",
+		"up_down":true
+	}
+  },
+  {
+    "res_name":"res3",
+    "data":"data2",
+	"line_name":"linea2",
+	"child":"tizio",
+	"stopUpOrDawn":{"name":"Sansa", "position":"46°24'12''", "time":"8:30","line_id":"null","up_down":true}
+  },
+  {
+    "res_name":"res4",
+    "data":"data2",
+	"line_name":"linea2",
+	"child":"caio",
+	"stopUpOrDawn":{"name":"P.za Bellini", "position":"46°24'12''", "time":"13:00","line_id":"null","up_down":false}
   }
 ] 

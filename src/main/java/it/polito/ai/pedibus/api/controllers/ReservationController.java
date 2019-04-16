@@ -1,6 +1,8 @@
 package it.polito.ai.pedibus.api.controllers;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.repositories.ReservationRepository;
 import org.bson.types.ObjectId;
@@ -11,7 +13,10 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/reservations")
@@ -29,10 +34,40 @@ public class ReservationController {
     riportanti, per ogni fermata di andata e ritorno, l’elenco delle persone che devono essere
     prese in carico / lasciate in corrispondenza della fermata*/
     @RequestMapping(value = "/{line_name}/{data}", method = RequestMethod.GET)
-    public List<Reservation>getListChildForStop(@PathVariable("line_name") String line_name,
+    public String getListChildForStop(@PathVariable("line_name") String line_name,
                                            @PathVariable("data")String data){
+        //ovvero <"Sale o Scende", <"Nome Fermata", [Lista di gente che sale o scende]>>
+        HashMap<String, HashMap<String, ArrayList<String>>> mappazza = new HashMap<>();
+        //<Fermata,<ListaBambini>>
+        HashMap<String,ArrayList<String>> innerMapUp = new HashMap<>();
+        HashMap<String,ArrayList<String>> innerMapDown = new HashMap<>();
         List<Reservation> listReservation = reservationRepository.findReservationsByLineData(line_name,data);
-        return listReservation;
+        for(Reservation res : listReservation){
+            if(res.getStopUpOrDawn().getUp_down().equals(true)){
+                //add in innerMapUp
+                if(!innerMapUp.containsKey(res.getStopUpOrDawn().getName())){
+                    innerMapUp.put(res.getStopUpOrDawn().getName(),new ArrayList<>());
+                    innerMapUp.get(res.getStopUpOrDawn().getName()).add(res.getChild());
+                }else
+                    innerMapUp.get(res.getStopUpOrDawn().getName()).add(res.getChild());
+            }
+            else{
+                if(!innerMapDown.containsKey(res.getStopUpOrDawn().getName())){
+                    innerMapDown.put(res.getStopUpOrDawn().getName(),new ArrayList<>());
+                    innerMapDown.get(res.getStopUpOrDawn().getName()).add(res.getChild());
+                }else
+                    innerMapDown.get(res.getStopUpOrDawn().getName()).add(res.getChild());
+            }
+        }
+        mappazza.put("Andata",innerMapUp);
+        mappazza.put("Discesa",innerMapDown);
+        try {
+            String json = new ObjectMapper().writeValueAsString(mappazza);
+            return json;
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return "no";
     }
 
 

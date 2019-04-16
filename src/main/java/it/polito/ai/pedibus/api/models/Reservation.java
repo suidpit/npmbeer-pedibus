@@ -15,5 +15,5 @@ public class Reservation {
     private String date;
     private String line_name;
     private String child;
-
+    private Stop stopUpOrDawn;
 }

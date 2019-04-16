@@ -11,7 +11,7 @@ public interface ReservationRepository extends MongoRepository<Reservation,Strin
 
     Reservation findById(ObjectId id);
 
-    List<Reservation> findByData(String data);
+    List<Reservation> findByDate(String data);
 
     @Query("{'line_name' : ?0 , 'data' : ?1}")
     List<Reservation> findReservationsByLineData(String line_name, String data);

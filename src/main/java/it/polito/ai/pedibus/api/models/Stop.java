@@ -16,8 +16,6 @@ public class Stop {
     private String time;
     private String position;
 
-    @Transient
-    private Integer line_id;
-    @Transient
+    private String line_id;
     private Boolean up_down;
 }
