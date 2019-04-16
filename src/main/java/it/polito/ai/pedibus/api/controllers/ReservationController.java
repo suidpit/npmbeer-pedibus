@@ -28,11 +28,12 @@ public class ReservationController {
 /*    GET /reservations/{nome_linea}/{data} – restituisce un oggetto JSON contenente due liste,
     riportanti, per ogni fermata di andata e ritorno, l’elenco delle persone che devono essere
     prese in carico / lasciate in corrispondenza della fermata*/
-   /* @RequestMapping(value = "/{line_name}/{data}", method = RequestMethod.GET)
-    public Reservation getReservations(@PathVariable("line_name") String line_name, @PathVariable("data")String data){
-        Reservation listReservation = reservationRepository.getListFromLineAndData(line_name,data);
+    @RequestMapping(value = "/{line_name}/{data}", method = RequestMethod.GET)
+    public List<Reservation>getListChildForStop(@PathVariable("line_name") String line_name,
+                                           @PathVariable("data")String data){
+        List<Reservation> listReservation = reservationRepository.findReservationsByLineData(line_name,data);
         return listReservation;
-    }*/
+    }
 
 
     /*POST /reservations/{nome_linea}/{data} – invia un oggetto JSON contenente il nome
@@ -43,7 +44,7 @@ public class ReservationController {
             public ObjectId insert(@PathVariable("line_name") String line_name,
                                @PathVariable("data")String data,
                                @RequestBody Reservation reservation){
-                reservation.setData(data);
+                reservation.setDate(data);
                 reservation.setLine_name(line_name);
                 this.reservationRepository.insert(reservation);
                 return  reservation.getId();

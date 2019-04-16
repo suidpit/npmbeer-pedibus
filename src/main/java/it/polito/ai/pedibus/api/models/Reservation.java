@@ -12,7 +12,7 @@ public class Reservation {
     @Id
     private ObjectId id;
     private String res_name;
-    private String data;
+    private String date;
     private String line_name;
     private String child;
 
