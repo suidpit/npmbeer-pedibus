@@ -15,19 +15,21 @@ import java.util.List;
 @SpringBootApplication
 public class PedibusApplication {
 
-    private static String testDataFileName = "test_data_init.json";
-    
+    private static String initDataFileName = "init.json";
+
     @Bean
     @Autowired
     public ObjectMapper objectMapper(LinesRepository linesRepository) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
         // Read lines from .json using the mapper (second argument returns a TypeReference to List<Line> type
-        List<Line> lines = mapper.readValue(new File(testDataFileName),
+        List<Line> lines = mapper.readValue(new File(initDataFileName),
                 mapper.getTypeFactory().constructCollectionType(List.class, Line.class));
 
-        // Automagically inserting all the lines data
-        linesRepository.insert(lines);
+        // Automagically inserting all the lines data only if it has not been already initialized.
+        if (linesRepository.findAll().size() == 0) {
+            linesRepository.insert(lines);
+        }
         return mapper;
     }
 
