@@ -18,7 +18,7 @@ public class LineController {
     @Autowired
     private LinesRepository linesRepository;
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
     public List<Line> getLines(){
         return linesRepository.findAll();
     }
