@@ -1,5 +1,7 @@
 package it.polito.ai.pedibus.api.models;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import it.polito.ai.pedibus.api.serializers.ObjectIdSerializer;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -12,6 +14,7 @@ import java.util.List;
 @Document(collection = "lines")
 public class Line {
     @Id
+    @JsonSerialize(using = ObjectIdSerializer.class)
     private ObjectId id;
     private String name;
     private List<List<Stop>> outward;

@@ -21,7 +21,7 @@ public class LineController {
      * GET /lines – restituisce una lista JSON con i nomi delle linee presenti nel DBMS.
      * @return una List<Line> contenente gli oggetti presi dal repository.
      */
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
     public List<Line> getLines(){
         return linesRepository.findAll();
     }

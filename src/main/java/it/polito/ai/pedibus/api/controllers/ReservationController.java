@@ -7,14 +7,20 @@ import it.polito.ai.pedibus.api.dtos.ReservationDTO;
 import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.repositories.LinesRepository;
 import it.polito.ai.pedibus.api.repositories.ReservationRepository;
+import org.apache.tomcat.jni.Local;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,12 +48,15 @@ public class ReservationController {
      * prese in carico / lasciate in corrispondenza della fermata.
      *
      * @param lineName -> Il nome della linea.
-     * @param date     -> La data della ricerca.
+     * @param dateString     -> La data della ricerca.
      * @return
      */
     @RequestMapping(value = "/{lineName}/{date}", method = RequestMethod.GET)
     public HashMap<String, HashMap<String, ArrayList<String>>> getChildsForStop(@PathVariable("lineName") String lineName,
-                                                                                @PathVariable("date") String date) {
+                                                                                @PathVariable("date") String dateString) {
+
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("ddMMyyyy");
+        LocalDate date = LocalDate.parse(dateString, fmt);
 
         //ovvero <"Sale o Scende", <"Nome Fermata", [Lista di gente che sale o scende]>>
         HashMap<String, HashMap<String, ArrayList<String>>> mappazza = new HashMap<>();
@@ -83,10 +92,12 @@ public class ReservationController {
      */
     @ReservationPostFields
     @RequestMapping(value = "/{lineName}/{date}", method = RequestMethod.POST)
-    public String insert(@PathVariable("lineName") @Valid @NotNull String lineName,
-                         @PathVariable("date") @NotNull String date,
-                         @Valid @RequestBody ReservationDTO resd) {
+    public ObjectId insert(@PathVariable("lineName") String lineName,
+                         @PathVariable("date") String dateString,
+                         @RequestBody ReservationDTO resd) {
 
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("ddMMyyyy");
+        LocalDate date = LocalDate.parse(dateString, fmt);
         // The stop is now identified by a line, a direction, and a trip index.
         Reservation res = Reservation.builder()
                 .date(date)
@@ -97,16 +108,18 @@ public class ReservationController {
                 .tripIndex(resd.getTripIndex())
                 .build();
         reservationRepository.insert(res);
-        return res.getId().toString();
+        return res.getId();
     }
 
 
     @ReservationPutFields
-    @RequestMapping(value = "/{lineName}/{data}/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{lineName}/{date}/{id}", method = RequestMethod.PUT)
     public void update(@PathVariable("lineName") String lineName,
-                       @PathVariable("data") String date,
+                       @PathVariable("date") String dateString,
                        @PathVariable("id") ObjectId id,
                        @RequestBody ReservationDTO resd) {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("ddMMyyyy");
+        LocalDate date = LocalDate.parse(dateString, fmt);
         Reservation res = Reservation.builder()
                 .date(date)
                 .lineName(lineName)
@@ -124,29 +137,40 @@ public class ReservationController {
      * indicata.
      *
      * @param lineName
-     * @param data
+     * @param dateString
      * @param id
      */
-    @RequestMapping(value = "/{lineName}/{data}/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{lineName}/{date}/{id}", method = RequestMethod.DELETE)
     public void delete(@PathVariable("lineName") String lineName,
-                       @PathVariable("data") String data,
+                       @PathVariable("date") String dateString,
                        @PathVariable("id") ObjectId id) {
-        this.reservationRepository.deleteByIdAndLineNameAndDate(id, lineName, data);
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("ddMMyyyy");
+        LocalDate date = LocalDate.parse(dateString, fmt);
+        this.reservationRepository.deleteByIdAndLineNameAndDate(id, lineName, date);
     }
 
     /**
      * GET /reservations/{nome_linea}/{data}/{reservation_id} – restituisce la prenotazione
      *
      * @param lineName
-     * @param date
+     * @param dateString
      * @param id
      * @return
      */
-    @RequestMapping(value = "/{lineName}/{data}/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{lineName}/{date}/{id}", method = RequestMethod.GET)
     public Reservation getReservation(@PathVariable("lineName") String lineName,
-                                      @PathVariable("data") String date,
+                                      @PathVariable("date") String dateString,
                                       @PathVariable("id") ObjectId id) {
+
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("ddMMyyyy");
+        LocalDate date = LocalDate.parse(dateString, fmt);
         //Should be one element
-        return this.reservationRepository.findByLineNameAndDateAndId(lineName, date, id);
+        Reservation res = reservationRepository.findByLineNameAndDateAndId(lineName, date, id);
+        return res;
+    }
+
+    @ExceptionHandler(Exception.class)
+    public String handleException(final Exception e) {
+        return "forward/serverError";
     }
 }

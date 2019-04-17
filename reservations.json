@@ -1,6 +1,6 @@
 [
   {
-    "date": "data2",
+    "date": "12-12-2012",
     "lineName": "linea2",
     "childs": "Napalm",
     "direction": 0,
@@ -8,15 +8,15 @@
     "tripIndex": 0
   },
   {
-    "date": "data2",
-    "lineName": "linea2",
+    "date": "12-12-2012",
+    "lineName": "12-12-2012",
     "child": "Beer",
     "direction": 0,
     "stop_name": "P.za Castello",
     "tripIndex": 0
   },
   {
-    "date": "data2",
+    "date": "11-11-2011",
     "lineName": "linea2",
     "child": "tizio",
     "direction": 0,
@@ -24,7 +24,7 @@
     "tripIndex": 0
   },
   {
-    "date": "data2",
+    "date": "11-10-2010",
     "lineName": "linea2",
     "child": "caio",
     "direction": 1,
