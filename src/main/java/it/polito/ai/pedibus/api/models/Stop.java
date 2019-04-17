@@ -1,21 +1,16 @@
 package it.polito.ai.pedibus.api.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
+
+import java.time.LocalTime;
 
 @Data
 public class Stop {
 
-    @Id
-    private ObjectId id;
-
+    // It doesn't have an ID right now, since it is bound to its line.
     private String name;
-    private String time;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    private LocalTime time;
     private String position;
-
-    private String line_id;
-    private Boolean up_down;
 }

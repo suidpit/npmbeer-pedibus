@@ -1,5 +1,7 @@
 package it.polito.ai.pedibus.api.models;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import it.polito.ai.pedibus.api.serializers.ObjectIdSerializer;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -12,10 +14,11 @@ import java.util.List;
 @Document(collection = "lines")
 public class Line {
     @Id
+    @JsonSerialize(using = ObjectIdSerializer.class)
     private ObjectId id;
-    private String line_name;
-    private List<List<Stop>> goings;    // See below
-    private List<List<Stop>> returns;   // Sorry for the plural, but return is a reserved word
+    private String name;
+    private List<List<Stop>> outward;
+    private List<List<Stop>> back;
     @Email
     private String admin_email;
 }
