@@ -85,7 +85,7 @@ public class ReservationController {
      */
     @ReservationPostFields
     @RequestMapping(value = "/{lineName}/{date}", method = RequestMethod.POST)
-    public ObjectId insert(@PathVariable("lineName") String lineName,
+    public String insert(@PathVariable("lineName") String lineName,
                            @PathVariable("date") String dateString,
                            @RequestBody ReservationDTO resd) {
 
@@ -101,7 +101,7 @@ public class ReservationController {
                 .tripIndex(resd.getTripIndex())
                 .build();
         reservationRepository.insert(res);
-        return res.getId();
+        return res.getId().toString();
     }
 
     /**

@@ -2,7 +2,7 @@
   {
     "date": "12-12-2012",
     "lineName": "linea2",
-    "childs": "Napalm",
+    "child": "Napalm",
     "direction": 0,
     "stop_name": "P.za Solferino",
     "tripIndex": 0
