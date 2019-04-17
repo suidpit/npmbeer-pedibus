@@ -7,18 +7,11 @@ import it.polito.ai.pedibus.api.dtos.ReservationDTO;
 import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.repositories.LinesRepository;
 import it.polito.ai.pedibus.api.repositories.ReservationRepository;
-import org.apache.tomcat.jni.Local;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -47,8 +40,8 @@ public class ReservationController {
      * riportanti, per ogni fermata di andata e ritorno, l’elenco delle persone che devono essere
      * prese in carico / lasciate in corrispondenza della fermata.
      *
-     * @param lineName -> Il nome della linea.
-     * @param dateString     -> La data della ricerca.
+     * @param lineName
+     * @param dateString
      * @return
      */
     @RequestMapping(value = "/{lineName}/{date}", method = RequestMethod.GET)
@@ -93,8 +86,8 @@ public class ReservationController {
     @ReservationPostFields
     @RequestMapping(value = "/{lineName}/{date}", method = RequestMethod.POST)
     public ObjectId insert(@PathVariable("lineName") String lineName,
-                         @PathVariable("date") String dateString,
-                         @RequestBody ReservationDTO resd) {
+                           @PathVariable("date") String dateString,
+                           @RequestBody ReservationDTO resd) {
 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("ddMMyyyy");
         LocalDate date = LocalDate.parse(dateString, fmt);
@@ -111,7 +104,14 @@ public class ReservationController {
         return res.getId();
     }
 
-
+    /**
+     * PUT /reservations/{nome_linea}/{data}/{reservation_id} – invia un oggetto JSON che
+     * permette di aggiornare i dati relativi alla prenotazione indicata
+     * @param lineName
+     * @param dateString
+     * @param id
+     * @param resd
+     */
     @ReservationPutFields
     @RequestMapping(value = "/{lineName}/{date}/{id}", method = RequestMethod.PUT)
     public void update(@PathVariable("lineName") String lineName,
@@ -167,10 +167,5 @@ public class ReservationController {
         //Should be one element
         Reservation res = reservationRepository.findByLineNameAndDateAndId(lineName, date, id);
         return res;
-    }
-
-    @ExceptionHandler(Exception.class)
-    public String handleException(final Exception e) {
-        return "forward/serverError";
     }
 }
