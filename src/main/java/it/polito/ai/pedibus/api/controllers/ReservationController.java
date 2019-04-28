@@ -8,6 +8,8 @@ import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.repositories.LinesRepository;
 import it.polito.ai.pedibus.api.repositories.ReservationRepository;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -22,12 +24,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
-
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
     private ReservationRepository reservationRepository;
 
     @Autowired
     private LinesRepository linesRepository;
+
+    @Autowired
+    private DateTimeFormatter fmt;
 
     //TODO: delete this
     @RequestMapping(value = "/all", method = RequestMethod.GET)
@@ -48,7 +53,6 @@ public class ReservationController {
     public HashMap<String, HashMap<String, ArrayList<String>>> getChildsForStop(@PathVariable("lineName") String lineName,
                                                                                 @PathVariable("date") String dateString) {
 
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("ddMMyyyy");
         LocalDate date = LocalDate.parse(dateString, fmt);
 
         //ovvero <"Sale o Scende", <"Nome Fermata", [Lista di gente che sale o scende]>>
@@ -88,9 +92,9 @@ public class ReservationController {
     public String insert(@PathVariable("lineName") String lineName,
                            @PathVariable("date") String dateString,
                            @RequestBody ReservationDTO resd) {
-
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("ddMMyyyy");
+        logger.info(dateString);
         LocalDate date = LocalDate.parse(dateString, fmt);
+        logger.info(date.toString());
         // The stop is now identified by a line, a direction, and a trip index.
         Reservation res = Reservation.builder()
                 .date(date)
@@ -118,7 +122,7 @@ public class ReservationController {
                        @PathVariable("date") String dateString,
                        @PathVariable("id") ObjectId id,
                        @RequestBody ReservationDTO resd) {
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("ddMMyyyy");
+
         LocalDate date = LocalDate.parse(dateString, fmt);
         Reservation res = Reservation.builder()
                 .date(date)
@@ -144,7 +148,7 @@ public class ReservationController {
     public void delete(@PathVariable("lineName") String lineName,
                        @PathVariable("date") String dateString,
                        @PathVariable("id") ObjectId id) {
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("ddMMyyyy");
+
         LocalDate date = LocalDate.parse(dateString, fmt);
         this.reservationRepository.deleteByIdAndLineNameAndDate(id, lineName, date);
     }
@@ -162,7 +166,6 @@ public class ReservationController {
                                       @PathVariable("date") String dateString,
                                       @PathVariable("id") ObjectId id) {
 
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("ddMMyyyy");
         LocalDate date = LocalDate.parse(dateString, fmt);
         //Should be one element
         Reservation res = reservationRepository.findByLineNameAndDateAndId(lineName, date, id);

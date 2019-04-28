@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @SpringBootApplication
@@ -35,6 +36,10 @@ public class PedibusApplication {
         return mapper;
     }
 
+    @Bean
+    public DateTimeFormatter fmt(){
+        return DateTimeFormatter.ofPattern("ddMMyyyy");
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(PedibusApplication.class, args);

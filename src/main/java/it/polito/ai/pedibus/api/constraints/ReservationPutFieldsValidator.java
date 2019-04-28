@@ -20,6 +20,9 @@ import java.time.format.DateTimeFormatter;
 public class ReservationPutFieldsValidator implements ConstraintValidator<ReservationPutFields, Object[]> {
 
     @Autowired
+    private DateTimeFormatter fmt;
+
+    @Autowired
     private ReservationRepository repo;
 
     @Override
@@ -28,7 +31,7 @@ public class ReservationPutFieldsValidator implements ConstraintValidator<Reserv
         // For now, the only logic we want is to have a valid ID in reservation, and that id has to match line and date.
         String lineName = String.valueOf(value[0]);
         String dateString = String.valueOf(value[1]);
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("ddMMyyyy");
+
         LocalDate date = LocalDate.parse(dateString, fmt);
         ObjectId id = (ObjectId) value[2];
         Reservation res = repo.findByLineNameAndDateAndId(lineName, date, id);
