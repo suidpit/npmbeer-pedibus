@@ -94,9 +94,9 @@ public class ReservationController {
     public String insert(@PathVariable("lineName") String lineName,
                            @PathVariable("date") String dateString,
                            @RequestBody ReservationDTO resd) {
-        logger.info(dateString);
+        // logger.info(dateString);
         LocalDate date = LocalDate.parse(dateString, fmt);
-        logger.info(date.toString());
+        // logger.info(date.toString());
         // The stop is now identified by a line, a direction, and a trip index.
         Reservation res = Reservation.builder()
                 .date(date)
