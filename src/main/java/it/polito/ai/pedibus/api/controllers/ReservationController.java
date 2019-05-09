@@ -11,6 +11,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -87,14 +88,15 @@ public class ReservationController {
      * percorrenza (andata/ritorno); restituisce un identificatore univoco della prenotazione
      * creata
      */
+    @Transactional
     @ReservationPostFields
     @RequestMapping(value = "/{lineName}/{date}", method = RequestMethod.POST)
     public String insert(@PathVariable("lineName") String lineName,
                            @PathVariable("date") String dateString,
                            @RequestBody ReservationDTO resd) {
-        logger.info(dateString);
+        // logger.info(dateString);
         LocalDate date = LocalDate.parse(dateString, fmt);
-        logger.info(date.toString());
+        // logger.info(date.toString());
         // The stop is now identified by a line, a direction, and a trip index.
         Reservation res = Reservation.builder()
                 .date(date)
@@ -116,6 +118,7 @@ public class ReservationController {
      * @param id
      * @param resd
      */
+    @Transactional
     @ReservationPutFields
     @RequestMapping(value = "/{lineName}/{date}/{id}", method = RequestMethod.PUT)
     public void update(@PathVariable("lineName") String lineName,
@@ -144,6 +147,7 @@ public class ReservationController {
      * @param dateString
      * @param id
      */
+    @Transactional
     @RequestMapping(value = "/{lineName}/{date}/{id}", method = RequestMethod.DELETE)
     public void delete(@PathVariable("lineName") String lineName,
                        @PathVariable("date") String dateString,
