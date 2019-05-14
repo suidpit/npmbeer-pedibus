@@ -1,5 +1,6 @@
 package it.polito.ai.pedibus.api.services;
 
+import it.polito.ai.pedibus.api.models.User;
 import lombok.Data;
 import org.springframework.context.ApplicationEvent;
 
@@ -9,10 +10,10 @@ import java.util.Locale;
 public class OnRecoveryCompleteEvent extends ApplicationEvent {
     private String appUrl;
     private Locale locale;
-    private EmailVerificationToken token;
-    public OnRecoveryCompleteEvent(EmailVerificationToken token, Locale locale, String appUrl) {
-        super(token);
-        this.token = token;
+    private User user;
+    public OnRecoveryCompleteEvent(User user, Locale locale, String appUrl) {
+        super(user);
+        this.user = user;
         this.locale = locale;
         this.appUrl = appUrl;
     }

@@ -13,7 +13,10 @@ public class UserService implements IUserService {
     private UserRepository repository;
 
     @Autowired
-    private EmailVerificationTokenRepository tokenRepository;
+    private EmailVerificationTokenRepository emailVerificationTokenRepository;
+
+    @Autowired
+    private RecoveryTokenRepository recoveryTokenRepository;
 
     @Override
     public User registerNewUserAccount(UserDTO accountDto)
@@ -43,23 +46,35 @@ public class UserService implements IUserService {
 
     @Override
     public User getUser(String verificationToken) {
-        User user = tokenRepository.findByToken(verificationToken).getUser();
+        User user = emailVerificationTokenRepository.findByToken(verificationToken).getUser();
         return user;
     }
 
     @Override
     public EmailVerificationToken getVerificationToken(String VerificationToken) {
-        return tokenRepository.findByToken(VerificationToken);
+        return emailVerificationTokenRepository.findByToken(VerificationToken);
     }
     @Override
     public EmailVerificationToken getVerificationTokenByUser(User user) {
-        return tokenRepository.findByUser(user);
+        return emailVerificationTokenRepository.findByUser(user);
     }
 
     @Override
     public User getUserByEmail(String email) {
        return repository.getByEmail(email);
 
+    }
+
+    @Override
+    public void createRecoveryToken(User user, String token) {
+        RecoveryToken recoveryToken = RecoveryToken
+                .builder()
+                .user(user)
+                .token(token)
+                .build();
+        recoveryToken.setExpiryDate(recoveryToken.calculateExpiryDate(60));
+        recoveryToken.getUser().setEnabled(true);
+        recoveryTokenRepository.insert(recoveryToken);
     }
 
     @Override
@@ -73,6 +88,7 @@ public class UserService implements IUserService {
         repository.save(user);
     }
 
+
     @Override
     public void createVerificationToken(User user, String token) {
 
@@ -83,6 +99,6 @@ public class UserService implements IUserService {
                 .build();
         myToken.setExpiryDate(myToken.calculateExpiryDate(60));
         myToken.getUser().setEnabled(true);
-        tokenRepository.insert(myToken);
+        emailVerificationTokenRepository.insert(myToken);
     }
 }

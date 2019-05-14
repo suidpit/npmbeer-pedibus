@@ -20,4 +20,6 @@ public interface IUserService {
     EmailVerificationToken getVerificationTokenByUser(User user);
 
     User getUserByEmail(String email);
+
+    void createRecoveryToken(User user, String token);
 }

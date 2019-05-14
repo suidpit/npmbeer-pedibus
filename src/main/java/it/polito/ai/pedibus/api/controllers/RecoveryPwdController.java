@@ -7,12 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import javax.validation.Valid;
@@ -56,7 +54,7 @@ public class RecoveryPwdController {
         try {
             String appUrl = request.getContextPath();
             eventPublisher.publishEvent(new OnRecoveryCompleteEvent
-                    (emailVerificationToken, request.getLocale(), appUrl));
+                    (registered, request.getLocale(), appUrl));
 
         } catch (Exception me) {
             return "error "+ me.toString();
@@ -66,6 +64,19 @@ public class RecoveryPwdController {
 
     }
 
+    /*GET /recover/{randomUUID} – Restituisce una pagina HTML contente una form per la
+    sostituzione della password*/
+    @RequestMapping(value = "/recover/{randomUUID}", method = RequestMethod.GET)
+    public String recoverPwdForm
+    (WebRequest request, Model model, @PathVariable("randomUUID") String token){
+        return "recoverPwdForm";
+    }
+
+    @RequestMapping(value = "/recover/{randomUUID}", method = RequestMethod.POST)
+    public String recoverPwd
+            (WebRequest request, Model model, @PathVariable("randomUUID") String token){
+        return "recoverPwdForm";
+    }
 
 }
 
