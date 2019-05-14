@@ -4,27 +4,27 @@ package it.polito.ai.pedibus.api.controllers;
 import it.polito.ai.pedibus.api.dtos.UserDTO;
 import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
-import it.polito.ai.pedibus.api.services.EmailNotificationService;
-import it.polito.ai.pedibus.api.services.OnRegistrationCompleteEvent;
+import it.polito.ai.pedibus.api.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mail.MailException;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.util.Calendar;
+import java.util.Locale;
 
 @RestController
 //@RequestMapping("/mio")
-public class RegLoginController {
+public class RegistrationController {
 
-    private Logger logger = LoggerFactory.getLogger(RegLoginController.class);
+    private Logger logger = LoggerFactory.getLogger(RegistrationController.class);
     @Autowired
     private UserRepository userRepository;
 
@@ -67,32 +67,61 @@ public class RegLoginController {
     @Autowired
     ApplicationEventPublisher eventPublisher;
 
+    @Autowired
+    IUserService service;
     @RequestMapping(value = "/user/registration", method = RequestMethod.POST)
     public String registerUserAccount(
             @RequestBody @Valid UserDTO accountDto,
             BindingResult result,
             WebRequest request,
-            Errors errors) {
+            Errors errors) throws EmailExistsException {
 
         if (result.hasErrors()) {
             return result.getFieldErrors().toString();
         }
 
-        User registered = User.builder()
-                .email(accountDto.getEmail())
-                .password(accountDto.getPass())
-                .enabled(false)
-                .build();
+        User registered = service.registerNewUserAccount(accountDto);
         if (registered == null) {
             result.rejectValue("email", "message.regError");
         }
         try {
             String appUrl = request.getContextPath();
+
             eventPublisher.publishEvent(new OnRegistrationCompleteEvent
                     (registered, request.getLocale(), appUrl));
+
         } catch (Exception me) {
-            return "error";
+            return "error "+ me.toString();
         }
         return "success";
+    }
+
+
+
+    @RequestMapping(value = "/regitrationConfirm.html", method = RequestMethod.GET)
+    public String confirmRegistration
+            (WebRequest request, Model model, @RequestParam("token") String token) {
+
+        Locale locale = request.getLocale();
+
+        logger.info("In /regitrationConfirm");
+        ModelEmailVerificationToken verificationToken = service.getVerificationToken(token);
+        if (verificationToken == null) {
+            /*String message = messages.getMessage("auth.message.invalidToken", null, locale);
+            model.addAttribute("message", message);*/
+            return "redirect:/badUser.html?lang=" + locale.getLanguage();
+        }
+
+        User user = verificationToken.getUser();
+        Calendar cal = Calendar.getInstance();
+        if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
+            /*String messageValue = messages.getMessage("auth.message.expired", null, locale)
+            model.addAttribute("message", messageValue);*/
+            return "redirect:/badUser.html?lang=" + locale.getLanguage();
+        }
+
+        user.setEnabled(true);
+        service.saveRegisteredUser(user);
+        return "redirect:/login.html?lang=" + request.getLocale().getLanguage();
     }
 }

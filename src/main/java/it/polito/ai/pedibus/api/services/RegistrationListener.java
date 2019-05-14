@@ -18,10 +18,11 @@ import java.util.UUID;
 public class RegistrationListener implements
         ApplicationListener<OnRegistrationCompleteEvent> {
 
-   // private IUserService service;
+    @Autowired
+    private IUserService service;
 
 
-    private MessageSource messages;
+   // private MessageSource messages;
 
     @Autowired
     private JavaMailSender mailSender;
@@ -34,7 +35,7 @@ public class RegistrationListener implements
     private void confirmRegistration(OnRegistrationCompleteEvent event) {
         User user = event.getUser();
         String token = UUID.randomUUID().toString();
-        //service.createVerificationToken(user, token);
+        service.createVerificationToken(user, token);
 
         String recipientAddress = user.getEmail();
         String subject = "Registration Confirmation";
