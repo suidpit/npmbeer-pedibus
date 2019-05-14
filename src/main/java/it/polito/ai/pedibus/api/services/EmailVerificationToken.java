@@ -15,7 +15,7 @@ import java.util.Date;
 @Data
 @Builder
 @Document(collection = "emailTokens")
-public class ModelEmailVerificationToken{
+public class EmailVerificationToken {
     private static final int EXPIRATION = 60 * 24;
 
         @Id

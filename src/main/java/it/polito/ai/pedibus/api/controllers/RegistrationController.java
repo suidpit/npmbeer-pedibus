@@ -3,14 +3,11 @@ package it.polito.ai.pedibus.api.controllers;
 
 import it.polito.ai.pedibus.api.dtos.UserDTO;
 import it.polito.ai.pedibus.api.models.User;
-import it.polito.ai.pedibus.api.repositories.UserRepository;
 import it.polito.ai.pedibus.api.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpStatus;
-import org.springframework.mail.MailException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
@@ -22,11 +19,10 @@ import java.util.Calendar;
 import java.util.Locale;
 
 @RestController
-//@RequestMapping("/mio")
 public class RegistrationController {
 
     private Logger logger = LoggerFactory.getLogger(RegistrationController.class);
-    
+
 
     /*POST /register – invia un oggetto JSON contenente e-mail, password, password di verifica.
     Controlla che l’utente con l’indirizzo di posta indicato non sia già presente nella base dati
@@ -77,7 +73,7 @@ public class RegistrationController {
         Locale locale = request.getLocale();
 
         logger.info("In /regitrationConfirm");
-        ModelEmailVerificationToken verificationToken = service.getVerificationToken(token);
+        EmailVerificationToken verificationToken = service.getVerificationToken(token);
         if (verificationToken == null) {
             /*String message = messages.getMessage("auth.message.invalidToken", null, locale);
             model.addAttribute("message", message);*/

@@ -5,9 +5,6 @@ import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.xml.crypto.Data;
 
 @Service
 public class UserService implements IUserService {
@@ -33,7 +30,7 @@ public class UserService implements IUserService {
                 .password(accountDto.getPass())
                 .enabled(false)
                 .build();
-        return repository.save(user);
+        return repository.insert(user);
     }
 
     private boolean emailExist(String email) {
@@ -51,8 +48,18 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public ModelEmailVerificationToken getVerificationToken(String VerificationToken) {
+    public EmailVerificationToken getVerificationToken(String VerificationToken) {
         return tokenRepository.findByToken(VerificationToken);
+    }
+    @Override
+    public EmailVerificationToken getVerificationTokenByUser(User user) {
+        return tokenRepository.findByUser(user);
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+       return repository.getByEmail(email);
+
     }
 
     @Override
@@ -69,12 +76,13 @@ public class UserService implements IUserService {
     @Override
     public void createVerificationToken(User user, String token) {
 
-        ModelEmailVerificationToken myToken = ModelEmailVerificationToken
+        EmailVerificationToken myToken = EmailVerificationToken
                 .builder()
                 .user(user)
                 .token(token)
                 .build();
         myToken.setExpiryDate(myToken.calculateExpiryDate(60));
+        myToken.getUser().setEnabled(true);
         tokenRepository.insert(myToken);
     }
 }

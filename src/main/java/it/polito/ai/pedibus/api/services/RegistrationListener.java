@@ -21,9 +21,6 @@ public class RegistrationListener implements
     @Autowired
     private IUserService service;
 
-
-   // private MessageSource messages;
-
     @Autowired
     private JavaMailSender mailSender;
 
