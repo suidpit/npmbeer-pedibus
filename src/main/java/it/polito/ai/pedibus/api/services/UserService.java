@@ -24,7 +24,7 @@ public class UserService implements IUserService {
 
         if (emailExist(accountDto.getEmail())) {
             throw new EmailExistsException(
-                    "There is an account with that email adress: "
+                    "There is an account with that email address: "
                             + accountDto.getEmail());
         }
 
@@ -57,6 +57,12 @@ public class UserService implements IUserService {
 
     @Override
     public void saveRegisteredUser(User user) {
+        repository.save(user);
+    }
+
+    @Override
+    public void enableUser(User user){
+        user.setEnabled(true);
         repository.save(user);
     }
 

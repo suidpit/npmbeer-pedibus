@@ -11,6 +11,8 @@ public interface IUserService {
 
     void saveRegisteredUser(User user);
 
+    void enableUser(User user);
+
     void createVerificationToken(User user, String token);
 
     ModelEmailVerificationToken getVerificationToken(String VerificationToken);
