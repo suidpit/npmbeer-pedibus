@@ -1,5 +1,6 @@
 package it.polito.ai.pedibus.api.constraints;
 
+import it.polito.ai.pedibus.api.dtos.NewPasswordDTO;
 import it.polito.ai.pedibus.api.dtos.UserDTO;
 import it.polito.ai.pedibus.api.models.User;
 
@@ -15,4 +16,5 @@ public class EqualPasswordsValidator implements ConstraintValidator<EqualPasswor
     public boolean isValid(UserDTO form, ConstraintValidatorContext ctx) {
         return form.getPass().equals(form.getRepass());
     }
+
 }

@@ -22,4 +22,10 @@ public interface IUserService {
     User getUserByEmail(String email);
 
     void createRecoveryToken(User user, String token);
+
+    RecoveryToken getRecoveryToken(String token);
+
+    void userChangePassword(User user, String pass);
+
+    void expireRecoveryToken(RecoveryToken recoveryToken);
 }

@@ -43,7 +43,8 @@ public class RegistrationController {
             Errors errors) throws EmailExistsException {
 
         if (result.hasErrors()) {
-            return result.getFieldErrors().toString();
+            return "error in bindingRes: " + result.getFieldErrors().toString();
+
         }
 
         User registered = service.registerNewUserAccount(accountDto);

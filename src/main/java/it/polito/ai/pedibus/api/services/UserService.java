@@ -6,11 +6,15 @@ import it.polito.ai.pedibus.api.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
+
 @Service
 public class UserService implements IUserService {
 
     @Autowired
-    private UserRepository repository;
+    private UserRepository userRepository;
 
     @Autowired
     private EmailVerificationTokenRepository emailVerificationTokenRepository;
@@ -33,11 +37,11 @@ public class UserService implements IUserService {
                 .password(accountDto.getPass())
                 .enabled(false)
                 .build();
-        return repository.insert(user);
+        return userRepository.insert(user);
     }
 
     private boolean emailExist(String email) {
-        User user = repository.findByEmail(email);
+        User user = userRepository.findByEmail(email);
         if (user != null) {
             return true;
         }
@@ -61,7 +65,7 @@ public class UserService implements IUserService {
 
     @Override
     public User getUserByEmail(String email) {
-       return repository.getByEmail(email);
+       return userRepository.getByEmail(email);
 
     }
 
@@ -78,14 +82,36 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public RecoveryToken getRecoveryToken(String recoveryToken) {
+        return recoveryTokenRepository.findByToken(recoveryToken);
+    }
+
+    @Override
+    public void userChangePassword(User user, String pass) {
+
+        user.setPassword(pass);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void expireRecoveryToken(RecoveryToken recoveryToken) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Timestamp(-1));
+        Date expired = new Date(cal.getTime().getTime());
+        recoveryToken.setExpiryDate(expired);
+        recoveryTokenRepository.save(recoveryToken);
+    }
+
+
+    @Override
     public void saveRegisteredUser(User user) {
-        repository.save(user);
+        userRepository.save(user);
     }
 
     @Override
     public void enableUser(User user){
         user.setEnabled(true);
-        repository.save(user);
+        userRepository.save(user);
     }
 
 
