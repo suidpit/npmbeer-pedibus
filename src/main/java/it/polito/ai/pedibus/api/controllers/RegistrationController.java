@@ -90,7 +90,6 @@ public class RegistrationController {
             throw new EmailTokenNotFoundException();
         }
 
-
         service.enableUser(user);
         return "redirect:/login.html?lang=" + request.getLocale().getLanguage();
     }

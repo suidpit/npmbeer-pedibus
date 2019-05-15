@@ -49,24 +49,56 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public User getUserByEmail(String email) {
+        return userRepository.getByEmail(email);
+
+    }
+
+    @Override
+    public void userChangePassword(User user, String pass) {
+
+        user.setPassword(pass);
+        userRepository.save(user);
+    }
+    @Override
+    public void saveRegisteredUser(User user) {
+        userRepository.save(user);
+    }
+
+    @Override
+    public void enableUser(User user){
+        user.setEnabled(true);
+        userRepository.save(user);
+    }
+
+    @Override
     public User getUser(String verificationToken) {
-        User user = emailVerificationTokenRepository.findByToken(verificationToken).getUser();
-        return user;
+        return emailVerificationTokenRepository.findByToken(verificationToken).getUser();
+
     }
 
     @Override
     public EmailVerificationToken getVerificationToken(String VerificationToken) {
         return emailVerificationTokenRepository.findByToken(VerificationToken);
     }
+
     @Override
     public EmailVerificationToken getVerificationTokenByUser(User user) {
         return emailVerificationTokenRepository.findByUser(user);
     }
 
     @Override
-    public User getUserByEmail(String email) {
-       return userRepository.getByEmail(email);
+    public void createVerificationToken(User user, String token) {
 
+        EmailVerificationToken myToken = EmailVerificationToken
+                .builder()
+                .user(user)
+                .token(token)
+                .expiryDate(RecoveryToken.calculateExpiryDate())
+                .build();
+        //myToken.setExpiryDate(myToken.calculateExpiryDate(60));
+        myToken.getUser().setEnabled(true);
+        emailVerificationTokenRepository.insert(myToken);
     }
 
     @Override
@@ -75,8 +107,9 @@ public class UserService implements IUserService {
                 .builder()
                 .user(user)
                 .token(token)
+                .expiryDate(RecoveryToken.calculateExpiryDate())
                 .build();
-        recoveryToken.setExpiryDate(recoveryToken.calculateExpiryDate(60));
+        //recoveryToken.setExpiryDate(recoveryToken.calculateExpiryDate());
         recoveryToken.getUser().setEnabled(true);
         recoveryTokenRepository.insert(recoveryToken);
     }
@@ -84,13 +117,6 @@ public class UserService implements IUserService {
     @Override
     public RecoveryToken getRecoveryToken(String recoveryToken) {
         return recoveryTokenRepository.findByToken(recoveryToken);
-    }
-
-    @Override
-    public void userChangePassword(User user, String pass) {
-
-        user.setPassword(pass);
-        userRepository.save(user);
     }
 
     @Override
@@ -103,28 +129,4 @@ public class UserService implements IUserService {
     }
 
 
-    @Override
-    public void saveRegisteredUser(User user) {
-        userRepository.save(user);
-    }
-
-    @Override
-    public void enableUser(User user){
-        user.setEnabled(true);
-        userRepository.save(user);
-    }
-
-
-    @Override
-    public void createVerificationToken(User user, String token) {
-
-        EmailVerificationToken myToken = EmailVerificationToken
-                .builder()
-                .user(user)
-                .token(token)
-                .build();
-        myToken.setExpiryDate(myToken.calculateExpiryDate(60));
-        myToken.getUser().setEnabled(true);
-        emailVerificationTokenRepository.insert(myToken);
-    }
 }

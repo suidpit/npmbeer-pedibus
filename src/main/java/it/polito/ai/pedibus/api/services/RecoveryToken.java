@@ -27,10 +27,10 @@ public class RecoveryToken {
 
     private Date expiryDate;
 
-    public Date calculateExpiryDate(int expiryTimeInMinutes) {
+    public static Date calculateExpiryDate() {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Timestamp(cal.getTime().getTime()));
-        cal.add(Calendar.MINUTE, expiryTimeInMinutes);
+        cal.add(Calendar.MINUTE, EXPIRATION);
         return new Date(cal.getTime().getTime());
     }
 
