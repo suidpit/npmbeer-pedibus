@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
@@ -60,11 +61,11 @@ public class RegistrationController {
         } catch (Exception me) {
             return "error "+ me.toString();
         }
-        return "success";
+        return "";
     }
 
 
-
+    @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/confirm/{randomUUID}", method = RequestMethod.GET)
     public String confirmRegistration
             (WebRequest request, Model model, @PathVariable("randomUUID") String token)
@@ -86,11 +87,11 @@ public class RegistrationController {
         Calendar cal = Calendar.getInstance();
         if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
             // return 404 not found
-            //return "redirect:/badUser.html?lang=" + locale.getLanguage();
             throw new EmailTokenNotFoundException();
         }
 
         service.enableUser(user);
-        return "redirect:/login.html?lang=" + request.getLocale().getLanguage();
+        service.expireRegistationToken(verificationToken);
+        return "";
     }
 }

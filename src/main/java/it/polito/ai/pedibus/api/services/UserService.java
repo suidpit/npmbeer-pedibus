@@ -96,8 +96,6 @@ public class UserService implements IUserService {
                 .token(token)
                 .expiryDate(RecoveryToken.calculateExpiryDate())
                 .build();
-        //myToken.setExpiryDate(myToken.calculateExpiryDate(60));
-        myToken.getUser().setEnabled(true);
         emailVerificationTokenRepository.insert(myToken);
     }
 
@@ -109,8 +107,6 @@ public class UserService implements IUserService {
                 .token(token)
                 .expiryDate(RecoveryToken.calculateExpiryDate())
                 .build();
-        //recoveryToken.setExpiryDate(recoveryToken.calculateExpiryDate());
-        recoveryToken.getUser().setEnabled(true);
         recoveryTokenRepository.insert(recoveryToken);
     }
 
@@ -126,6 +122,15 @@ public class UserService implements IUserService {
         Date expired = new Date(cal.getTime().getTime());
         recoveryToken.setExpiryDate(expired);
         recoveryTokenRepository.save(recoveryToken);
+    }
+
+    @Override
+    public void expireRegistationToken(EmailVerificationToken verificationToken) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Timestamp(-1));
+        Date expired = new Date(cal.getTime().getTime());
+        verificationToken.setExpiryDate(expired);
+        emailVerificationTokenRepository.save(verificationToken);
     }
 
 
