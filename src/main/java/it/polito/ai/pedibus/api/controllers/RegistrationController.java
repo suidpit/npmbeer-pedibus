@@ -2,6 +2,10 @@ package it.polito.ai.pedibus.api.controllers;
 
 
 import it.polito.ai.pedibus.api.dtos.UserDTO;
+import it.polito.ai.pedibus.api.events.OnRegistrationCompleteEvent;
+import it.polito.ai.pedibus.api.exceptions.EmailExistsException;
+import it.polito.ai.pedibus.api.exceptions.EmailTokenNotFoundException;
+import it.polito.ai.pedibus.api.models.EmailVerificationToken;
 import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.services.*;
 import org.slf4j.Logger;

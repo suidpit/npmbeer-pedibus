@@ -1,6 +1,7 @@
-package it.polito.ai.pedibus.api.services;
+package it.polito.ai.pedibus.api.events;
 
 import it.polito.ai.pedibus.api.models.User;
+import it.polito.ai.pedibus.api.services.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.mail.SimpleMailMessage;

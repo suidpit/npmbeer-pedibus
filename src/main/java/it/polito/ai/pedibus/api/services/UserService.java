@@ -1,7 +1,12 @@
 package it.polito.ai.pedibus.api.services;
 
 import it.polito.ai.pedibus.api.dtos.UserDTO;
+import it.polito.ai.pedibus.api.exceptions.EmailExistsException;
+import it.polito.ai.pedibus.api.models.EmailVerificationToken;
+import it.polito.ai.pedibus.api.models.RecoveryToken;
 import it.polito.ai.pedibus.api.models.User;
+import it.polito.ai.pedibus.api.repositories.EmailVerificationTokenRepository;
+import it.polito.ai.pedibus.api.repositories.RecoveryTokenRepository;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

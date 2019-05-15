@@ -2,7 +2,11 @@ package it.polito.ai.pedibus.api.controllers;
 
 import it.polito.ai.pedibus.api.dtos.EmailDTO;
 import it.polito.ai.pedibus.api.dtos.NewPasswordDTO;
+import it.polito.ai.pedibus.api.events.OnRecoveryCompleteEvent;
+import it.polito.ai.pedibus.api.exceptions.RecoveryTokenNotFoundException;
+import it.polito.ai.pedibus.api.models.RecoveryToken;
 import it.polito.ai.pedibus.api.models.User;
+import it.polito.ai.pedibus.api.repositories.EmailVerificationTokenRepository;
 import it.polito.ai.pedibus.api.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +83,7 @@ public class RecoveryPwdController {
             (@RequestBody @Valid NewPasswordDTO newPasswordDTO,
              BindingResult result,
              WebRequest request,
-             @PathVariable("randomUUID") String token) throws RecoveryTokenNotFoundException{
+             @PathVariable("randomUUID") String token) throws RecoveryTokenNotFoundException {
 
 
         if (result.hasErrors()) {
