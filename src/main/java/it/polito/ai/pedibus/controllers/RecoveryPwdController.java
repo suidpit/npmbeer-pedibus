@@ -1,4 +1,4 @@
-package it.polito.ai.pedibus.api.controllers;
+package it.polito.ai.pedibus.controllers;
 
 import it.polito.ai.pedibus.api.dtos.EmailDTO;
 import it.polito.ai.pedibus.api.dtos.NewPasswordDTO;
@@ -8,6 +8,7 @@ import it.polito.ai.pedibus.api.models.RecoveryToken;
 import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.EmailVerificationTokenRepository;
 import it.polito.ai.pedibus.api.services.*;
+import it.polito.ai.pedibus.controllers.RegistrationController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,8 +1,7 @@
 package it.polito.ai.pedibus.api.controllers;
 
 import it.polito.ai.pedibus.api.models.Line;
-import it.polito.ai.pedibus.api.repositories.LinesRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import it.polito.ai.pedibus.api.services.LineService;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,8 +13,11 @@ import java.util.List;
 @RequestMapping("/lines")
 public class LineController {
 
-    @Autowired
-    private LinesRepository linesRepository;
+    private final LineService lineService;
+
+    public LineController(LineService lineService) {
+        this.lineService = lineService;
+    }
 
     /**
      * GET /lines – restituisce una lista JSON con i nomi delle linee presenti nel DBMS.
@@ -23,7 +25,7 @@ public class LineController {
      */
     @RequestMapping(value = "", method = RequestMethod.GET)
     public List<Line> getLines(){
-        return linesRepository.findAll();
+        return lineService.getAllLines();
     }
 
     /**
@@ -35,6 +37,6 @@ public class LineController {
      */
     @RequestMapping(value = "/{nome_linea}", method = RequestMethod.GET)
     public Line getLineByName(@PathVariable("nome_linea")String name){
-        return linesRepository.findByName(name);
+        return lineService.getLine(name);
     }
 }

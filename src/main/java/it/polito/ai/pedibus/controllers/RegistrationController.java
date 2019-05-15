@@ -1,4 +1,4 @@
-package it.polito.ai.pedibus.api.controllers;
+package it.polito.ai.pedibus.controllers;
 
 
 import it.polito.ai.pedibus.api.dtos.UserDTO;

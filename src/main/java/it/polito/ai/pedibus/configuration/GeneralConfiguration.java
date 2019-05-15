@@ -3,7 +3,7 @@ package it.polito.ai.pedibus.configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.polito.ai.pedibus.api.models.Line;
-import it.polito.ai.pedibus.api.repositories.LinesRepository;
+import it.polito.ai.pedibus.api.repositories.LineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +20,7 @@ public class GeneralConfiguration {
 
     @Bean
     @Autowired
-    public ObjectMapper objectMapper(LinesRepository linesRepository) throws IOException {
+    public ObjectMapper objectMapper(LineRepository lineRepository) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
@@ -29,8 +29,8 @@ public class GeneralConfiguration {
                 mapper.getTypeFactory().constructCollectionType(List.class, Line.class));
 
         // Automagically inserting all the lines data only if it has not been already initialized.
-        if (linesRepository.findAll().size() == 0) {
-            linesRepository.insert(lines);
+        if (lineRepository.findAll().size() == 0) {
+            lineRepository.insert(lines);
         }
         return mapper;
     }
