@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrazione</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous">
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="container p-3" style="min-height:100% ! important; background-color: aliceblue;">
+    <h1>Registrazione</h1>
+    <tr th:each="error: ${#fields.globalErrors()}">
+        <td th:text="${error}" />
+    </tr>
+    <!-- <span clas="error" th:each="error: ${#fields.globalErrors()}" th:utext="${message} " th:style="'color:red'"></span>-->
+    <div>
+        <form method="post" th:object="${registration}">
+            <span th:style="'color:red'" th:if="${#fields.hasErrors()}" th:errors="${registration}"></span>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="n">Nome</label>
+                    <input type="text" th:class="'form-control'+${#fields.hasErrors('name')?' border-danger':''}"
+                           th:field="*{name}" id="n" placeholder="Mario">
+                    <span th:style="'color:red'" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="c">Cognome</label>
+                    <input type="text" th:class="'form-control'+${#fields.hasErrors('surn')?' border-danger':''}"
+                           th:field="*{surn}" id="c" placeholder="Rossi">
+                    <span th:style="'color:red'" th:if="${#fields.hasErrors('surn')}" th:errors="*{surn}"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="e">Email</label>
+                <input type="email" th:class="'form-control'+${#fields.hasErrors('email')?' border-danger':''}"
+                       th:field="*{email}" id="e" placeholder="Inserisci email">
+                <span th:style="'color:red'" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+            </div>
+            <div class="form-group">
+                <label for="p">Password</label>
+                <input type="password" th:class="'form-control'+${#fields.hasErrors('pass')?' border-danger':''}"
+                       th:field="*{pass}" id="p" placeholder="Inserisci password">
+                <span th:style="'color:red'" th:if="${#fields.hasErrors('pass')}" th:errors="*{pass}"></span>
+            </div>
+            <div class="form-group">
+                <label for="rp">Ripeti Password</label>
+                <input type="password" th:class="'form-control'+${#fields.hasErrors('repass')?' border-danger':''}"
+                       th:field="*{repass}" id="rp" placeholder="Ripeti password">
+                <span th:style="'color:red'" th:if="${#fields.hasErrors('repass')}" th:errors="*{repass}"></span>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" th:field="*{privacy}" id="pr">
+                <label for="pr" class="form-check-label">Accetto la normativa sulla privacy e sul trattamento dei dati
+                    personali</label>
+                <p th:style="'color:red'" th:if="${#fields.hasErrors('privacy')}" th:errors="*{privacy}"></p>
+            </div>
+
+
+            <div class="row">
+                <div class="col col-sm-8">
+                    <div class="p-3">
+                        <input class="btn btn-primary" type="submit" value="Registrati">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col col-sm-8">
+                    <p class="p-2">
+                        Hai già un account? <a href="/login">Login qui</a>
+                    </p>
+                </div>
+            </div>
+
+
+        </form>
+    </div>
+</div>
+</body>
+</html>
