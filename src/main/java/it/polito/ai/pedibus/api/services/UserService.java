@@ -49,41 +49,9 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User getUser(String verificationToken) {
-        User user = emailVerificationTokenRepository.findByToken(verificationToken).getUser();
-        return user;
-    }
-
-    @Override
-    public EmailVerificationToken getVerificationToken(String VerificationToken) {
-        return emailVerificationTokenRepository.findByToken(VerificationToken);
-    }
-    @Override
-    public EmailVerificationToken getVerificationTokenByUser(User user) {
-        return emailVerificationTokenRepository.findByUser(user);
-    }
-
-    @Override
     public User getUserByEmail(String email) {
-       return userRepository.getByEmail(email);
+        return userRepository.getByEmail(email);
 
-    }
-
-    @Override
-    public void createRecoveryToken(User user, String token) {
-        RecoveryToken recoveryToken = RecoveryToken
-                .builder()
-                .user(user)
-                .token(token)
-                .build();
-        recoveryToken.setExpiryDate(recoveryToken.calculateExpiryDate(60));
-        recoveryToken.getUser().setEnabled(true);
-        recoveryTokenRepository.insert(recoveryToken);
-    }
-
-    @Override
-    public RecoveryToken getRecoveryToken(String recoveryToken) {
-        return recoveryTokenRepository.findByToken(recoveryToken);
     }
 
     @Override
@@ -92,17 +60,6 @@ public class UserService implements IUserService {
         user.setPassword(pass);
         userRepository.save(user);
     }
-
-    @Override
-    public void expireRecoveryToken(RecoveryToken recoveryToken) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Timestamp(-1));
-        Date expired = new Date(cal.getTime().getTime());
-        recoveryToken.setExpiryDate(expired);
-        recoveryTokenRepository.save(recoveryToken);
-    }
-
-
     @Override
     public void saveRegisteredUser(User user) {
         userRepository.save(user);
@@ -114,6 +71,21 @@ public class UserService implements IUserService {
         userRepository.save(user);
     }
 
+    @Override
+    public User getUser(String verificationToken) {
+        return emailVerificationTokenRepository.findByToken(verificationToken).getUser();
+
+    }
+
+    @Override
+    public EmailVerificationToken getVerificationToken(String VerificationToken) {
+        return emailVerificationTokenRepository.findByToken(VerificationToken);
+    }
+
+    @Override
+    public EmailVerificationToken getVerificationTokenByUser(User user) {
+        return emailVerificationTokenRepository.findByUser(user);
+    }
 
     @Override
     public void createVerificationToken(User user, String token) {
@@ -122,9 +94,57 @@ public class UserService implements IUserService {
                 .builder()
                 .user(user)
                 .token(token)
+                .expiryDate(RecoveryToken.calculateExpiryDate())
                 .build();
-        myToken.setExpiryDate(myToken.calculateExpiryDate(60));
-        myToken.getUser().setEnabled(true);
         emailVerificationTokenRepository.insert(myToken);
     }
+
+    @Override
+    public void createRecoveryToken(User user, String token) {
+        RecoveryToken recoveryToken = RecoveryToken
+                .builder()
+                .user(user)
+                .token(token)
+                .expiryDate(RecoveryToken.calculateExpiryDate())
+                .build();
+        recoveryTokenRepository.insert(recoveryToken);
+    }
+
+    @Override
+    public RecoveryToken getRecoveryToken(String recoveryToken) {
+        return recoveryTokenRepository.findByToken(recoveryToken);
+    }
+
+    @Override
+    public void expireRecoveryToken(RecoveryToken recoveryToken) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Timestamp(-1));
+        Date expired = new Date(cal.getTime().getTime());
+        recoveryToken.setExpiryDate(expired);
+        recoveryTokenRepository.save(recoveryToken);
+    }
+
+    @Override
+    public void expireRegistationToken(EmailVerificationToken verificationToken) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Timestamp(-1));
+        Date expired = new Date(cal.getTime().getTime());
+        verificationToken.setExpiryDate(expired);
+        emailVerificationTokenRepository.save(verificationToken);
+    }
+
+    @Override
+    public boolean isUserEnabled(User user) {
+        return user.isEnabled();
+    }
+
+    @Override
+    public boolean checkPwd(User user, String pwdTocheck) {
+        String userPwd = user.getPassword();
+        if(userPwd.equals(pwdTocheck))
+            return true;
+        return false;
+    }
+
+
 }
