@@ -1,6 +1,7 @@
 package it.polito.ai.pedibus.api.controllers;
 
 
+import it.polito.ai.pedibus.api.dtos.NewPasswordDTO;
 import it.polito.ai.pedibus.api.dtos.UserDTO;
 import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.services.*;
@@ -94,4 +95,43 @@ public class RegistrationController {
         service.expireRegistationToken(verificationToken);
         return "";
     }
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping(value = "/recover/{randomUUID}", method = RequestMethod.POST)
+    public String recoverPassword
+            (@Valid @ModelAttribute("changePassword") NewPasswordDTO newPasswordDTO,
+             BindingResult result,
+             WebRequest request,
+             Model model,
+             @PathVariable("randomUUID") String token) throws RecoveryTokenNotFoundException {
+
+
+        if (result.hasErrors()) {
+            return "error in bindingRes: " + result.getFieldErrors().toString();
+        }
+        model.addAttribute("changePassword",newPasswordDTO);
+        logger.info("PASS: Checkink recoveryToken " + newPasswordDTO.toString());
+        RecoveryToken recoveryToken = service.getRecoveryToken(token);
+        logger.info("RECOVERY TOKEN: " + recoveryToken.toString());
+
+        if(recoveryToken==null){
+            result.rejectValue("email", "message.regError");
+            throw new RecoveryTokenNotFoundException();
+        }
+        Calendar cal = Calendar.getInstance();
+        logger.info("tokenTime " + recoveryToken.getExpiryDate().getTime()+ "---" + "Curr time: " + cal.getTime().getTime());
+        logger.info("Difference time: " + (recoveryToken.getExpiryDate().getTime() - cal.getTime().getTime()) );
+        if ((recoveryToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
+            throw new RecoveryTokenNotFoundException();
+        }
+        if(newPasswordDTO.getPass().equals(newPasswordDTO.getRepass())){
+            User user = recoveryToken.getUser();
+            service.userChangePassword(user,newPasswordDTO.getPass());
+            service.expireRecoveryToken(recoveryToken);
+        }else {
+            logger.info("Passwords are different");
+            throw new RecoveryTokenNotFoundException();
+        }
+        return "success:Cambio pwd";
+    }
+
 }

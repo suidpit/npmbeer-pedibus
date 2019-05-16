@@ -133,5 +133,18 @@ public class UserService implements IUserService {
         emailVerificationTokenRepository.save(verificationToken);
     }
 
+    @Override
+    public boolean isUserEnabled(User user) {
+        return user.isEnabled();
+    }
+
+    @Override
+    public boolean checkPwd(User user, String pwdTocheck) {
+        String userPwd = user.getPassword();
+        if(userPwd.equals(pwdTocheck))
+            return true;
+        return false;
+    }
+
 
 }
