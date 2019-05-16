@@ -1,12 +1,10 @@
 package it.polito.ai.pedibus.api.controllers;
 
-import com.sun.deploy.net.HttpResponse;
+
 import it.polito.ai.pedibus.api.dtos.UserPrivilegesDTO;
 import it.polito.ai.pedibus.api.models.SystemAuthority;
 import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
