@@ -31,4 +31,10 @@ public interface IUserService {
     void userChangePassword(User user, String pass);
 
     void expireRecoveryToken(RecoveryToken recoveryToken);
+
+    void expireRegistationToken(EmailVerificationToken verificationToken);
+
+    boolean isUserEnabled(User user);
+
+    boolean checkPwd(User user, String pwdTocheck);
 }
