@@ -5,6 +5,8 @@ import it.polito.ai.pedibus.api.models.SystemAuthority;
 import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
 import it.polito.ai.pedibus.security.JwtTokenProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.*;
@@ -13,7 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
-import javax.mail.AuthenticationFailedException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -40,16 +41,22 @@ public class UserService implements IUserService {
     @Autowired
     PasswordEncoder encoder;
 
+    Logger logger = LoggerFactory.getLogger(UserService.class);
+
     @Override
     public String signin(String email, String password) {
         try{
             authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-            User user = getUserByEmail(email);
-            if(!user.isEnabled()){
-                throw new DisabledException("User not Enabled");
-            }
+//            User user = getUserByEmail(email);
+//            if(!user.isEnabled()){
+//                throw new DisabledException("User not Enabled");
+//            }
+//            if(!encoder.encode(password).equals(user.getPassword())){
+//                throw new BadCredentialsException("Wrong Password");
+//            }
             return jwtTokenProvider.createToken(email, null);
         }catch(AuthenticationException e){
+            logger.info(e.getMessage());
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized");
         }
     }
@@ -64,11 +71,11 @@ public class UserService implements IUserService {
                             + accountDto.getEmail());
         }
         ArrayList<String> roles = new ArrayList<>();
-        roles.add("ROLE_USER");
+        roles.add("USER");
         ArrayList<SystemAuthority> authorities = new ArrayList<>();
         SystemAuthority authority = new SystemAuthority();
         authority.setAuthority(SystemAuthority.Authority.USER);
-        authority.setLine_name("");
+        authority.setLine_names(new ArrayList<>());
         authorities.add(authority);
 
         User user = new User();

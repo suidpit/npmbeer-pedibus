@@ -5,17 +5,17 @@ import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class CustomUserDetails implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
@@ -29,31 +29,45 @@ public class CustomUserDetails implements UserDetailsService {
         }
 
         List<GrantedAuthority> authorities = user.getAuthorities().stream()
-                .map(a -> new LineGrantedAuthority(a.getAuthority(), a.getLine_name()))
+                .map(a -> new LineGrantedAuthority(a.getAuthority(), a.getLine_names()))
                 .collect(Collectors.toList());
+
+        for(String role: user.getRoles()){
+            authorities.add(new SimpleGrantedAuthority(role));
+        }
 
         return org.springframework.security.core.userdetails.User.builder()
                 .username(email)
                 .password(user.getPassword())
-                .roles(user.getRoles().toArray(new String[user.getRoles().size()]))
                 .authorities(authorities)
-                .disabled(user.isEnabled())
+                .disabled(!user.isEnabled())
                 .build();
     }
 
-    private class LineGrantedAuthority implements GrantedAuthority{
+    public class LineGrantedAuthority implements GrantedAuthority{
 
         private SystemAuthority.Authority authority;
-        private String lineName;
 
-        public LineGrantedAuthority(SystemAuthority.Authority authority, String lineName){
+        //TODO: line list
+        private List<String> lineNames;
+
+        public LineGrantedAuthority(SystemAuthority.Authority authority, List<String> lineNames){
             this.authority = authority;
-            this.lineName = lineName;
+            this.lineNames = lineNames;
         }
 
         @Override
         public String getAuthority() {
-            return this.authority+this.lineName;
+            return this.authority.name();
+        }
+
+        public List<String> getLineNames(){
+            return this.lineNames;
+        }
+
+        @Override
+        public String toString(){
+            return this.authority.name()+": "+this.lineNames.toString();
         }
     }
 }

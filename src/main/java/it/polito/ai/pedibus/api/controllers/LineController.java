@@ -3,6 +3,8 @@ package it.polito.ai.pedibus.api.controllers;
 import it.polito.ai.pedibus.api.models.Line;
 import it.polito.ai.pedibus.api.repositories.LinesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,6 +25,8 @@ public class LineController {
      */
     @RequestMapping(value = "", method = RequestMethod.GET)
     public List<Line> getLines(){
+        UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
         return linesRepository.findAll();
     }
 

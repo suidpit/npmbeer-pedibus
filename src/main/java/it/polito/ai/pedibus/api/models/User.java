@@ -11,14 +11,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.*;
 import java.util.List;
 
-@Data
-@Document(collection = "users")
-public class User {
+    @Data
+    @Document(collection = "users")
+    public class User {
 
-    @Id
-    @JsonSerialize(using = ObjectIdSerializer.class)
-    ObjectId id;
-    @Email
+        @Id
+        @JsonSerialize(using = ObjectIdSerializer.class)
+        ObjectId id;
+        @Email
     private String email;
     private String password;
 

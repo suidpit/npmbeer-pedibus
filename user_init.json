@@ -3,12 +3,12 @@
     "email": "n@palm.beer",
     "password": "1234",
     "roles": [
-      "ROLE_USER",
-      "ROLE_SYSTEM_ADMIN"
+      "USER",
+      "SYSTEM_ADMIN"
     ],
     "authorities": [
       {
-        "line_name": "linea1",
+        "line_names": ["linea1"],
         "authority": 0
       }
     ],

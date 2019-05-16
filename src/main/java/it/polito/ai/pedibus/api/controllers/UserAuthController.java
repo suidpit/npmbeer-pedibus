@@ -1,6 +1,7 @@
 package it.polito.ai.pedibus.api.controllers;
 
 
+import it.polito.ai.pedibus.api.dtos.LoginDTO;
 import it.polito.ai.pedibus.api.dtos.UserDTO;
 import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.services.*;
@@ -38,10 +39,11 @@ public class UserAuthController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String login(
-        @RequestParam("email") String email,
-        @RequestParam("password") String password
+        @RequestBody LoginDTO loginDTO
     ){
-        return service.signin(email, password);
+        logger.info(loginDTO.getEmail());
+        logger.info(loginDTO.getPassword());
+        return service.signin(loginDTO.getEmail(), loginDTO.getPassword());
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)

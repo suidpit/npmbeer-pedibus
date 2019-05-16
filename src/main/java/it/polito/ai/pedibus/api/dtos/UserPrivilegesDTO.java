@@ -1,15 +1,19 @@
 package it.polito.ai.pedibus.api.dtos;
 
 import it.polito.ai.pedibus.api.models.SystemAuthority;
+import it.polito.ai.pedibus.security.CustomUserDetailsService;
 import lombok.Data;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Data
 public class UserPrivilegesDTO {
 
-    private List<String> roles;
+    private SystemAuthority.Authority authority;
 
-    private List<SystemAuthority> authorities;
+    private String lineName;
+
+    private String action;
 
 }

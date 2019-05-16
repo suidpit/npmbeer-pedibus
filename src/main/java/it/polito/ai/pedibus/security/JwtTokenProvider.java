@@ -1,18 +1,13 @@
 package it.polito.ai.pedibus.security;
 
 import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.auth0.jwt.interfaces.Verification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,15 +30,15 @@ public class JwtTokenProvider {
     @Value("${security.jwt.token.validityHours:2}")
     private Integer validityHours;
 
-    @Value("${security.jwt.token.issuer:issuer")
+    @Value("${security.jwt.token.issuer:issuer}")
     private String issuer;
 
     private Algorithm signingAlgorithm;
 
-    private CustomUserDetails userDetailsService;
+    private CustomUserDetailsService userDetailsService;
 
     @Autowired
-    public JwtTokenProvider(CustomUserDetails userDetailsService){
+    public JwtTokenProvider(CustomUserDetailsService userDetailsService){
         this.userDetailsService = userDetailsService;
     }
 
@@ -60,7 +55,7 @@ public class JwtTokenProvider {
         calendar.add(Calendar.HOUR_OF_DAY, this.validityHours);
         Date expiresAt = calendar.getTime();
         return JWT.create() // returns a Builder
-                .withClaim("user", username)
+                .withClaim("email", username)
                 .withNotBefore(notBefore)
                 .withExpiresAt(expiresAt)
                 .withIssuer(this.issuer)
@@ -88,7 +83,7 @@ public class JwtTokenProvider {
         String authHeader = req.getHeader("Authorization");
         if(authHeader != null) {
             String[] split = authHeader.split(" ");
-            if(split[0].equals("Bearer")){
+            if(split[0].equals("bearer")){
                 return split[1];
             }
         }
@@ -101,6 +96,7 @@ public class JwtTokenProvider {
     }
 
     private String extractUsername(String token){
-        return JWT.decode(token).getClaim("user").toString();
+        DecodedJWT jwt = JWT.decode(token);
+        return jwt.getClaim("email").asString();
     }
 }
