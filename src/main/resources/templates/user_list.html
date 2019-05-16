@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista Utenti</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous">
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container p-3" style="min-height:100% ! important; background-color: aliceblue;">
+        <div th:with="splits=${T(com.google.common.collect.Lists).partition(users, 10)}">
+            <p>
+                <a th:each="i: ${#numbers.sequence(0, splits.size()-1)}" class="btn btn-primary"
+                   data-toggle="collapse" th:href="'page_'+${i}" role="button" aria-expanded="false"
+                   aria-controls="collapseExample" th:text="${i}">
+                </a>
+            </p>
+            <div th:each="i: ${#numbers.sequence(0, splits.size()-1)}"
+                    class="collapse" th:id="'page_'+${i}">
+                <div class="card card-body">
+                    <table>
+                        <tr>
+                            <th>Email</th>
+                        <tr th:each="user: ${users}">
+                            <td th:text="${user}"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

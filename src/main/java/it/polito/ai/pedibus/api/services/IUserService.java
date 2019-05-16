@@ -4,6 +4,9 @@ import it.polito.ai.pedibus.api.dtos.UserDTO;
 import it.polito.ai.pedibus.api.models.User;
 
 public interface IUserService {
+
+    String signin(String email, String password);
+
     User registerNewUserAccount(UserDTO accountDto)
             throws EmailExistsException;
 

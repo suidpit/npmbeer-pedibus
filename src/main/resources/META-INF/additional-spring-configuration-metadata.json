@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "security.jwt.token.issuer",
+      "type": "java.lang.String",
+      "description": "Description for security.jwt.token.issuer."
+    },
+    {
+      "name": "security.jwt.token.validityHours",
+      "type": "java.lang.String",
+      "description": "Description for security.jwt.token.validityHours."
+    },
+    {
+      "name": "security.jwt.token.secret",
+      "type": "java.lang.String",
+      "description": "Description for security.jwt.token.secret."
+    }
+  ]
+}
