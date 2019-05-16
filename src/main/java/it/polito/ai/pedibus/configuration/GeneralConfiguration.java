@@ -9,6 +9,7 @@ import it.polito.ai.pedibus.api.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +18,9 @@ import java.util.List;
 
 @Configuration
 public class GeneralConfiguration {
+
+    @Autowired
+    PasswordEncoder encoder;
 
     private static String initDataFileName = "init.json";
     private static String userInitDataFileName = "user_init.json";
@@ -39,6 +43,9 @@ public class GeneralConfiguration {
         List<User> users = mapper.readValue(new File(userInitDataFileName),
                             mapper.getTypeFactory().constructCollectionType(List.class, User.class));
 
+        for(User user: users){
+            user.setPassword(encoder.encode(user.getPassword()));
+        }
         if(userRepository.findAll().size() == 0){
             userRepository.insert(users);
         }

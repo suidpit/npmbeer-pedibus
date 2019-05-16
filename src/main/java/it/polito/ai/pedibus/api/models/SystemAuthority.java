@@ -1,13 +1,14 @@
 package it.polito.ai.pedibus.api.models;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.Setter;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
-@Builder
 public class SystemAuthority {
 
-    private String lineName;
+    @Field("line_name")
+    private String line_name;
     private Authority authority;
 
     public enum Authority {SYSTEM_ADMIN, ADMIN, USER}

@@ -19,7 +19,7 @@ import java.util.Calendar;
 
 @RestController
 public class RecoveryPwdController {
-    private Logger logger = LoggerFactory.getLogger(RegistrationController.class);
+    private Logger logger = LoggerFactory.getLogger(UserAuthController.class);
 
     @Autowired
     EmailVerificationTokenRepository emailVerificationTokenRepository;

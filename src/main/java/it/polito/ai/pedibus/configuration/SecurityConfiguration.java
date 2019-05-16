@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -35,23 +36,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);
     }
 
-    private AuthenticationSuccessHandler sh;
-    private AuthenticationFailureHandler fh;
-
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-            .inMemoryAuthentication()
-                .withUser("Admin")
-                .password(encoder().encode("admin"))
-                .roles("USER", "ADMIN")
-            .and()
-                .withUser("Napalm")
-                .password(encoder().encode("Beer"))
-                .roles("ADMIN");
+        auth.authenticationProvider(authenticationProvider());
     }
 
     @Override
@@ -77,5 +67,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         http.addFilterBefore(new JwtTokenValidationFilter(jwtTokenProvider),
                 UsernamePasswordAuthenticationFilter.class);
+    }
+
+    @Bean
+    DaoAuthenticationProvider authenticationProvider(){
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userDetailsService());
+        authenticationProvider.setPasswordEncoder(encoder());
+        return authenticationProvider;
     }
 }

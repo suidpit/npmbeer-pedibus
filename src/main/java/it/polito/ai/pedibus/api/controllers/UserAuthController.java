@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
@@ -19,10 +20,9 @@ import java.util.Calendar;
 import java.util.Locale;
 
 @RestController
-public class RegistrationController {
+public class UserAuthController {
 
-    private Logger logger = LoggerFactory.getLogger(RegistrationController.class);
-
+    private Logger logger = LoggerFactory.getLogger(UserAuthController.class);
 
     /*POST /register – invia un oggetto JSON contenente e-mail, password, password di verifica.
     Controlla che l’utente con l’indirizzo di posta indicato non sia già presente nella base dati
@@ -36,6 +36,14 @@ public class RegistrationController {
     @Autowired
     IUserService service;
 
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public String login(
+        @RequestParam("email") String email,
+        @RequestParam("password") String password
+    ){
+        return service.signin(email, password);
+    }
+
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public String registerUserAccount(
             @RequestBody @Valid UserDTO accountDto,
@@ -44,8 +52,12 @@ public class RegistrationController {
             Errors errors) throws EmailExistsException {
 
         if (result.hasErrors()) {
-            return "error in bindingRes: " + result.getFieldErrors().toString();
-
+            StringBuilder sb = new StringBuilder("Failure - Reason:\n");
+            for(FieldError fe: result.getFieldErrors()){
+                sb.append("Field: ").append(fe.getField());
+                sb.append(" - Error: ").append(fe.getDefaultMessage()).append("\n");
+            }
+            return sb.toString();
         }
 
         User registered = service.registerNewUserAccount(accountDto);

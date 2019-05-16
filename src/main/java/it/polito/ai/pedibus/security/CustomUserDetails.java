@@ -9,11 +9,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
+@Service
 public class CustomUserDetails implements UserDetailsService {
 
     @Autowired
@@ -28,7 +29,7 @@ public class CustomUserDetails implements UserDetailsService {
         }
 
         List<GrantedAuthority> authorities = user.getAuthorities().stream()
-                .map(a -> new LineGrantedAuthority(a.getAuthority(), a.getLineName()))
+                .map(a -> new LineGrantedAuthority(a.getAuthority(), a.getLine_name()))
                 .collect(Collectors.toList());
 
         return org.springframework.security.core.userdetails.User.builder()
