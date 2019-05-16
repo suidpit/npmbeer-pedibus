@@ -25,8 +25,6 @@ public class LineController {
      */
     @RequestMapping(value = "", method = RequestMethod.GET)
     public List<Line> getLines(){
-        UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         return linesRepository.findAll();
     }
 
