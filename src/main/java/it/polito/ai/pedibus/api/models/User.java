@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.*;
+import java.util.List;
 
 @Data
 @Builder
@@ -18,6 +19,10 @@ public class User {
     @Email
     private String email;
     private String password;
+
+    private List<String> roles;
+
+    private List<SystemAuthority> authorities;
 
     private boolean enabled;
 

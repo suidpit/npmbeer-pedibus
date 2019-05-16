@@ -1,12 +1,14 @@
 package it.polito.ai.pedibus.api.services;
 
 import it.polito.ai.pedibus.api.dtos.UserDTO;
+import it.polito.ai.pedibus.api.models.SystemAuthority;
 import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -31,10 +33,19 @@ public class UserService implements IUserService {
                     "There is an account with that email address: "
                             + accountDto.getEmail());
         }
+        ArrayList<String> roles = new ArrayList<>();
+        roles.add("ROLE_USER");
+        ArrayList<SystemAuthority> authorities = new ArrayList<>();
+        authorities.add(SystemAuthority.builder()
+                .authority(SystemAuthority.Authority.USER)
+                .lineName("")
+                .build());
 
         User user = User.builder()
                 .email(accountDto.getEmail())
                 .password(accountDto.getPass())
+                .roles(roles)
+                .authorities(authorities)
                 .enabled(false)
                 .build();
         return userRepository.insert(user);

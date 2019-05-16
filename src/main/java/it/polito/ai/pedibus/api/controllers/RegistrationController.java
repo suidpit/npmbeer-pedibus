@@ -35,6 +35,7 @@ public class RegistrationController {
 
     @Autowired
     IUserService service;
+
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public String registerUserAccount(
             @RequestBody @Valid UserDTO accountDto,
