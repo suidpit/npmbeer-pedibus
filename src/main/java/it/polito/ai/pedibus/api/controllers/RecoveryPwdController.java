@@ -71,7 +71,7 @@ public class RecoveryPwdController {
     Verifica inoltre che le due password inviate corrispondano e che abbiano i necessari criteri
     di robustezza. In caso positivo aggiorna la base dati degli utenti con la nuova password e
     restituisce 200 – Ok, in caso negativo restituisce 404 – Not found*/
-    @ResponseStatus(HttpStatus.OK)
+   /* @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/recover/{randomUUID}", method = RequestMethod.POST)
     public String recoverPassword
             (@RequestBody @Valid NewPasswordDTO newPasswordDTO,
@@ -106,7 +106,7 @@ public class RecoveryPwdController {
             throw new RecoveryTokenNotFoundException();
         }
         return "";
-    }
+    }*/
 
 }
 
