@@ -1,4 +1,7 @@
 import { Injectable } from '@angular/core';
+import { Line } from "../../models/line";
+import { Builder } from "builder-pattern";
+import { Observable, of } from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -316,6 +319,28 @@ export class DataService {
     }
   ];
 
+  private lines: Line[] = null;
 
   constructor() { }
+
+  getLines(){
+    if(this.lines === null){
+      this.lines = this.line_db.map(function(line){
+        return Builder(Line)
+          .id(line._id)
+          .lineName(line.name)
+          .adminEmail(line.admin_email)
+          .build();
+      });
+    }
+    return of(this.lines); // Maybe Shouldn't be an Observable? should we consider this as an immutable collection?
+  }
+
+  getLineById(id){
+    return this.line_db.find(line => line._id == id);
+  }
+
+  getReservationByLineAndDate(line_id, date){
+
+  }
 }

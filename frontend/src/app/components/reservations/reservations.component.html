@@ -1,0 +1,23 @@
+<mat-grid-list cols="1" rowHeight="512px" ><!-- max height actually -->
+  <mat-grid-tile>
+    <div>
+      <mat-card>
+        <mat-card-title>
+          Reservations
+        </mat-card-title>
+        <mat-card-content>
+          <mat-form-field>
+            <mat-label>Seleziona una linea</mat-label>
+            <mat-select [(value)]="selectedLine">
+              <mat-option *ngFor="let line of lines" [value]="line">{{line.lineName}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-divider [inset]="true"></mat-divider>
+
+          <p>Your current selection is {{selectedLine.lineName}}</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </mat-grid-tile>
+</mat-grid-list>
