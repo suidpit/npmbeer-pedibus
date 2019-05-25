@@ -9,6 +9,8 @@ import it.polito.ai.pedibus.api.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.core.geo.GeoJsonModule;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.File;
@@ -30,6 +32,7 @@ public class GeneralConfiguration {
             throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
+        mapper.registerModule(new GeoJsonModule());
 
         // Read lines from .json using the mapper (second argument returns a TypeReference to List<Line> type
         List<Line> lines = mapper.readValue(new File(initDataFileName),
