@@ -1,15 +1,13 @@
-package it.polito.ai.pedibus.api.services;
+package it.polito.ai.pedibus.api.events;
 
+import it.polito.ai.pedibus.api.events.OnRegistrationCompleteEvent;
 import it.polito.ai.pedibus.api.models.User;
-import lombok.Data;
+import it.polito.ai.pedibus.api.services.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.MessageSource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 

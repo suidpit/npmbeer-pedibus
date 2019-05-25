@@ -1,11 +1,7 @@
 package it.polito.ai.pedibus.api.constraints;
 
-import it.polito.ai.pedibus.api.dtos.ReservationDTO;
-import it.polito.ai.pedibus.api.models.Line;
 import it.polito.ai.pedibus.api.models.Reservation;
-import it.polito.ai.pedibus.api.repositories.LinesRepository;
 import it.polito.ai.pedibus.api.repositories.ReservationRepository;
-import org.apache.tomcat.jni.Local;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 
