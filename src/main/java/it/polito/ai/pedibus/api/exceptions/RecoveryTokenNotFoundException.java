@@ -1,4 +1,4 @@
-package it.polito.ai.pedibus.api.services;
+package it.polito.ai.pedibus.api.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
