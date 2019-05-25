@@ -1,4 +1,4 @@
-package it.polito.ai.pedibus.api.services;
+package it.polito.ai.pedibus.api.events;
 
 import it.polito.ai.pedibus.api.models.User;
 import lombok.Data;

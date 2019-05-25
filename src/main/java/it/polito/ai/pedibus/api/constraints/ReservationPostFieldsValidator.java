@@ -3,9 +3,7 @@ package it.polito.ai.pedibus.api.constraints;
 import it.polito.ai.pedibus.api.dtos.ReservationDTO;
 import it.polito.ai.pedibus.api.models.Line;
 import it.polito.ai.pedibus.api.models.Reservation;
-import it.polito.ai.pedibus.api.models.Stop;
-import it.polito.ai.pedibus.api.repositories.LinesRepository;
-import org.bson.types.ObjectId;
+import it.polito.ai.pedibus.api.repositories.LineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.ConstraintValidator;
@@ -17,7 +15,7 @@ import javax.validation.constraintvalidation.ValidationTarget;
 public class ReservationPostFieldsValidator implements ConstraintValidator<ReservationPostFields, Object[]> {
 
     @Autowired
-    private LinesRepository repo;
+    private LineRepository repo;
 
     @Override
     public boolean isValid(Object[] value,

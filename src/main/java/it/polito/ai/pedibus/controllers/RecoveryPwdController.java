@@ -1,7 +1,7 @@
-package it.polito.ai.pedibus.api.controllers;
+package it.polito.ai.pedibus.controllers;
 
 import it.polito.ai.pedibus.api.dtos.EmailDTO;
-import it.polito.ai.pedibus.api.dtos.NewPasswordDTO;
+import it.polito.ai.pedibus.api.events.OnRecoveryCompleteEvent;
 import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.services.*;
 import org.slf4j.Logger;
@@ -9,18 +9,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import javax.validation.Valid;
-import java.util.Calendar;
 
 @RestController
 public class RecoveryPwdController {
-    private Logger logger = LoggerFactory.getLogger(UserAuthController.class);
+    private Logger logger = LoggerFactory.getLogger(RecoveryPwdController.class);
 
     @Autowired
     ApplicationEventPublisher eventPublisher;
@@ -77,7 +75,7 @@ public class RecoveryPwdController {
             (@RequestBody @Valid NewPasswordDTO newPasswordDTO,
              BindingResult result,
              WebRequest request,
-             @PathVariable("randomUUID") String token) throws RecoveryTokenNotFoundException{
+             @PathVariable("randomUUID") String token) throws RecoveryTokenNotFoundException {
 
 
         if (result.hasErrors()) {
