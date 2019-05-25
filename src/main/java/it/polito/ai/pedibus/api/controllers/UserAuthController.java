@@ -115,6 +115,7 @@ public class UserAuthController {
         service.expireRegistationToken(verificationToken);
         return "";
     }
+
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/recover/{randomUUID}", method = RequestMethod.POST)
     public String recoverPassword
