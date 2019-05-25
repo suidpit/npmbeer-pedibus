@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous">
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="container p-3" style="min-height:100% ! important; background-color: aliceblue;">
+    <h1>Cambio Password</h1>
+
+    <div>
+        <form method="post" th:object="${changePassword}">
+            <div class="form-group">
+                <label for="p1"></label>
+                <input type="password"  class="form-control" name="pass" id="p1" placeholder="Inserisci password">
+            </div>
+            <div class="form-group">
+                <label for="p2"></label>
+                <input type="password"  class="form-control" name="repass" id="p2" placeholder="Conferma password">
+            </div>
+            <div class="row">
+                <div class="col col-sm-8">
+                    <div class="p-3">
+                        <input class="btn btn-primary" type="submit" value="Change">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

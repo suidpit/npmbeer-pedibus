@@ -1,0 +1,17 @@
+[
+  {
+    "email": "n@palm.beer",
+    "password": "1234",
+    "roles": [
+      "USER",
+      "SYSTEM_ADMIN"
+    ],
+    "authorities": [
+      {
+        "line_names": ["linea1"],
+        "authority": 0
+      }
+    ],
+    "enabled": true
+  }
+]

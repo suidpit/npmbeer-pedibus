@@ -1,0 +1,37 @@
+package it.polito.ai.pedibus.api.services;
+
+import it.polito.ai.pedibus.api.models.User;
+import lombok.Builder;
+import lombok.Data;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
+
+@Data
+@Builder
+@Document(collection = "recoveryTokens")
+public class RecoveryToken {
+    private static final int EXPIRATION = 60 * 24;
+
+    @Id
+    private ObjectId objectId;
+    private String token;
+
+    /* @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+     @JoinColumn(nullable = false, name = "user_id")*/
+    private User user;
+
+    private Date expiryDate;
+
+    public static Date calculateExpiryDate() {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Timestamp(cal.getTime().getTime()));
+        cal.add(Calendar.MINUTE, EXPIRATION);
+        return new Date(cal.getTime().getTime());
+    }
+
+}
