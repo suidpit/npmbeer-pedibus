@@ -1,5 +1,6 @@
-package it.polito.ai.pedibus.api.services;
+package it.polito.ai.pedibus.api.repositories;
 
+import it.polito.ai.pedibus.api.models.EmailVerificationToken;
 import it.polito.ai.pedibus.api.models.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 

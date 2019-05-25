@@ -1,6 +1,9 @@
 package it.polito.ai.pedibus.api.services;
 
 import it.polito.ai.pedibus.api.dtos.UserDTO;
+import it.polito.ai.pedibus.api.exceptions.EmailExistsException;
+import it.polito.ai.pedibus.api.models.EmailVerificationToken;
+import it.polito.ai.pedibus.api.models.RecoveryToken;
 import it.polito.ai.pedibus.api.models.User;
 
 public interface IUserService {

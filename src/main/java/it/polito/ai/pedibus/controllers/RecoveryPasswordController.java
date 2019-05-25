@@ -1,9 +1,9 @@
 package it.polito.ai.pedibus.controllers;
 
 import it.polito.ai.pedibus.api.controllers.UserAuthController;
+import it.polito.ai.pedibus.api.exceptions.RecoveryTokenNotFoundException;
+import it.polito.ai.pedibus.api.models.RecoveryToken;
 import it.polito.ai.pedibus.api.services.IUserService;
-import it.polito.ai.pedibus.api.services.RecoveryToken;
-import it.polito.ai.pedibus.api.services.RecoveryTokenNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
