@@ -6,9 +6,35 @@ import { Injectable } from '@angular/core';
 
 export class DataService {
 
-  reservation_db = {
-
-  }
+  reservation_db = [
+    {
+      "_id":"5ce930a382ce95d654ff3865",
+      "date": "2019-05-29T21:00:00Z",
+      "lineName":"linea1",
+      "stopName":"P.za Solferino",
+      "childName":"Aldo",
+      "direction":"OUTWARD",
+      "tripIndex":0,
+    },
+    {
+      "_id":"5ce9312c82ce95d654ff3866",
+        "date":"2019-05-29T21:00:00Z",
+        "lineName":"linea1",
+        "stopName":"P.za Castello",
+        "childName":"Giovanni",
+        "direction":"OUTWARD",
+        "tripIndex":0,
+    },
+    {
+      "_id":"5ce9314482ce95d654ff3867",
+        "date":"2019-05-29T21:00:00Z",
+        "lineName":"linea1",
+        "stopName":"Sansa",
+        "childName":"Giacomo",
+        "direction":"OUTWARD",
+        "tripIndex":0,
+    }
+  ];
 
   line_db = [
     {
@@ -241,7 +267,7 @@ export class DataService {
        "admin_email":"admin@me.com",
        "_class":"it.polito.ai.pedibus.api.models.Line"
     }
-  ]
+  ];
 
   user_db = [
       {
@@ -288,7 +314,7 @@ export class DataService {
        "enabled":true,
        "_class":"it.polito.ai.pedibus.api.models.User"
     }
-  ]
+  ];
 
 
   constructor() { }
