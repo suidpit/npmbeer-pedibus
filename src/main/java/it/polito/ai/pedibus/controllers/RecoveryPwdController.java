@@ -1,37 +1,35 @@
 package it.polito.ai.pedibus.controllers;
 
 import it.polito.ai.pedibus.api.dtos.EmailDTO;
-import it.polito.ai.pedibus.api.dtos.NewPasswordDTO;
 import it.polito.ai.pedibus.api.events.OnRecoveryCompleteEvent;
-import it.polito.ai.pedibus.api.exceptions.RecoveryTokenNotFoundException;
-import it.polito.ai.pedibus.api.models.RecoveryToken;
 import it.polito.ai.pedibus.api.models.User;
-import it.polito.ai.pedibus.api.repositories.EmailVerificationTokenRepository;
 import it.polito.ai.pedibus.api.services.*;
-import it.polito.ai.pedibus.controllers.RegistrationController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import javax.validation.Valid;
-import java.util.Calendar;
 
 @RestController
 public class RecoveryPwdController {
-    private Logger logger = LoggerFactory.getLogger(RegistrationController.class);
+    private Logger logger = LoggerFactory.getLogger(RecoveryPwdController.class);
 
-    @Autowired
-    EmailVerificationTokenRepository emailVerificationTokenRepository;
     @Autowired
     ApplicationEventPublisher eventPublisher;
     @Autowired
     IUserService service;
+
+    /*POST /recover – invia un’indirizzo di posta elettronica di cui si vuole ricuperare la
+    password. Se l’indirizzo corrisponde a quello di un utente registrato, invia un messaggio di
+    posta elettronica all’utente contenente un link random per la modifica della password.
+    Risponde sempre 200 - Ok*/
+    @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/recover", method = RequestMethod.POST)
     public String recoverPasswordSendEmail(
             @RequestBody @Valid EmailDTO emailDTO,
@@ -41,7 +39,7 @@ public class RecoveryPwdController {
         logger.info("Recovery ENDPOINT Received "+ emailDTO.toString());
         logger.info("Email:  "+emailDTO.getEmail());
         if (result.hasErrors()) {
-            return result.getFieldErrors().toString();
+            return "error in bindRes: " + result.getFieldErrors().toString();
         }
         User registered = service.getUserByEmail(emailDTO.getEmail());
         if (registered == null) {
@@ -61,16 +59,8 @@ public class RecoveryPwdController {
             return "error "+ me.toString();
         }
 
-        return "fine recover";
+        return "";
 
-    }
-
-    /*GET /recover/{randomUUID} – Restituisce una pagina HTML contente una form per la
-    sostituzione della password*/
-    @RequestMapping(value = "/recover/{randomUUID}", method = RequestMethod.GET)
-    public String recoverPwdForm
-    (WebRequest request, Model model, @PathVariable("randomUUID") String token){
-        return "recoverPwdForm";
     }
 
 
@@ -79,8 +69,9 @@ public class RecoveryPwdController {
     Verifica inoltre che le due password inviate corrispondano e che abbiano i necessari criteri
     di robustezza. In caso positivo aggiorna la base dati degli utenti con la nuova password e
     restituisce 200 – Ok, in caso negativo restituisce 404 – Not found*/
+   /* @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/recover/{randomUUID}", method = RequestMethod.POST)
-    public String recoverPwd
+    public String recoverPassword
             (@RequestBody @Valid NewPasswordDTO newPasswordDTO,
              BindingResult result,
              WebRequest request,
@@ -96,6 +87,7 @@ public class RecoveryPwdController {
 
         if(recoveryToken==null){
             result.rejectValue("email", "message.regError");
+            throw new RecoveryTokenNotFoundException();
         }
         Calendar cal = Calendar.getInstance();
         logger.info("tokenTime " + recoveryToken.getExpiryDate().getTime()+ "---" + "Curr time: " + cal.getTime().getTime());
@@ -108,11 +100,11 @@ public class RecoveryPwdController {
             service.userChangePassword(user,newPasswordDTO.getPass());
             service.expireRecoveryToken(recoveryToken);
         }else {
-            logger.info("Password Diverse");
+            logger.info("Passwords are different");
             throw new RecoveryTokenNotFoundException();
         }
-        return "recoverPwdForm";
-    }
+        return "";
+    }*/
 
 }
 

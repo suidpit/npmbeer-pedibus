@@ -7,6 +7,9 @@ import it.polito.ai.pedibus.api.models.RecoveryToken;
 import it.polito.ai.pedibus.api.models.User;
 
 public interface IUserService {
+
+    String signin(String email, String password);
+
     User registerNewUserAccount(UserDTO accountDto)
             throws EmailExistsException;
 
@@ -31,4 +34,10 @@ public interface IUserService {
     void userChangePassword(User user, String pass);
 
     void expireRecoveryToken(RecoveryToken recoveryToken);
+
+    void expireRegistationToken(EmailVerificationToken verificationToken);
+
+    boolean isUserEnabled(User user);
+
+    boolean checkPwd(User user, String pwdTocheck);
 }
