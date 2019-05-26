@@ -1,0 +1,29 @@
+[
+    {
+      "_id":"5ce930a382ce95d654ff3865",
+      "date": "2019-05-29T21:00:00Z",
+      "lineName":"linea1",
+      "stopName":"P.za Solferino",
+      "childName":"Aldo",
+      "direction":"OUTWARD",
+      "tripIndex":0
+    },
+    {
+      "_id":"5ce9312c82ce95d654ff3866",
+        "date":"2019-05-29T21:00:00Z",
+        "lineName":"linea1",
+        "stopName":"P.za Castello",
+        "childName":"Giovanni",
+        "direction":"OUTWARD",
+        "tripIndex":0
+    },
+    {
+      "_id":"5ce9314482ce95d654ff3867",
+        "date":"2019-05-29T21:00:00Z",
+        "lineName":"linea1",
+        "stopName":"Sansa",
+        "childName":"Giacomo",
+        "direction":"OUTWARD",
+        "tripIndex":0
+    }
+  ]

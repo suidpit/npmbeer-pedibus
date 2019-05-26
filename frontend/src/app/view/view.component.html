@@ -1,0 +1,16 @@
+<p>
+  view works!
+</p> 
+
+<ul class="reservations">
+  <li *ngFor="let reservation of reservations">
+      <span class="badge">{{reservation | json}}</span>
+  </li>
+  <li *ngFor="let user of users">
+    <span class="badge">{{user | json }}</span>
+  </li>
+  <li *ngFor="let line of lines">
+    <span class="badge">{{line | json }}</span>
+  </li>
+</ul> 
+

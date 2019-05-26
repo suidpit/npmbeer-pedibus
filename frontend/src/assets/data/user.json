@@ -1,0 +1,46 @@
+[
+    {
+     "_id":"5cdd97716178bd763090819f",
+     "email":"n@palm.beer",
+     "password":"$2a$10$A/hrVydgqrFBXFcW0aYBtubE8MYN5C/nGQTat3gOjOMwiwBGucJZK",
+     "roles":[
+        "USER",
+        "SYSTEM_ADMIN"
+     ],
+     "authorities":[
+        {
+           "line_names":[
+              "linea1"
+           ],
+           "authority":"SYSTEM_ADMIN"
+        }
+     ],
+     "enabled":true,
+     "_class":"it.polito.ai.pedibus.api.models.User"
+  },
+  {
+     "_id":"5cdd98d16178bd76309081a0",
+     "email":"dademanna@gmail.com",
+     "password":"$2a$10$6sdwtCRALpAGZsh/9EYmL.923NuTvotc9o89X0yWUrMDc5WFrdQ62",
+     "roles":[
+        "USER"
+     ],
+     "authorities":[
+        {
+           "line_names":[
+
+           ],
+           "authority":"USER"
+        },
+        {
+           "line_names":[
+              "linea1",
+              "linea2"
+           ],
+           "authority":"ADMIN"
+        }
+     ],
+     "enabled":true,
+     "_class":"it.polito.ai.pedibus.api.models.User"
+  }
+]
