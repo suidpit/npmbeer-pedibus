@@ -17,7 +17,7 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
 
     @Override
     public MongoClient mongoClient() {
-        return new MongoClient("127.0.0.1", 27017);
+        return new MongoClient("127.0.0.1", 27018);
     }
 
     @Override

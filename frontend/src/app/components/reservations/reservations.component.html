@@ -1,0 +1,88 @@
+<mat-card class="container" >
+  <mat-card-title>
+    Presenze
+  </mat-card-title>
+  <mat-card-content>
+    <div>
+      <mat-grid-list cols="1" rowHeight="4:1">
+        <mat-grid-tile class="row">
+          <mat-form-field>
+            <mat-label>Seleziona una linea</mat-label>
+            <mat-select [(value)]="selectedLine" (valueChange)="updateRunData()">
+              <mat-option *ngFor="let line of lines" [value]="line">{{line.lineName}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <span class="fill-row"></span>
+
+          <mat-form-field>
+            <mat-label>Direzione</mat-label>
+            <mat-select [(value)]="selectedDirection">
+              <mat-option value="outward">Scuola</mat-option>
+              <mat-option value="back">Casa</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+        </mat-grid-tile>
+
+        <mat-grid-tile class="row">
+          <mat-form-field>
+            <input matInput [matDatepickerFilter]="allowedDaysFilter"
+                   [matDatepicker]="picker" placeholder="Seleziona una data"
+                   [formControl]="selectedDate" #date>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker [touchUi]="isMobile" #picker></mat-datepicker>
+          </mat-form-field>
+
+          <span class="fill-row"></span>
+
+          <span>
+            <button mat-icon-button>
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+
+            <button mat-icon-button>
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </span>
+        </mat-grid-tile>
+
+      </mat-grid-list>
+
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div>
+      <mat-tab-group mat-align-tabs="center">
+        <span *ngIf="selectedDirection === 'outward'" ></span>
+        <mat-tab *ngFor="let run of selectedLine.outward; let i = index" label="Corsa {{i+1}}">
+          <mat-list dense>
+            <mat-list-item>
+              <mat-icon svgIcon="start"></mat-icon>
+              Partenza
+            </mat-list-item>
+            <mat-list-item>
+              <mat-icon svgIcon="growing_dots_long"></mat-icon>
+            </mat-list-item>
+            <mat-list-item>
+              <mat-icon svgIcon="dot"></mat-icon>
+              Fermata Intermedia
+            </mat-list-item>
+            <mat-list-item>
+              <mat-icon svgIcon="growing_dots_long"></mat-icon>
+            </mat-list-item>
+            <mat-list-item>
+              <mat-icon svgIcon="finish_green"></mat-icon>
+              Scuola
+            </mat-list-item>
+          </mat-list>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+
+    <mat-card-footer>
+      This is a footer
+    </mat-card-footer>
+  </mat-card-content>
+</mat-card>

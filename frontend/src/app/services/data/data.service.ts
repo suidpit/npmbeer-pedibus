@@ -1,4 +1,10 @@
 import { Injectable } from '@angular/core';
+import { Line } from "../../models/line";
+import { Builder } from "builder-pattern";
+import { Observable, of } from "rxjs";
+import { LocalTime, LocalDateTime} from "js-joda";
+import {Stop} from "../../models/stop";
+import {StopList} from "../../models/stop-list";
 
 @Injectable({
   providedIn: 'root'
@@ -316,6 +322,73 @@ export class DataService {
     }
   ];
 
+  private lines: Line[] = null;
 
-  constructor() { }
+  constructor() {}
+
+  getLines(){
+    if(this.lines === null){
+      /*
+      * On the next lines we are building the lines array by mapping the data received from the db to:
+      * 1st -> the outward-inward(back) stops: Array<StopList> per line
+      * 2nd -> the lines themselves
+      * All of this though the aid of the .map array function and the Builder class which implements
+      * the builder pattern, check: https://github.com/Vincent-Pang/builder-pattern
+      * */
+      this.lines = this.line_db.map(function(line){
+        let outwards : Array<StopList> = [];
+        let backs : Array<StopList> = [];
+
+        // map outwards
+        for(let out of line.outward){
+          let stopList = Builder(StopList)
+            .stops(out.map(function(stop){
+              let d = LocalDateTime.parse(stop.time.replace("Z", ""));
+              let time = LocalTime.of(d.hour(), d.minute(), d.second());
+              return Builder(Stop)
+                .name(stop.name)
+                .time(time)
+                .position(stop.position)
+                .build();
+            }))
+            .build();
+          outwards.push(stopList);
+        }
+
+        // map inwards
+        for(let b of line.back){
+          let stopList = Builder(StopList)
+            .stops(b.map(function(stop){
+              let d = LocalDateTime.parse(stop.time.replace("Z", ""));
+              let time = LocalTime.of(d.hour(), d.minute(), d.second());
+              return Builder(Stop)
+                .name(stop.name)
+                .time(time)
+                .position(stop.position)
+                .build();
+            }))
+            .build();
+          backs.push(stopList);
+        }
+
+        // finally build the Line
+        return Builder(Line)
+          .id(line._id)
+          .lineName(line.name)
+          .adminEmail(line.admin_email)
+          .outward(outwards)
+          .back(backs)
+          .build();
+      });
+    }
+    return of(this.lines); // Maybe Shouldn't be an Observable? should we consider this as an immutable collection?
+  }
+
+  getLineById(id){
+    return this.line_db.find(line => line._id == id);
+  }
+
+  getReservationByLineAndDate(line_id, date){
+
+  }
 }
