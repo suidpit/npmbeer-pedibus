@@ -8,7 +8,6 @@ import {Stop} from "../../models/stop";
 import {StopList} from "../../models/stop-list";
 import {Reservation} from "../../models/reservation";
 import {User} from "../../models/user";
-import { Linee } from "../../models/line2";
 
 
 
@@ -27,14 +26,18 @@ export class DataService {
 
   private lines: Line[] = null;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+     this.getReservationHttp();
+     this.getLinesHttp();
+     this.getUsersHttp();
+   }
 
   getReservationHttp(): Observable<Reservation[]>{
    return this.http.get<Reservation[]>(this.reservation_url);
  }
 
- getLinesHttp(): Observable<Linee[]>{
-   return this.http.get<Linee[]>(this.line_url);
+ getLinesHttp(): Observable<Line[]>{
+   return this.http.get<Line[]>(this.line_url);
  }
 
   getUsersHttp(): Observable<User[]>{

@@ -43,6 +43,12 @@ export class ReservationsComponent implements OnInit {
     });
     this.dataService.getReservationHttp()
     .subscribe(data=>console.log(data));
+
+    this.dataService.getLinesHttp()
+    .subscribe(data=>console.log(data));
+
+
+
     
   }
 
