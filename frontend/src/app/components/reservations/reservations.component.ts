@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { DataService } from "../../services/data/data.service";
-import { MatDatepicker } from "@angular/material";
-import { FormControl } from "@angular/forms";
+import {DataService} from '../../services/data/data.service';
+import {FormControl} from '@angular/forms';
+import {LocalTime} from 'js-joda';
 
 @Component({
   selector: 'app-reservations',
@@ -15,14 +15,15 @@ export class ReservationsComponent implements OnInit {
   selectedDate = null;
   selectedDirection = undefined;
   isMobile = false;
+  selectedRun = undefined;
 
   /**
    * Filter passed to the date picker to filter out non-school days, i.e. sundays (0) and saturdays(6)
    * **/
   allowedDaysFilter = (d: Date): boolean => {
-    let dayNum = d.getDay();
+    const dayNum = d.getDay();
     return !(dayNum === 0 || dayNum === 6);
-  };
+  }
 
   constructor(private dataService: DataService) {
     this.selectedDate = new FormControl(new Date());
@@ -30,7 +31,7 @@ export class ReservationsComponent implements OnInit {
     // check if it is a mobile user, if so, use touchUI elements for better targeting
     // see https://stackoverflow.com/a/25394023/6945436 for userAgent checking
     // TODO: check this on mobile, seems to work on desktop
-    let userAgent = navigator.userAgent;
+    const userAgent = navigator.userAgent;
     this.isMobile =
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(userAgent);
   }
@@ -40,10 +41,52 @@ export class ReservationsComponent implements OnInit {
       this.selectedLine = lines[1];
       return this.lines = lines;
     });
+
+    if (this.selectedLine.outward[0].endsAt.isAfter(LocalTime.now())) {
+      this.selectedRun = 0;
+      this.selectedDirection = 'outward';
+    } else if (this.selectedLine.back[0].endsAt.isAfter(LocalTime.now())) {
+      this.selectedRun = 1;
+      this.selectedDirection = 'back';
+    } else if (this.selectedLine.back[1].endsAt.isAfter(LocalTime.now())) {
+      this.selectedRun = 2;
+      this.selectedDirection = 'back';
+    } else {
+      this.selectedRun = 3;
+      this.selectedDirection = 'outward';
+    }
   }
 
-  updateRunData(){
-    this.selectedDirection = "outward";
-    console.log("Set focus on the first available run")
+  updateLineData() {
+    if (this.selectedLine != null) {
+      if (this.selectedLine.outward[0].endsAt.isAfter(LocalTime.now())) {
+        this.selectedRun = 0;
+        this.selectedDirection = 'outward';
+      } else if (this.selectedLine.back[0].endsAt.isAfter(LocalTime.now())) {
+        this.selectedDirection = 'back';
+        this.selectedRun = 1;
+      } else if (this.selectedLine.back[1].endsAt.isAfter(LocalTime.now())) {
+        this.selectedDirection = 'back';
+        this.selectedRun = 2;
+      } else {
+        this.selectedDirection = 'outward';
+        this.selectedRun = 0;
+      }
+    }
+  }
+
+  updateDirection() {
+    if (this.selectedDirection === 'outward') {
+      this.selectedRun = 0;
+    }
+    if (this.selectedDirection === 'back') {
+      if (this.selectedLine.back[0].endsAt.isAfter(LocalTime.now())) {
+        this.selectedRun = 1;
+      } else if (this.selectedLine.back[1].endsAt.isAfter(LocalTime.now())) {
+        this.selectedRun = 2;
+      } else {
+        this.selectedRun = 1;
+      }
+    }
   }
 }
