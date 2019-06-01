@@ -15,6 +15,7 @@ export class ReservationsComponent implements OnInit {
   selectedDate = null;
   selectedDirection = undefined;
   isMobile = false;
+  public res = [];
 
   /**
    * Filter passed to the date picker to filter out non-school days, i.e. sundays (0) and saturdays(6)
@@ -40,6 +41,9 @@ export class ReservationsComponent implements OnInit {
       this.selectedLine = lines[1];
       return this.lines = lines;
     });
+    this.dataService.getReservationHttp()
+    .subscribe(data=>console.log(data));
+    
   }
 
   updateRunData(){
