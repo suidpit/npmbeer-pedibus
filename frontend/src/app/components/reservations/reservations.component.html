@@ -8,7 +8,7 @@
         <mat-grid-tile class="row">
           <mat-form-field>
             <mat-label>Seleziona una linea</mat-label>
-            <mat-select [(value)]="selectedLine" (valueChange)="updateLineData()">
+            <mat-select [(value)]="selectedLine" (valueChange)="updateData()">
               <mat-option *ngFor="let line of lines" [value]="line">{{line.lineName}}</mat-option>
             </mat-select>
           </mat-form-field>
@@ -16,7 +16,7 @@
 
           <mat-form-field>
             <mat-label>Direzione</mat-label>
-            <mat-select [(value)]="selectedDirection" (valueChange)="updateDirection()">
+            <mat-select [(value)]="selectedDirection" (valueChange)="updateData()">
               <mat-option value="outward">Scuola</mat-option>
               <mat-option value="back">Casa</mat-option>
             </mat-select>
