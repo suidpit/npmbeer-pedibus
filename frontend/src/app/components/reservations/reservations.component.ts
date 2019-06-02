@@ -13,12 +13,12 @@ import { ILine } from 'src/app/models/iline';
 export class ReservationsComponent implements OnInit {
 
   selectedLine = [];
-  lines = null;
+  lines = [];
   selectedDate = null;
   selectedDirection = undefined;
   isMobile = false;
   public res = [];
-
+  
   /**
    * Filter passed to the date picker to filter out non-school days, i.e. sundays (0) and saturdays(6)
    * **/
@@ -48,7 +48,7 @@ export class ReservationsComponent implements OnInit {
       //console.log('DATAAA: ' + JSON.stringify(data[1]['name']));
       //this.selectedLine.push(data[0]['name']);
       for(let d of data){
-        this.selectedLine.push(d);
+        this.lines.push(d);
       }
     });
     this.dataService.getReservationHttp()
