@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { DataService } from "../../services/data/data.service";
 import { MatDatepicker } from "@angular/material";
 import { FormControl } from "@angular/forms";
+import { Line } from 'src/app/models/line';
+import { ILine } from 'src/app/models/iline';
 
 @Component({
   selector: 'app-reservations',
@@ -10,7 +12,7 @@ import { FormControl } from "@angular/forms";
 })
 export class ReservationsComponent implements OnInit {
 
-  selectedLine = null;
+  selectedLine = [];
   lines = null;
   selectedDate = null;
   selectedDirection = undefined;
@@ -37,19 +39,26 @@ export class ReservationsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.dataService.getLines().subscribe(lines => {
-      this.selectedLine = lines[1];
-      return this.lines = lines;
+    // this.dataService.getLines().subscribe(lines => {
+    //   //console.log('Res comp: '+ lines);
+    //   this.selectedLine = lines[1];
+    //   return this.lines = lines;
+    // });
+    this.dataService.getLinesHttp().subscribe(data =>{
+      console.log('DATAAA: ' + JSON.stringify(data[1]['name']));
+      //this.selectedLine.push(data[0]['name']);
+      let i=0;
+      for(let d of data){
+        this.selectedLine.push(d['name']);
+        i++;
+      }
     });
     this.dataService.getReservationHttp()
     .subscribe(data=>console.log(data));
 
     this.dataService.getLinesHttp()
     .subscribe(data=>console.log(data));
-
-
-
-    
+    console.log('Lines: ' + this.selectedLine);
   }
 
   updateRunData(){

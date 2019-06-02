@@ -8,6 +8,7 @@ import {Stop} from "../../models/stop";
 import {StopList} from "../../models/stop-list";
 import {Reservation} from "../../models/reservation";
 import {User} from "../../models/user";
+import { ILine } from 'src/app/models/iline';
 
 
 
@@ -24,20 +25,76 @@ export class DataService {
  
    private user_url = "/assets/data/user.json";
 
-  private lines: Line[] = null;
+  private lines: Line[];
 
   constructor(private http: HttpClient) {
-     this.getReservationHttp();
-     this.getLinesHttp();
-     this.getUsersHttp();
+   //   let self = this;
+   //   //this.getReservationHttp();
+   //   this.http.get<Line[]>(this.line_url);
+   //   this.getLinesHttp().subscribe(function(lines){
+   //    self.lines = lines.map(function(line){
+   //       let outwards : Array<StopList> = [];
+   //       let backs : Array<StopList> = [];
+   //       // map outwards
+   //       for(let out of line.outward){
+   //          console.log('Out: ' + JSON.stringify(out));
+   //         let stopList = Builder(StopList)
+   //           .stops(out.map(function(stop){
+   //             let d = LocalDateTime.parse(stop.time.replace("Z", ""));
+   //             let time = LocalTime.of(d.hour(), d.minute(), d.second());
+   //             return Builder(Stop)
+   //               .name(stop.name)
+   //               .time(time)
+   //               .position(stop.position)
+   //               .build();
+   //           }))
+   //           .build();
+   //          console.log('stopList: ' + JSON.stringify(stopList));
+   //         outwards.push(stopList);
+   //       }
+   //       console.log('OUTWARDS: ' + JSON.stringify(outwards));
+
+ 
+   //       // map inwards
+   //       for(let b of line.back){
+   //         let stopList = Builder(StopList)
+   //           .stops(b.map(function(stop){
+   //             let d = LocalDateTime.parse(stop.time.replace("Z", ""));
+   //             let time = LocalTime.of(d.hour(), d.minute(), d.second());
+   //             // return Builder(Stop)
+   //             //   .name(stop.name)
+   //             //   .time(time)
+   //             //   .position(stop.position)
+   //             //   .build();
+   //           }))
+   //           .build();
+   //         backs.push(stopList);
+   //       }
+ 
+   //       // finally build the Line
+   //       return Builder(Line)
+   //         .id(line._id)
+   //         .lineName(line.name)
+   //         .adminEmail(line.admin_email)
+   //         .outward(outwards)
+   //         .back(backs)
+   //         .build();
+   //     });
+   //     console.log('Lines: ' + JSON.stringify(self.lines));
+   //   });
+   //   console.log('Lines2: ' + JSON.stringify(self.lines));
+
+
+
+     //this.getUsersHttp();
    }
 
   getReservationHttp(): Observable<Reservation[]>{
    return this.http.get<Reservation[]>(this.reservation_url);
  }
 
- getLinesHttp(): Observable<Line[]>{
-   return this.http.get<Line[]>(this.line_url);
+ getLinesHttp(): Observable<ILine[]>{
+   return this.http.get<ILine[]>(this.line_url);
  }
 
   getUsersHttp(): Observable<User[]>{
@@ -357,7 +414,6 @@ export class DataService {
 
 
   getLines(){
-    if(this.lines === null){
       /*
       * On the next lines we are building the lines array by mapping the data received from the db to:
       * 1st -> the outward-inward(back) stops: Array<StopList> per line
@@ -365,52 +421,7 @@ export class DataService {
       * All of this though the aid of the .map array function and the Builder class which implements
       * the builder pattern, check: https://github.com/Vincent-Pang/builder-pattern
       * */
-      this.lines = this.line_db.map(function(line){
-        let outwards : Array<StopList> = [];
-        let backs : Array<StopList> = [];
-
-        // map outwards
-        for(let out of line.outward){
-          let stopList = Builder(StopList)
-            .stops(out.map(function(stop){
-              let d = LocalDateTime.parse(stop.time.replace("Z", ""));
-              let time = LocalTime.of(d.hour(), d.minute(), d.second());
-              return Builder(Stop)
-                .name(stop.name)
-                .time(time)
-                .position(stop.position)
-                .build();
-            }))
-            .build();
-          outwards.push(stopList);
-        }
-
-        // map inwards
-        for(let b of line.back){
-          let stopList = Builder(StopList)
-            .stops(b.map(function(stop){
-              let d = LocalDateTime.parse(stop.time.replace("Z", ""));
-              let time = LocalTime.of(d.hour(), d.minute(), d.second());
-              return Builder(Stop)
-                .name(stop.name)
-                .time(time)
-                .position(stop.position)
-                .build();
-            }))
-            .build();
-          backs.push(stopList);
-        }
-
-        // finally build the Line
-        return Builder(Line)
-          .id(line._id)
-          .lineName(line.name)
-          .adminEmail(line.admin_email)
-          .outward(outwards)
-          .back(backs)
-          .build();
-      });
-    }
+   
     return of(this.lines); // Maybe Shouldn't be an Observable? should we consider this as an immutable collection?
   }
 
