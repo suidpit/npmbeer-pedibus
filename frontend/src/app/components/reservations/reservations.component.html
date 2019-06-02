@@ -56,7 +56,7 @@
          <mat-tab *ngFor="let run of selectedLine.outward; let i = index" label="Andata {{i+1}}">
            <mat-list dense>
              <mat-list-item>
-               <app-stop-row [type]="'start'"></app-stop-row>
+               <app-stop-row [stop-name]="'Partenza'"[type]="'start'"></app-stop-row>
              </mat-list-item>
              <mat-list-item>
                <app-stop-row [type]="'dots'"></app-stop-row>
@@ -75,14 +75,14 @@
                </mat-list-item>
              </div>
              <mat-list-item>
-               <app-stop-row [type]="'end'"></app-stop-row>
+               <app-stop-row [stop-name]="'Scuola'" [type]="'end'"></app-stop-row>
              </mat-list-item>
            </mat-list>
          </mat-tab>
          <mat-tab *ngFor="let run of selectedLine.back; let i = index" label="Ritorno {{i+1}}">
            <mat-list dense>
              <mat-list-item>
-               <app-stop-row [type]="'start'"></app-stop-row>
+               <app-stop-row [stop-name]="'Scuola'" [type]="'start'"></app-stop-row>
              </mat-list-item>
              <mat-list-item>
                <app-stop-row [type]="'dots'"></app-stop-row>
@@ -101,7 +101,7 @@
                </mat-list-item>
              </div>
              <mat-list-item>
-               <app-stop-row [type]="'end'"></app-stop-row>
+               <app-stop-row [stop-name]="'Arrivo'" [type]="'end'"></app-stop-row>
              </mat-list-item>
            </mat-list>
          </mat-tab>

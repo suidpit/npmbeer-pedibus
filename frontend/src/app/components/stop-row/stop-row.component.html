@@ -36,6 +36,17 @@
       <div fxFlexOrder="0" fxFlexAlign="center">
         <mat-icon svgIcon="start"></mat-icon>
       </div>
+      <div fxFlexOrder="1" fxFlexAlign="start">
+        <div fxLayout="row" fxLayoutGap="4px">
+          <div fxLayout="column" fxLayoutAlign="start">
+            <div>-- : --</div>
+          </div>
+
+          <div fxLayout="column" fxLayoutGap="4px">
+            <div style="text-align: center;border-bottom: 1px solid #c9c9c9">{{stopName}}</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -45,6 +56,17 @@
       <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="8px">
         <div fxFlexOrder="0" fxFlexAlign="center">
           <mat-icon svgIcon="finish_green"></mat-icon>
+        </div>
+        <div fxFlexOrder="1" fxFlexAlign="start">
+          <div fxLayout="row" fxLayoutGap="4px">
+            <div fxLayout="column" fxLayoutAlign="start">
+              <div>-- : --</div>
+            </div>
+
+            <div fxLayout="column" fxLayoutGap="4px">
+              <div style="text-align: center;border-bottom: 1px solid #c9c9c9">{{stopName}}</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

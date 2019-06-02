@@ -93,8 +93,10 @@ export class ReservationsComponent implements OnInit {
           .back(backs)
           .build();
       });
+    }, () => null, () =>{
       this.selectedLine = this.lines[0];
-    }, () => null, () =>this.updateData());
+      this.updateData()
+    });
   }
 
   ngOnInit() {
@@ -105,25 +107,21 @@ export class ReservationsComponent implements OnInit {
     if (this.selectedLine != null) {
       if (this.selectedLine.outward[0].endsAt.isAfter(LocalTime.now()) || this.selectedDirection === 'outward') {
         this.selectedRun = 0;
-        this.selectedDirection = 'outward';
       } else if (this.selectedLine.back[0].endsAt.isAfter(LocalTime.now())) {
         this.selectedRun = 1;
-        this.selectedDirection = 'back';
       } else if (this.selectedLine.back[1].endsAt.isAfter(LocalTime.now())) {
         this.selectedRun = 2;
-        this.selectedDirection = 'back';
       } else if (this.selectedDirection === 'back') {
         this.selectedRun = 1;
-        this.selectedDirection = 'back';
       } else {
         this.selectedRun = 0;
-        this.selectedDirection = 'outward';
+        let today = new Date();
+        today.setDate(today.getDate()+1);
+        this.selectedDate.setValue(today);
       }
 
       this.updateReservation();
     }
-
-
   }
 
   togglePresence(child: Child) {
