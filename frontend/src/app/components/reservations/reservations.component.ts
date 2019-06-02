@@ -1,49 +1,78 @@
 import { Component, OnInit } from '@angular/core';
 import { DataService } from "../../services/data/data.service";
-import { MatDatepicker } from "@angular/material/datepicker";
 import { FormControl } from "@angular/forms";
+import { LocalTime } from 'js-joda';
 
+import { Child } from '../../models/child'
 @Component({
-  selector: 'app-reservations',
-  templateUrl: './reservations.component.html',
-  styleUrls: ['./reservations.component.scss']
+    selector: 'app-reservations',
+    templateUrl: './reservations.component.html',
+    styleUrls: ['./reservations.component.scss']
 })
 export class ReservationsComponent implements OnInit {
 
-  selectedLine = null;
-  lines = null;
-  selectedDate = null;
-  selectedDirection = undefined;
-  isMobile = false;
+    selectedLine = null;
+    lines = null;
+    selectedDate = null;
+    selectedDirection = undefined;
+    isMobile = false;
+    selectedRun = undefined;
 
-  /**
-   * Filter passed to the date picker to filter out non-school days, i.e. sundays (0) and saturdays(6)
-   * **/
-  allowedDaysFilter = (d: Date): boolean => {
-    let dayNum = d.getDay();
-    return !(dayNum === 0 || dayNum === 6);
-  };
+    /**
+     * Filter passed to the date picker to filter out non-school days, i.e. sundays (0) and saturdays(6)
+     * **/
+    allowedDaysFilter = (d: Date): boolean => {
+        const dayNum = d.getDay();
+        return !(dayNum === 0 || dayNum === 6);
+    };
 
-  constructor(private dataService: DataService) {
-    this.selectedDate = new FormControl(new Date());
+    constructor(private dataService: DataService) {
+        this.selectedDate = new FormControl(new Date());
 
-    // check if it is a mobile user, if so, use touchUI elements for better targeting
-    // see https://stackoverflow.com/a/25394023/6945436 for userAgent checking
-    // TODO: check this on mobile, seems to work on desktop
-    let userAgent = navigator.userAgent;
-    this.isMobile =
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(userAgent);
-  }
+        // check if it is a mobile user, if so, use touchUI elements for better targeting
+        // see https://stackoverflow.com/a/25394023/6945436 for userAgent checking
+        // TODO: check this on mobile, seems to work on desktop
+        const userAgent = navigator.userAgent;
+        this.isMobile =
+            /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(userAgent);
+    }
 
-  ngOnInit() {
-    this.dataService.getLines().subscribe(lines => {
-      this.selectedLine = lines[1];
-      return this.lines = lines;
-    });
-  }
+    ngOnInit() {
+        this.dataService.getLines().subscribe(lines => {
+            this.selectedLine = lines[1];
+            return this.lines = lines;
+        });
+        this.updateData();
 
-  updateRunData(){
-    this.selectedDirection = "outward";
-    console.log("Set focus on the first available run")
-  }
+    }
+
+    updateData() {
+        if (this.selectedLine != null) {
+            if (this.selectedLine.outward[0].endsAt.isAfter(LocalTime.now()) || this.selectedDirection === 'outward') {
+                this.selectedRun = 0;
+                this.selectedDirection = 'outward';
+            } else if (this.selectedLine.back[0].endsAt.isAfter(LocalTime.now())) {
+                this.selectedRun = 1;
+                this.selectedDirection = 'back';
+            } else if (this.selectedLine.back[1].endsAt.isAfter(LocalTime.now())) {
+                this.selectedRun = 2;
+                this.selectedDirection = 'back';
+            } else if (this.selectedDirection === 'back') {
+                this.selectedRun = 1;
+                this.selectedDirection = 'back';
+            } else {
+                this.selectedRun = 0;
+                this.selectedDirection = 'outward';
+            }
+        }
+    }
+
+    togglePresence(child: Child) {
+        console.log(child)
+        child.present = !child.present
+    }
+
+    logEvent(event){
+      console.log(event);
+    }
 }

@@ -28,3 +28,11 @@ mat-list-item{
   justify-content: flex-start;
 }
 
+.present {
+  color: blue;
+}
+
+.custom-list .mat-list-item{
+  height: auto;
+  min-height: 48px;
+}

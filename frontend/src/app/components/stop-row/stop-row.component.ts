@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 
 @Component({
   selector: 'app-stop-row',
@@ -7,34 +7,20 @@ import { Component, OnInit } from '@angular/core';
 })
 export class StopRowComponent implements OnInit {
 
+  @Input("type") type = "end";
+
+  @Input("stop-data") stop;
+
+  @Output("child-presence") change: EventEmitter<Kid> = new EventEmitter<Kid>();
+
   icon = "dot";
 
   children = [
-    {
-      "name": "Pazzo",
-      "hadReservation": true,
-      "isPresent": true
-    },
-    {
-      "name": "Pezzo",
-      "hadReservation": true,
-      "isPresent": true
-    },
-    {
-      "name": "Pizzo",
-      "hadReservation": true,
-      "isPresent": false
-    },
-    {
-      "name": "Pozzo",
-      "hadReservation": false,
-      "isPresent": true
-    },
-    {
-      "name": "Puzzo",
-      "hadReservation": false,
-      "isPresent": false
-    }
+    new Kid("Pazzo", true, true),
+    new Kid("Pezzo", true, true),
+    new Kid("Pizzo", true, false),
+    new Kid("Pozzo", false, true),
+    new Kid("Puzzo", false, false)
   ];
 
   constructor() { }
@@ -42,4 +28,20 @@ export class StopRowComponent implements OnInit {
   ngOnInit() {
   }
 
+  togglePresence(child){
+    child.isPresent = !child.isPresent;
+    this.change.emit(child);
+  }
+}
+
+export class Kid{
+  name: string;
+  hadReservation: false;
+  isPresent: false;
+
+  constructor(name, hadReservation, isPresent){
+    this.name = name;
+    this.hadReservation = hadReservation;
+    this.isPresent = isPresent;
+  }
 }
