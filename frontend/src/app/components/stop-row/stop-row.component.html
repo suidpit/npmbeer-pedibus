@@ -1,0 +1,84 @@
+<div *ngIf="type === 'intermediate'; else startOrEnd">
+
+  <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="8px">
+    <div fxFlexOrder="0" fxFlexAlign="center">
+      <mat-icon svgIcon="{{icon}}"></mat-icon>
+    </div>
+    <div fxFlexOrder="1" fxFlexAlign="start">
+      <div fxLayout="row" fxLayoutGap="4px">
+        <div fxLayout="column" fxLayoutAlign="start">
+          <div>{{stopTime}}</div>
+        </div>
+
+        <div fxLayout="column" fxLayoutGap="4px">
+          <div style="text-align: center;border-bottom: 1px solid #c9c9c9">{{stopName}}</div>
+          <mat-chip-list [selectable]="true" [multiple]="true">
+            <div *ngIf="children && children.length !== 0; else noKids">
+              <mat-chip *ngFor="let child of children"
+                        [class.mat-accent]="child.hadReservation"
+                        [class.had-reservation]="child.hadReservation"
+                        [selected]="child.isPresent"
+                        (click)="togglePresence(child)">{{child.name}}</mat-chip>
+            </div>
+            <ng-template #noKids>
+              <div> No Reservations </div>
+            </ng-template>
+          </mat-chip-list>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #startOrEnd>
+  <div *ngIf="type === 'start'; else end">
+    <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="8px">
+      <div fxFlexOrder="0" fxFlexAlign="center">
+        <mat-icon svgIcon="start"></mat-icon>
+      </div>
+      <div fxFlexOrder="1" fxFlexAlign="start">
+        <div fxLayout="row" fxLayoutGap="4px">
+          <div fxLayout="column" fxLayoutAlign="start">
+            <div>-- : --</div>
+          </div>
+
+          <div fxLayout="column" fxLayoutGap="4px">
+            <div style="text-align: center;border-bottom: 1px solid #c9c9c9">{{stopName}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <ng-template #end>
+    <div *ngIf="type === 'end'; else dots">
+      <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="8px">
+        <div fxFlexOrder="0" fxFlexAlign="center">
+          <mat-icon svgIcon="finish_green"></mat-icon>
+        </div>
+        <div fxFlexOrder="1" fxFlexAlign="start">
+          <div fxLayout="row" fxLayoutGap="4px">
+            <div fxLayout="column" fxLayoutAlign="start">
+              <div>-- : --</div>
+            </div>
+
+            <div fxLayout="column" fxLayoutGap="4px">
+              <div style="text-align: center;border-bottom: 1px solid #c9c9c9">{{stopName}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #dots>
+      <div>
+        <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="8px">
+          <div fxFlexOrder="0" fxFlexAlign="center">
+            <mat-icon svgIcon="growing_dots_long"></mat-icon>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ng-template>
+</ng-template>

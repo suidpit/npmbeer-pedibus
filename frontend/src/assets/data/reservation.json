@@ -1,29 +1,38 @@
 [
     {
       "_id":"5ce930a382ce95d654ff3865",
-      "date": "2019-05-29T21:00:00Z",
+      "date": "2019-07-29",
       "lineName":"linea1",
       "stopName":"P.za Solferino",
       "childName":"Aldo",
-      "direction":"OUTWARD",
+      "direction":"outward",
       "tripIndex":0
     },
     {
       "_id":"5ce9312c82ce95d654ff3866",
-        "date":"2019-05-29T21:00:00Z",
+        "date":"2019-07-29",
         "lineName":"linea1",
         "stopName":"P.za Castello",
         "childName":"Giovanni",
-        "direction":"OUTWARD",
+        "direction":"outward",
         "tripIndex":0
     },
     {
       "_id":"5ce9314482ce95d654ff3867",
-        "date":"2019-05-29T21:00:00Z",
+        "date":"2019-07-29",
         "lineName":"linea1",
         "stopName":"Sansa",
-        "childName":"Giacomo",
-        "direction":"OUTWARD",
+        "childName":"Peppino",
+        "direction":"outward",
         "tripIndex":0
+    },
+    {
+      "_id":"5ce9314482ce95d654ff3867",
+      "date":"2019-07-29",
+      "lineName":"linea1",
+      "stopName":"Sansa",
+      "childName":"Giacomo",
+      "direction":"outward",
+      "tripIndex":0
     }
   ]
