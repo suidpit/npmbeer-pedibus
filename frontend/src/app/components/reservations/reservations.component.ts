@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DataService } from "../../services/data/data.service";
-import { MatDatepicker } from "@angular/material";
+import { MatDatepicker } from "@angular/material/datepicker";
 import { FormControl } from "@angular/forms";
 
 @Component({
