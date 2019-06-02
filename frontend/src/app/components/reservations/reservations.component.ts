@@ -45,16 +45,17 @@ export class ReservationsComponent implements OnInit {
     //   return this.lines = lines;
     // });
     this.dataService.getLinesHttp().subscribe(data =>{
-      console.log('DATAAA: ' + JSON.stringify(data[1]['name']));
+      //console.log('DATAAA: ' + JSON.stringify(data[1]['name']));
       //this.selectedLine.push(data[0]['name']);
-      let i=0;
       for(let d of data){
-        this.selectedLine.push(d['name']);
-        i++;
+        this.selectedLine.push(d);
       }
     });
     this.dataService.getReservationHttp()
-    .subscribe(data=>console.log(data));
+    .subscribe(data=>{console.log(data)
+      
+      }  
+    );
 
     this.dataService.getLinesHttp()
     .subscribe(data=>console.log(data));

@@ -9,6 +9,7 @@ import {StopList} from "../../models/stop-list";
 import {Reservation} from "../../models/reservation";
 import {User} from "../../models/user";
 import { ILine } from 'src/app/models/iline';
+import { IReservation } from 'src/app/models/ireservation';
 
 
 
@@ -89,8 +90,8 @@ export class DataService {
      //this.getUsersHttp();
    }
 
-  getReservationHttp(): Observable<Reservation[]>{
-   return this.http.get<Reservation[]>(this.reservation_url);
+  getReservationHttp(): Observable<IReservation[]>{
+   return this.http.get<IReservation[]>(this.reservation_url);
  }
 
  getLinesHttp(): Observable<ILine[]>{
