@@ -21,7 +21,6 @@ export class StopRowComponent implements OnInit {
   icon = "dot";
 
   constructor() {
-    console.log("ahahah");
   }
 
   ngOnInit() {
