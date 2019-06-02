@@ -1,4 +1,4 @@
-<mat-card class="container" >
+<mat-card class="container">
   <mat-card-title>
     Presenze
   </mat-card-title>
@@ -12,12 +12,11 @@
               <mat-option *ngFor="let line of lines" [value]="line">{{line.name}}</mat-option>
             </mat-select>
           </mat-form-field>
-
           <span class="fill-row"></span>
 
           <mat-form-field>
             <mat-label>Direzione</mat-label>
-            <mat-select [(value)]="selectedDirection">
+            <mat-select [(value)]="selectedDirection" (valueChange)="updateData()">
               <mat-option value="outward">Scuola</mat-option>
               <mat-option value="back">Casa</mat-option>
             </mat-select>
@@ -27,9 +26,8 @@
 
         <mat-grid-tile class="row">
           <mat-form-field>
-            <input matInput [matDatepickerFilter]="allowedDaysFilter"
-                   [matDatepicker]="picker" placeholder="Seleziona una data"
-                   [formControl]="selectedDate" #date>
+            <input matInput [matDatepickerFilter]="allowedDaysFilter" [matDatepicker]="picker"
+              placeholder="Seleziona una data" [formControl]="selectedDate" #date>
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker [touchUi]="isMobile" #picker></mat-datepicker>
           </mat-form-field>
@@ -50,12 +48,9 @@
       </mat-grid-list>
 
     </div>
-
     <mat-divider></mat-divider>
-
     <div>
-      <mat-tab-group mat-align-tabs="center">
-        <span *ngIf="selectedDirection === 'outward'" ></span>
+      <mat-tab-group mat-align-tabs="center" [(selectedIndex)]="selectedRun">
         <mat-tab *ngFor="let run of selectedLine.outward; let i = index" label="Corsa {{i+1}}">
           <mat-list dense>
             <mat-list-item>
@@ -65,21 +60,62 @@
             <mat-list-item>
               <mat-icon svgIcon="growing_dots_long"></mat-icon>
             </mat-list-item>
-            <mat-list-item>
-              <mat-icon svgIcon="dot"></mat-icon>
-              Fermata Intermedia
-            </mat-list-item>
-            <mat-list-item>
-              <mat-icon svgIcon="growing_dots_long"></mat-icon>
-            </mat-list-item>
+            <div *ngFor="let run of selectedLine.outward[0].stops">
+              <mat-list-item>
+                <mat-icon svgIcon="dot"></mat-icon>
+                {{run.name}}
+                {{run.time}}
+                <mat-chip-list selectable="false">
+                  <mat-chip *ngFor="let child of run.childs" (click)="togglePresence(child)"
+                    [class.present]="child.present">{{ child.name }}
+                  </mat-chip>
+                </mat-chip-list>
+              </mat-list-item>
+              <mat-list-item>
+                <mat-icon svgIcon="growing_dots_long"></mat-icon>
+              </mat-list-item>
+            </div>
             <mat-list-item>
               <mat-icon svgIcon="finish_green"></mat-icon>
               Scuola
             </mat-list-item>
           </mat-list>
         </mat-tab>
+        <mat-tab *ngFor="let run of selectedLine._back; let i = index" label="Corsa {{i+2}}">
+          <mat-list dense>
+            <mat-list-item>
+              <mat-icon svgIcon="start"></mat-icon>
+              Scuola
+            </mat-list-item>
+            <mat-list-item>
+              <mat-icon svgIcon="growing_dots_long"></mat-icon>
+            </mat-list-item>
+            <div *ngFor="let run of selectedLine._back[i].stops">
+              <mat-list-item>
+                <mat-icon svgIcon="dot"></mat-icon>
+                {{run.name}}
+                {{run.time}}
+                <mat-chip-list selectable="false">
+                  <mat-chip *ngFor="let child of run.childs" (click)="togglePresence(child)"
+                    [class.present]="child.present">{{ child.name }}
+                  </mat-chip>
+                </mat-chip-list>
+              </mat-list-item>
+              <mat-list-item>
+                <mat-icon svgIcon="growing_dots_long"></mat-icon>
+              </mat-list-item>
+              <mat-list-item>
+              </mat-list-item>
+            </div>
+            <mat-list-item>
+              <mat-icon svgIcon="finish_green"></mat-icon>
+              Arrivo
+            </mat-list-item>
+          </mat-list>
+        </mat-tab>
       </mat-tab-group>
     </div>
+
 
     <mat-card-footer>
       This is a footer

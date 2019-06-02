@@ -1,14 +1,17 @@
 import { Component, OnInit } from '@angular/core';
+
 import { DataService } from "../../services/data/data.service";
 import { MatDatepicker } from "@angular/material";
 import { FormControl } from "@angular/forms";
 import { Line } from 'src/app/models/line';
 import { ILine } from 'src/app/models/iline';
+import { LocalTime } from 'js-joda';
 
+import { Child } from '../../models/child'
 @Component({
-  selector: 'app-reservations',
-  templateUrl: './reservations.component.html',
-  styleUrls: ['./reservations.component.scss']
+    selector: 'app-reservations',
+    templateUrl: './reservations.component.html',
+    styleUrls: ['./reservations.component.scss']
 })
 export class ReservationsComponent implements OnInit {
 
