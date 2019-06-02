@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { DataService } from '../../services/data/data.service';
-import { FormControl } from '@angular/forms';
+
+import { DataService } from "../../services/data/data.service";
+import { MatDatepicker } from "@angular/material";
+import { FormControl } from "@angular/forms";
+import { Line } from 'src/app/models/line';
+import { ILine } from 'src/app/models/iline';
 import { LocalTime } from 'js-joda';
 
 import { Child } from '../../models/child'
@@ -11,59 +15,58 @@ import { Child } from '../../models/child'
 })
 export class ReservationsComponent implements OnInit {
 
-    selectedLine = null;
-    lines = null;
-    selectedDate = null;
-    selectedDirection = undefined;
-    isMobile = false;
-    selectedRun = undefined;
+  selectedLine = [];
+  lines = [];
+  selectedDate = null;
+  selectedDirection = undefined;
+  isMobile = false;
+  public res = [];
+  
+  /**
+   * Filter passed to the date picker to filter out non-school days, i.e. sundays (0) and saturdays(6)
+   * **/
+  allowedDaysFilter = (d: Date): boolean => {
+    let dayNum = d.getDay();
+    return !(dayNum === 0 || dayNum === 6);
+  };
 
-    /**
-     * Filter passed to the date picker to filter out non-school days, i.e. sundays (0) and saturdays(6)
-     * **/
-    allowedDaysFilter = (d: Date): boolean => {
-        const dayNum = d.getDay();
-        return !(dayNum === 0 || dayNum === 6);
-    };
+  constructor(private dataService: DataService) {
+    this.selectedDate = new FormControl(new Date());
 
-    constructor(private dataService: DataService) {
-        this.selectedDate = new FormControl(new Date());
+    // check if it is a mobile user, if so, use touchUI elements for better targeting
+    // see https://stackoverflow.com/a/25394023/6945436 for userAgent checking
+    // TODO: check this on mobile, seems to work on desktop
+    let userAgent = navigator.userAgent;
+    this.isMobile =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(userAgent);
+  }
 
-        // check if it is a mobile user, if so, use touchUI elements for better targeting
-        // see https://stackoverflow.com/a/25394023/6945436 for userAgent checking
-        // TODO: check this on mobile, seems to work on desktop
-        const userAgent = navigator.userAgent;
-        this.isMobile =
-            /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(userAgent);
-    }
+  ngOnInit() {
+    // this.dataService.getLines().subscribe(lines => {
+    //   //console.log('Res comp: '+ lines);
+    //   this.selectedLine = lines[1];
+    //   return this.lines = lines;
+    // });
+    this.dataService.getLinesHttp().subscribe(data =>{
+      //console.log('DATAAA: ' + JSON.stringify(data[1]['name']));
+      //this.selectedLine.push(data[0]['name']);
+      for(let d of data){
+        this.lines.push(d);
+      }
+    });
+    this.dataService.getReservationHttp()
+    .subscribe(data=>{console.log(data)
+      
+      }  
+    );
 
-    ngOnInit() {
-        this.dataService.getLines().subscribe(lines => {
-            this.selectedLine = lines[1];
-            return this.lines = lines;
-        });
-        this.updateData();
+    this.dataService.getLinesHttp()
+    .subscribe(data=>console.log(data));
+    console.log('Lines: ' + this.selectedLine);
+  }
 
-    }
-
-    updateData() {
-        if (this.selectedLine != null) {
-            if (this.selectedLine.outward[0].endsAt.isAfter(LocalTime.now()) || this.selectedDirection === 'outward') {
-                this.selectedRun = 0;
-            } else if (this.selectedLine.back[0].endsAt.isAfter(LocalTime.now())) {
-                this.selectedRun = 1;
-            } else if (this.selectedLine.back[1].endsAt.isAfter(LocalTime.now())) {
-                this.selectedRun = 2;
-            } else if (this.selectedDirection === 'back') {
-                this.selectedRun = 1;
-            } else {
-                this.selectedRun = 0;
-            }
-        }
-    }
-
-    togglePresence(child: Child) {
-        console.log(child)
-        child.present = !child.present
-    }
+  updateRunData(){
+    this.selectedDirection = "outward";
+    console.log("Set focus on the first available run")
+  }
 }

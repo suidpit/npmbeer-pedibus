@@ -8,8 +8,8 @@
         <mat-grid-tile class="row">
           <mat-form-field>
             <mat-label>Seleziona una linea</mat-label>
-            <mat-select [(value)]="selectedLine" (valueChange)="updateData()">
-              <mat-option *ngFor="let line of lines" [value]="line">{{line.lineName}}</mat-option>
+            <mat-select [(value)]="selectedLine" (valueChange)="updateRunData()">
+              <mat-option *ngFor="let line of lines" [value]="line">{{line.name}}</mat-option>
             </mat-select>
           </mat-form-field>
           <span class="fill-row"></span>

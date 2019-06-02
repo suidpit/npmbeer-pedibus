@@ -1,12 +1,18 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Line } from "../../models/line";
 import { Builder } from "builder-pattern";
 import { Observable, of } from "rxjs";
-import { LocalTime, LocalDateTime } from "js-joda";
-import { Stop } from "../../models/stop";
-import { StopList } from "../../models/stop-list";
 
+import { LocalTime, LocalDateTime} from "js-joda";
+import {Stop} from "../../models/stop";
+import {StopList} from "../../models/stop-list";
+import {Reservation} from "../../models/reservation";
+import {User} from "../../models/user";
+import { ILine } from 'src/app/models/iline';
+import { IReservation } from 'src/app/models/ireservation';
 import { CHILDS } from '../mock-childs'
+
 
 @Injectable({
    providedIn: 'root'
@@ -14,35 +20,118 @@ import { CHILDS } from '../mock-childs'
 
 export class DataService {
 
-   reservation_db = [
-      {
-         "_id": "5ce930a382ce95d654ff3865",
-         "date": "2019-05-29T21:00:00Z",
-         "lineName": "linea1",
-         "stopName": "P.za Solferino",
-         "childName": "Aldo",
-         "direction": "OUTWARD",
-         "tripIndex": 0,
-      },
-      {
-         "_id": "5ce9312c82ce95d654ff3866",
-         "date": "2019-05-29T21:00:00Z",
-         "lineName": "linea1",
-         "stopName": "P.za Castello",
-         "childName": "Giovanni",
-         "direction": "OUTWARD",
-         "tripIndex": 0,
-      },
-      {
-         "_id": "5ce9314482ce95d654ff3867",
-         "date": "2019-05-29T21:00:00Z",
-         "lineName": "linea1",
-         "stopName": "Sansa",
-         "childName": "Giacomo",
-         "direction": "OUTWARD",
-         "tripIndex": 0,
-      }
-   ];
+   private reservation_url = "/assets/data/reservation.json";
+
+   private line_url = "/assets/data/line.json";
+ 
+   private user_url = "/assets/data/user.json";
+
+  private lines: Line[];
+
+  constructor(private http: HttpClient) {
+   //   let self = this;
+   //   //this.getReservationHttp();
+   //   this.http.get<Line[]>(this.line_url);
+   //   this.getLinesHttp().subscribe(function(lines){
+   //    self.lines = lines.map(function(line){
+   //       let outwards : Array<StopList> = [];
+   //       let backs : Array<StopList> = [];
+   //       // map outwards
+   //       for(let out of line.outward){
+   //          console.log('Out: ' + JSON.stringify(out));
+   //         let stopList = Builder(StopList)
+   //           .stops(out.map(function(stop){
+   //             let d = LocalDateTime.parse(stop.time.replace("Z", ""));
+   //             let time = LocalTime.of(d.hour(), d.minute(), d.second());
+   //             return Builder(Stop)
+   //               .name(stop.name)
+   //               .time(time)
+   //               .position(stop.position)
+   //               .build();
+   //           }))
+   //           .build();
+   //          console.log('stopList: ' + JSON.stringify(stopList));
+   //         outwards.push(stopList);
+   //       }
+   //       console.log('OUTWARDS: ' + JSON.stringify(outwards));
+
+ 
+   //       // map inwards
+   //       for(let b of line.back){
+   //         let stopList = Builder(StopList)
+   //           .stops(b.map(function(stop){
+   //             let d = LocalDateTime.parse(stop.time.replace("Z", ""));
+   //             let time = LocalTime.of(d.hour(), d.minute(), d.second());
+   //             // return Builder(Stop)
+   //             //   .name(stop.name)
+   //             //   .time(time)
+   //             //   .position(stop.position)
+   //             //   .build();
+   //           }))
+   //           .build();
+   //         backs.push(stopList);
+   //       }
+ 
+   //       // finally build the Line
+   //       return Builder(Line)
+   //         .id(line._id)
+   //         .lineName(line.name)
+   //         .adminEmail(line.admin_email)
+   //         .outward(outwards)
+   //         .back(backs)
+   //         .build();
+   //     });
+   //     console.log('Lines: ' + JSON.stringify(self.lines));
+   //   });
+   //   console.log('Lines2: ' + JSON.stringify(self.lines));
+
+
+
+     //this.getUsersHttp();
+   }
+
+  getReservationHttp(): Observable<IReservation[]>{
+   return this.http.get<IReservation[]>(this.reservation_url);
+ }
+
+ getLinesHttp(): Observable<ILine[]>{
+   return this.http.get<ILine[]>(this.line_url);
+ }
+
+  getUsersHttp(): Observable<User[]>{
+   return this.http.get<User[]>(this.user_url);
+
+ }
+
+  reservation_db = [
+    {
+      "_id":"5ce930a382ce95d654ff3865",
+      "date": "2019-05-29T21:00:00Z",
+      "lineName":"linea1",
+      "stopName":"P.za Solferino",
+      "childName":"Aldo",
+      "direction":"OUTWARD",
+      "tripIndex":0,
+    },
+    {
+      "_id":"5ce9312c82ce95d654ff3866",
+        "date":"2019-05-29T21:00:00Z",
+        "lineName":"linea1",
+        "stopName":"P.za Castello",
+        "childName":"Giovanni",
+        "direction":"OUTWARD",
+        "tripIndex":0,
+    },
+    {
+      "_id":"5ce9314482ce95d654ff3867",
+        "date":"2019-05-29T21:00:00Z",
+        "lineName":"linea1",
+        "stopName":"Sansa",
+        "childName":"Giacomo",
+        "direction":"OUTWARD",
+        "tripIndex":0,
+    }
+  ];
 
    line_db = [
       {
@@ -324,69 +413,18 @@ export class DataService {
       }
    ];
 
-   private lines: Line[] = null;
 
-   constructor() { }
-
-   getLines() {
-      if (this.lines === null) {
-         /*
-         * On the next lines we are building the lines array by mapping the data received from the db to:
-         * 1st -> the outward-inward(back) stops: Array<StopList> per line
-         * 2nd -> the lines themselves
-         * All of this though the aid of the .map array function and the Builder class which implements
-         * the builder pattern, check: https://github.com/Vincent-Pang/builder-pattern
-         * */
-         this.lines = this.line_db.map(function (line) {
-            let outwards: Array<StopList> = [];
-            let backs: Array<StopList> = [];
-
-            // map outwards
-            for (let out of line.outward) {
-               let stopList = Builder(StopList)
-                  .stops(out.map(function (stop) {
-                     let d = LocalDateTime.parse(stop.time.replace("Z", ""));
-                     let time = LocalTime.of(d.hour(), d.minute(), d.second());
-                     return Builder(Stop)
-                        .name(stop.name)
-                        .time(time)
-                        .position(stop.position)
-                        .childs(CHILDS.map(x => Object.assign({}, x)))
-                        .build();
-                  }))
-                  .build();
-               outwards.push(stopList);
-            }
-
-            // map inwards
-            for (let b of line.back) {
-               let stopList = Builder(StopList)
-                  .stops(b.map(function (stop) {
-                     let d = LocalDateTime.parse(stop.time.replace("Z", ""));
-                     let time = LocalTime.of(d.hour(), d.minute(), d.second());
-                     return Builder(Stop)
-                        .name(stop.name)
-                        .time(time)
-                        .position(stop.position)
-                        .childs(CHILDS.map(x => Object.assign({}, x)))
-                        .build();
-                  }))
-                  .build();
-               backs.push(stopList);
-            }
-
-            // finally build the Line
-            return Builder(Line)
-               .id(line._id)
-               .lineName(line.name)
-               .adminEmail(line.admin_email)
-               .outward(outwards)
-               .back(backs)
-               .build();
-         });
-      }
-      return of(this.lines); // Maybe Shouldn't be an Observable? should we consider this as an immutable collection?
-   }
+  getLines(){
+      /*
+      * On the next lines we are building the lines array by mapping the data received from the db to:
+      * 1st -> the outward-inward(back) stops: Array<StopList> per line
+      * 2nd -> the lines themselves
+      * All of this though the aid of the .map array function and the Builder class which implements
+      * the builder pattern, check: https://github.com/Vincent-Pang/builder-pattern
+      * */
+   
+    return of(this.lines); // Maybe Shouldn't be an Observable? should we consider this as an immutable collection?
+  }
 
    getLineById(id) {
       return this.line_db.find(line => line._id == id);
