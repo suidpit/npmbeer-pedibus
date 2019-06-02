@@ -3,9 +3,13 @@ import { DataService } from "../../services/data/data.service";
 import { FormControl } from "@angular/forms";
 import { Line } from 'src/app/models/line';
 import { ILine } from 'src/app/models/iline';
-import { LocalTime } from 'js-joda';
+import {LocalDateTime, LocalTime} from 'js-joda';
 
 import { Child } from '../../models/child'
+import {Stop} from "../../models/stop";
+import {Builder} from "builder-pattern";
+import {StopList} from "../../models/stop-list";
+import {CHILDS} from "../../services/mock-childs";
 @Component({
     selector: 'app-reservations',
     templateUrl: './reservations.component.html',
@@ -14,9 +18,10 @@ import { Child } from '../../models/child'
 export class ReservationsComponent implements OnInit {
 
   selectedLine = null;
+  selectedRun = 0;
   lines = [];
   selectedDate = null;
-  selectedDirection = undefined;
+  selectedDirection = "outward";
   isMobile = false;
   public res = [];
 
@@ -48,9 +53,53 @@ export class ReservationsComponent implements OnInit {
     this.dataService.getLinesHttp().subscribe(data =>{
       //console.log('DATAAA: ' + JSON.stringify(data[1]['name']));
       //this.selectedLine.push(data[0]['name']);
-      for(let d of data){
-      this.lines.push(d);
-      }
+      this.lines = data.map(function (line) {
+        let outwards: Array<StopList> = [];
+        let backs: Array<StopList> = [];
+        // map outwards
+        for (let out of line.outward) {
+          let stopList = Builder(StopList)
+            .stops(out.map(function (stop) {
+              let d = LocalDateTime.parse(stop.time.replace("Z", ""));
+              let time = LocalTime.of(d.hour(), d.minute(), d.second());
+              return Builder(Stop)
+                .name(stop.name)
+                .time(time)
+                .position(stop.position)
+                .childs(CHILDS.map(x => Object.assign({}, x)))
+                .build();
+            }))
+            .build();
+          outwards.push(stopList);
+        }
+
+        // map inwards
+        for (let b of line.back) {
+          let stopList = Builder(StopList)
+            .stops(b.map(function (stop) {
+              let d = LocalDateTime.parse(stop.time.replace("Z", ""));
+              let time = LocalTime.of(d.hour(), d.minute(), d.second());
+              return Builder(Stop)
+                .name(stop.name)
+                .time(time)
+                .position(stop.position)
+                .childs(CHILDS.map(x => Object.assign({}, x)))
+                .build();
+            }))
+            .build();
+          backs.push(stopList);
+        }
+
+        // finally build the Line
+        return Builder(Line)
+          .id(line.id)
+          .lineName(line.name)
+          .adminEmail(line.admin_email)
+          .outward(outwards)
+          .back(backs)
+          .build();
+      });
+      this.selectedLine = this.lines[0];
     });
 
     this.dataService.getReservationHttp()

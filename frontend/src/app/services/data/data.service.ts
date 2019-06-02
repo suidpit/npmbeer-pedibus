@@ -344,8 +344,8 @@ export class DataService {
    return this.http.get<IReservation[]>(this.reservation_url);
  }
 
- getLinesHttp(): Observable<ILine[]>{
-   return this.http.get<ILine[]>(this.line_url);
+ getLinesHttp(): Observable<any[]>{
+   return this.http.get<any[]>(this.line_url);
  }
 
   getUsersHttp(): Observable<User[]>{
