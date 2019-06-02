@@ -1,8 +1,9 @@
-import {Component, OnInit} from '@angular/core';
-import {DataService} from '../../services/data/data.service';
-import {FormControl} from '@angular/forms';
-import {LocalTime} from 'js-joda';
+import { Component, OnInit } from '@angular/core';
+import { DataService } from '../../services/data/data.service';
+import { FormControl } from '@angular/forms';
+import { LocalTime } from 'js-joda';
 
+import { Child } from '../../models/child'
 @Component({
     selector: 'app-reservations',
     templateUrl: './reservations.component.html',
@@ -41,7 +42,6 @@ export class ReservationsComponent implements OnInit {
             this.selectedLine = lines[1];
             return this.lines = lines;
         });
-
         this.updateData();
 
     }
@@ -60,5 +60,10 @@ export class ReservationsComponent implements OnInit {
                 this.selectedRun = 0;
             }
         }
+    }
+
+    togglePresence(child: Child) {
+        console.log(child)
+        child.present = !child.present
     }
 }

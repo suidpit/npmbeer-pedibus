@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatButtonModule, MatIconModule, MatCheckboxModule, MatCardModule, MatMenuModule, MatButtonToggleModule,
         MatSelectModule, MatGridListModule, MatDividerModule, MatDatepickerModule,
-        MatNativeDateModule, MatInputModule, MatTabsModule, MatListModule} from '@angular/material';
+        MatNativeDateModule, MatInputModule, MatTabsModule, MatListModule, MatChipsModule} from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 import { AppComponent } from './app.component';
@@ -34,7 +34,8 @@ import {HttpClientModule} from "@angular/common/http";
     FormsModule,
     ReactiveFormsModule,
     MatTabsModule,
-    MatListModule
+    MatListModule,
+    MatChipsModule
   ],
   providers: [MatDatepickerModule],
   bootstrap: [AppComponent]
