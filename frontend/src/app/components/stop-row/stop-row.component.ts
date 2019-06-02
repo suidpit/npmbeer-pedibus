@@ -1,29 +1,28 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 
 @Component({
   selector: 'app-stop-row',
   templateUrl: './stop-row.component.html',
-  styleUrls: ['./stop-row.component.scss']
+  styleUrls: ['./stop-row.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StopRowComponent implements OnInit {
 
   @Input("type") type = "end";
 
-  @Input("stop-data") stop;
+  @Input("stop-name") stopName;
+
+  @Input("stop-time") stopTime;
+
+  @Input("children") children;
 
   @Output("child-presence") change: EventEmitter<Kid> = new EventEmitter<Kid>();
 
   icon = "dot";
 
-  children = [
-    new Kid("Pazzo", true, true),
-    new Kid("Pezzo", true, true),
-    new Kid("Pizzo", true, false),
-    new Kid("Pozzo", false, true),
-    new Kid("Puzzo", false, false)
-  ];
-
-  constructor() { }
+  constructor() {
+    console.log("ahahah");
+  }
 
   ngOnInit() {
   }

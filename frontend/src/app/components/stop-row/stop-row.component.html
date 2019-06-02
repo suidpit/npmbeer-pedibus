@@ -7,17 +7,22 @@
     <div fxFlexOrder="1" fxFlexAlign="start">
       <div fxLayout="row" fxLayoutGap="4px">
         <div fxLayout="column" fxLayoutAlign="start">
-          <div>8.00</div>
+          <div>{{stopTime}}</div>
         </div>
 
         <div fxLayout="column" fxLayoutGap="4px">
-          <div style="text-align: center;border-bottom: 1px solid #c9c9c9">Nome Fermata</div>
+          <div style="text-align: center;border-bottom: 1px solid #c9c9c9">{{stopName}}</div>
           <mat-chip-list [selectable]="true" [multiple]="true">
-            <mat-chip *ngFor="let child of children"
-                      [class.mat-accent]="child.hadReservation"
-                      [class.had-reservation]="child.hadReservation"
-                      [selected]="child.isPresent"
-                      (click)="togglePresence(child)">{{child.name}}</mat-chip>
+            <div *ngIf="children && children.length !== 0; else noKids">
+              <mat-chip *ngFor="let child of children"
+                        [class.mat-accent]="child.hadReservation"
+                        [class.had-reservation]="child.hadReservation"
+                        [selected]="child.isPresent"
+                        (click)="togglePresence(child)">{{child.name}}</mat-chip>
+            </div>
+            <ng-template #noKids>
+              <div> No Reservations </div>
+            </ng-template>
           </mat-chip-list>
         </div>
       </div>

@@ -3,7 +3,7 @@ import { DataService } from "../../services/data/data.service";
 import { FormControl } from "@angular/forms";
 import { Line } from 'src/app/models/line';
 import { ILine } from 'src/app/models/iline';
-import {LocalDateTime, LocalTime} from 'js-joda';
+import {LocalDate, LocalDateTime, LocalTime} from 'js-joda';
 
 import { Child } from '../../models/child'
 import {Stop} from "../../models/stop";
@@ -22,6 +22,10 @@ export class ReservationsComponent implements OnInit {
   lines = [];
   selectedDate = null;
   selectedDirection = "outward";
+
+  reservations = [];
+  reservedStops;
+
   isMobile = false;
   public res = [];
 
@@ -30,7 +34,7 @@ export class ReservationsComponent implements OnInit {
    * **/
   allowedDaysFilter = (d: Date): boolean => {
     let dayNum = d.getDay();
-    return !(dayNum === 0 || dayNum === 6);
+    return !(dayNum === 0);
   };
 
   constructor(private dataService: DataService) {
@@ -42,17 +46,7 @@ export class ReservationsComponent implements OnInit {
     let userAgent = navigator.userAgent;
     this.isMobile =
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(userAgent);
-  }
-
-  ngOnInit() {
-    // this.dataService.getLines().subscribe(lines => {
-    //   //console.log('Res comp: '+ lines);
-    //   this.selectedLine = lines[1];
-    //   return this.lines = lines;
-    // });
     this.dataService.getLinesHttp().subscribe(data =>{
-      //console.log('DATAAA: ' + JSON.stringify(data[1]['name']));
-      //this.selectedLine.push(data[0]['name']);
       this.lines = data.map(function (line) {
         let outwards: Array<StopList> = [];
         let backs: Array<StopList> = [];
@@ -100,43 +94,106 @@ export class ReservationsComponent implements OnInit {
           .build();
       });
       this.selectedLine = this.lines[0];
-    });
+    }, () => null, () =>this.updateData());
+  }
 
+  ngOnInit() {
+
+  }
+
+  updateData() {
+    if (this.selectedLine != null) {
+      if (this.selectedLine.outward[0].endsAt.isAfter(LocalTime.now()) || this.selectedDirection === 'outward') {
+        this.selectedRun = 0;
+        this.selectedDirection = 'outward';
+      } else if (this.selectedLine.back[0].endsAt.isAfter(LocalTime.now())) {
+        this.selectedRun = 1;
+        this.selectedDirection = 'back';
+      } else if (this.selectedLine.back[1].endsAt.isAfter(LocalTime.now())) {
+        this.selectedRun = 2;
+        this.selectedDirection = 'back';
+      } else if (this.selectedDirection === 'back') {
+        this.selectedRun = 1;
+        this.selectedDirection = 'back';
+      } else {
+        this.selectedRun = 0;
+        this.selectedDirection = 'outward';
+      }
+
+      this.updateReservation();
+    }
+
+
+  }
+
+  togglePresence(child: Child) {
+    console.log(child)
+    child.present = !child.present
+  }
+
+  logEvent(event){
+    console.log(event);
+  }
+
+  logger(){
+    console.log(1);
+  }
+
+  updateReservation(){
     this.dataService.getReservationHttp()
       .subscribe(data=>{
-        console.log(data)
+        this.reservations = data.filter(res => {
+          let d = LocalDate.parse(res.date);
+          let selectedDate = LocalDate.of(
+            this.selectedDate.value.getFullYear(),
+            this.selectedDate.value.getMonth()+1,
+            this.selectedDate.value.getDate());
+
+          return d.equals(selectedDate) && res.lineName === this.selectedLine.lineName;
+        });
+      }, () => null, () =>{
+        if(this.selectedLine != null){
+
+          this.reservedStops = {"outward": [], "back": []};
+          let arr = [];
+
+          for(let stop of this.selectedLine.outward[0].stops){
+            let children = this.childrenByStop(stop.name, 0, "outward");
+            if(children !== undefined){
+              arr.push(children);
+            }
+          }
+          this.reservedStops["outward"].push(arr);
+
+          let i = 0;
+          for(let run of this.selectedLine.back){
+            let arr = [];
+            for(let stop of run.stops){
+              let children = this.childrenByStop(stop.name, i, "back");
+              if(children !== undefined){
+                arr.push(children);
+              }
+            }
+            this.reservedStops["back"].push(arr);
+            i += 1;
+          }
+        }
       });
   }
 
-    updateData() {
-        if (this.selectedLine != null) {
-            if (this.selectedLine.outward[0].endsAt.isAfter(LocalTime.now()) || this.selectedDirection === 'outward') {
-                this.selectedRun = 0;
-                this.selectedDirection = 'outward';
-            } else if (this.selectedLine.back[0].endsAt.isAfter(LocalTime.now())) {
-                this.selectedRun = 1;
-                this.selectedDirection = 'back';
-            } else if (this.selectedLine.back[1].endsAt.isAfter(LocalTime.now())) {
-                this.selectedRun = 2;
-                this.selectedDirection = 'back';
-            } else if (this.selectedDirection === 'back') {
-                this.selectedRun = 1;
-                this.selectedDirection = 'back';
-            } else {
-                this.selectedRun = 0;
-                this.selectedDirection = 'outward';
-            }
-        }
-    }
+  childrenByStop(stopName, index, direction){
+    return this.reservations.filter(res =>{
+      return res.stopName === stopName && res.direction === direction && res.tripIndex === index;
+      })
+      .map(res => {
+        return {"name":res.childName, "hadReservation":true, isPresent:false}})
+      .sort(function(a, b){
+        if(a.name < b.name) return -1;
+        if(a.name > b.name) return 1;
+        else return 0;
+      });
 
-    togglePresence(child: Child) {
-        console.log(child)
-        child.present = !child.present
-    }
-
-    logEvent(event){
-      console.log(event);
-    }
+  }
 
   updateRunData(){
     this.selectedDirection = "outward";
