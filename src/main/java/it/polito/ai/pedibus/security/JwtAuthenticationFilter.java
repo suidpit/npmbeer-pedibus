@@ -52,7 +52,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        String token = tokenProvider.createToken(user.getUsername(), roles);
+        String token = tokenProvider.createToken(user.getUsername(), roles, "1234");
         response.addHeader("Authorization", "Bearer "+token);
     }
 }

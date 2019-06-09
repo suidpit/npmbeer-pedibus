@@ -25,12 +25,14 @@ import { AppComponent } from './app.component';
 import { ReservationsComponent } from './components/reservations/reservations.component';
 import {HttpClientModule} from "@angular/common/http";
 import { StopRowComponent } from './components/stop-row/stop-row.component';
+import { LoginComponent } from './components/auth/login/login.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ReservationsComponent,
-    StopRowComponent
+    StopRowComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,

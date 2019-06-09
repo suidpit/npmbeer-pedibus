@@ -25,6 +25,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import javax.validation.Valid;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
 
 @RestController
@@ -45,7 +46,7 @@ public class UserAuthController {
     IUserService service;
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String login(
+    public HashMap<String, String> login(
         @RequestBody LoginDTO loginDTO
     ){
         logger.info(loginDTO.getEmail());

@@ -6,9 +6,11 @@ import it.polito.ai.pedibus.api.models.EmailVerificationToken;
 import it.polito.ai.pedibus.api.models.RecoveryToken;
 import it.polito.ai.pedibus.api.models.User;
 
+import java.util.HashMap;
+
 public interface IUserService {
 
-    String signin(String email, String password);
+    HashMap<String, String> signin(String email, String password);
 
     User registerNewUserAccount(UserDTO accountDto)
             throws EmailExistsException;
