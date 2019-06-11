@@ -23,14 +23,16 @@ import { FlexLayoutModule } from "@angular/flex-layout";
 
 import { AppComponent } from './app.component';
 import { ReservationsComponent } from './components/reservations/reservations.component';
-import {HttpClientModule} from "@angular/common/http";
+import { HttpClientModule } from "@angular/common/http";
 import { StopRowComponent } from './components/stop-row/stop-row.component';
+import { ProveComponent } from './prove/prove.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ReservationsComponent,
-    StopRowComponent
+    StopRowComponent,
+    ProveComponent
   ],
   imports: [
     BrowserModule,

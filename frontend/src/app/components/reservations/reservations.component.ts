@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { DataService } from "../../services/data/data.service";
 import { FormControl } from "@angular/forms";
 import { Line } from 'src/app/models/line';
 import {LocalDate, LocalDateTime, LocalTime} from 'js-joda';
@@ -8,7 +7,7 @@ import { Child } from '../../models/child'
 import {Stop} from "../../models/stop";
 import {Builder} from "builder-pattern";
 import {StopList} from "../../models/stop-list";
-import {CHILDS} from "../../services/mock-childs";
+import { ReservationsService } from 'src/app/reservations.service';
 @Component({
     selector: 'app-reservations',
     templateUrl: './reservations.component.html',
@@ -36,7 +35,7 @@ export class ReservationsComponent implements OnInit {
     return !(dayNum === 0);
   };
 
-  constructor(private dataService: DataService) {
+  constructor(private reservationsService: ReservationsService) {
     this.selectedDate = new FormControl(new Date());
 
     // check if it is a mobile user, if so, use touchUI elements for better targeting
@@ -45,21 +44,19 @@ export class ReservationsComponent implements OnInit {
     let userAgent = navigator.userAgent;
     this.isMobile =
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(userAgent);
-    this.dataService.getLinesHttp().subscribe(data =>{
-      this.lines = data.map(function (line) {
+    this.reservationsService.lines().subscribe(data => {
+      this.lines = data.map((line) => {
         let outwards: Array<StopList> = [];
         let backs: Array<StopList> = [];
         // map outwards
         for (let out of line.outward) {
           let stopList = Builder(StopList)
             .stops(out.map(function (stop) {
-              let d = LocalDateTime.parse(stop.time.replace("Z", ""));
-              let time = LocalTime.of(d.hour(), d.minute(), d.second());
+              let time = LocalTime.parse(stop.time);
               return Builder(Stop)
                 .name(stop.name)
                 .time(time)
                 .position(stop.position)
-                .childs(CHILDS.map(x => Object.assign({}, x)))
                 .build();
             }))
             .build();
@@ -70,13 +67,11 @@ export class ReservationsComponent implements OnInit {
         for (let b of line.back) {
           let stopList = Builder(StopList)
             .stops(b.map(function (stop) {
-              let d = LocalDateTime.parse(stop.time.replace("Z", ""));
-              let time = LocalTime.of(d.hour(), d.minute(), d.second());
+              let time = LocalTime.parse(stop.time);
               return Builder(Stop)
                 .name(stop.name)
                 .time(time)
                 .position(stop.position)
-                .childs(CHILDS.map(x => Object.assign({}, x)))
                 .build();
             }))
             .build();
@@ -92,6 +87,7 @@ export class ReservationsComponent implements OnInit {
           .back(backs)
           .build();
       });
+    console.log(this.lines)
     }, () => null, () =>{
       this.selectedLine = this.lines[0];
       this.updateData()
@@ -119,7 +115,7 @@ export class ReservationsComponent implements OnInit {
         this.selectedDate.setValue(today);
       }
 
-      this.updateReservation();
+      //this.updateReservation();
     }
   }
 
@@ -135,7 +131,7 @@ export class ReservationsComponent implements OnInit {
   logger(){
     console.log(1);
   }
-
+  /*
   updateReservation(){
     this.dataService.getReservationHttp()
       .subscribe(data=>{
@@ -191,6 +187,7 @@ export class ReservationsComponent implements OnInit {
       });
 
   }
+  */
 
   updateRunData(){
     this.selectedDirection = "outward";

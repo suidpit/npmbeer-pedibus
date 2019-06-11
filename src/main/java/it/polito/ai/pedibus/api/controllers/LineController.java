@@ -2,13 +2,11 @@ package it.polito.ai.pedibus.api.controllers;
 
 import it.polito.ai.pedibus.api.models.Line;
 import it.polito.ai.pedibus.api.services.LineService;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/lines")
 public class LineController {
