@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { DataService } from "../../services/data/data.service";
 import { FormControl } from "@angular/forms";
 import { Line } from 'src/app/models/line';
-import { ILine } from 'src/app/models/iline';
 import {LocalDate, LocalDateTime, LocalTime} from 'js-joda';
 
 import { Child } from '../../models/child'
