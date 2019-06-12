@@ -1,0 +1,40 @@
+<mat-card class="container">
+  <mat-card-title>
+    Registration
+  </mat-card-title>
+  <mat-card-content>
+    <div *ngIf="error" class="error">Email o password errati</div>
+    <div class="form-container">
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <table>
+          <tr>
+            <td>
+              <mat-form-field>
+                <input matInput placeholder="E-mail*" #emailField formControlName="email">
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <mat-form-field>
+                <input matInput [type]="'password'" placeholder="Password*" formControlName="password1">
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <mat-form-field>
+                <input matInput [type]="'password'" placeholder="Retype Password*" formControlName="password2">
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td> <button mat-raised-button class="btn-login"
+                         [type]="'submit'" [disabled]="!registerForm.valid">Register</button> </td>
+          </tr>
+        </table>
+
+      </form>
+    </div>
+  </mat-card-content>
+</mat-card>

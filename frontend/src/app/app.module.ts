@@ -31,6 +31,7 @@ import { LoginComponent } from './components/auth/login/login.component';
 import {AuthInterceptor} from "./services/auth/auth-interceptor";
 import {RouterModule} from "@angular/router";
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
+import {RegistrationComponent} from './components/registration/registration.component';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import { ToolbarComponent } from './components/toolbar/toolbar.component';
     ReservationsComponent,
     StopRowComponent,
     LoginComponent,
-    ToolbarComponent
+    ToolbarComponent,
+    RegistrationComponent
   ],
   imports: [
     BrowserModule,
@@ -46,7 +48,7 @@ import { ToolbarComponent } from './components/toolbar/toolbar.component';
     RouterModule.forRoot([
       { path: "login", component: LoginComponent},
       { path: "presenze", component: ReservationsComponent},
-      { path: "registrazione", component: LoginComponent },
+      { path: "registrazione", component: RegistrationComponent },
       { path: "**", redirectTo: "login", pathMatch: "full"}
     ]),
     HttpClientModule,
