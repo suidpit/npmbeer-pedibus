@@ -16,27 +16,39 @@ import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatChipsModule } from "@angular/material";
+import { MatChipsModule} from "@angular/material";
+import { MatToolbarModule } from "@angular/material";
+import { MatSidenavModule } from "@angular/material";
 
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { FlexLayoutModule } from "@angular/flex-layout";
 
 import { AppComponent } from './app.component';
 import { ReservationsComponent } from './components/reservations/reservations.component';
-import {HttpClientModule} from "@angular/common/http";
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import { StopRowComponent } from './components/stop-row/stop-row.component';
 import { LoginComponent } from './components/auth/login/login.component';
+import {AuthInterceptor} from "./services/auth/auth-interceptor";
+import {RouterModule} from "@angular/router";
+import { ToolbarComponent } from './components/toolbar/toolbar.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ReservationsComponent,
     StopRowComponent,
-    LoginComponent
+    LoginComponent,
+    ToolbarComponent
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    RouterModule.forRoot([
+      { path: "login", component: LoginComponent},
+      { path: "presenze", component: ReservationsComponent},
+      { path: "registrazione", component: LoginComponent },
+      { path: "**", redirectTo: "login", pathMatch: "full"}
+    ]),
     HttpClientModule,
     MatButtonModule,
     MatIconModule,
@@ -55,9 +67,15 @@ import { LoginComponent } from './components/auth/login/login.component';
     MatTabsModule,
     MatListModule,
     MatChipsModule,
+    MatToolbarModule,
+    MatSidenavModule,
     FlexLayoutModule
   ],
-  providers: [MatDatepickerModule],
+  providers: [MatDatepickerModule, {
+    provide: HTTP_INTERCEPTORS,
+    useClass: AuthInterceptor,
+    multi: true
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
