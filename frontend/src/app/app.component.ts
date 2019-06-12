@@ -29,6 +29,10 @@ export class AppComponent {
     {
       "name": "finish_green",
       "path": "finish_green.svg"
+    },
+    {
+      "name": "add",
+      "path": "add.svg"
     }
   ];
   constructor(private matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer){

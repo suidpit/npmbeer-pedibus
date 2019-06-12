@@ -126,7 +126,7 @@ export class ReservationsComponent implements OnInit {
   }
 
   togglePresence(child: Child) {
-    console.log(child)
+    console.log(child);
     child.present = !child.present
   }
 

@@ -15,6 +15,7 @@ export class AuthInterceptor implements HttpInterceptor{
       });
     }
     req = this.addAuthenticationToken(req);
+
     return next.handle(req);
   }
 

@@ -1,4 +1,5 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Inject, Input, OnInit, Output} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef} from "@angular/material";
 
 @Component({
   selector: 'app-stop-row',
@@ -18,9 +19,11 @@ export class StopRowComponent implements OnInit {
 
   @Output("child-presence") change: EventEmitter<Kid> = new EventEmitter<Kid>();
 
+  @Output("add-child") addChild: EventEmitter<Kid> = new EventEmitter<Kid>();
+
   icon = "dot";
 
-  constructor() {
+  constructor(private dialog: MatDialog) {
   }
 
   ngOnInit() {
@@ -30,16 +33,57 @@ export class StopRowComponent implements OnInit {
     child.isPresent = !child.isPresent;
     this.change.emit(child);
   }
+
+  emitChild(child){
+    this.addChild.emit(child);
+  }
+
+  showPopup(){
+    const self = this;
+    const dialogRef = this.dialog.open(DialogAddKid, {
+      width: "350px",
+      data: { name: "", gender: "", stop:self.stopName}
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if(result && result !== undefined){
+        const child = {name: result.name, hadReservation: false, isPresent: true};
+        self.children.push(child);
+        self.emitChild(child);
+      }
+    });
+  }
 }
 
-export class Kid{
+export interface Kid{
   name: string;
   hadReservation: false;
   isPresent: false;
 
-  constructor(name, hadReservation, isPresent){
-    this.name = name;
-    this.hadReservation = hadReservation;
-    this.isPresent = isPresent;
+  // constructor(name, hadReservation, isPresent){
+  //   this.name = name;
+  //   this.hadReservation = hadReservation;
+  //   this.isPresent = isPresent;
+  // }
+}
+
+export interface DialogAddKidData {
+  name: string;
+  gender: string;
+  stop: string;
+}
+
+@Component({
+  selector: 'add-kid-popup-template',
+  templateUrl: 'add-kid-popup-template.html',
+})
+export class DialogAddKid {
+
+  constructor(
+    public dialogRef: MatDialogRef<DialogAddKid>,
+    @Inject(MAT_DIALOG_DATA) public data: DialogAddKidData) {}
+
+  onNoClick(): void {
+    this.dialogRef.close();
   }
+
 }

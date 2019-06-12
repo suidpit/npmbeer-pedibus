@@ -49,7 +49,7 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem("user");
-    localStorage.removeItem("id_token");
+    localStorage.removeItem("token_id");
     localStorage.removeItem("expires_at");
     localStorage.removeItem("not_before");
     this.currentUserSubject.next(null);

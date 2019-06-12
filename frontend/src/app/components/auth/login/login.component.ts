@@ -28,6 +28,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+    this.auth.logout()
   }
 
   onSubmit(){

@@ -16,7 +16,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatChipsModule} from "@angular/material";
+import {MatChipsModule, MatDialogModule} from "@angular/material";
 import { MatToolbarModule } from "@angular/material";
 import { MatSidenavModule } from "@angular/material";
 
@@ -26,12 +26,14 @@ import { FlexLayoutModule } from "@angular/flex-layout";
 import { AppComponent } from './app.component';
 import { ReservationsComponent } from './components/reservations/reservations.component';
 import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
-import { StopRowComponent } from './components/stop-row/stop-row.component';
+import {DialogAddKid, StopRowComponent} from './components/stop-row/stop-row.component';
 import { LoginComponent } from './components/auth/login/login.component';
 import {AuthInterceptor} from "./services/auth/auth-interceptor";
 import {RouterModule} from "@angular/router";
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
-import {RegistrationComponent} from './components/registration/registration.component';
+import {RegistrationComponent, DialogAddKidReg} from './components/registration/registration.component';
+import {CdkStepperModule} from '@angular/cdk/stepper';
+import {MatStepperModule} from '@angular/material/stepper';
 
 @NgModule({
   declarations: [
@@ -40,7 +42,9 @@ import {RegistrationComponent} from './components/registration/registration.comp
     StopRowComponent,
     LoginComponent,
     ToolbarComponent,
-    RegistrationComponent
+    RegistrationComponent,
+    DialogAddKid,
+    DialogAddKidReg
   ],
   imports: [
     BrowserModule,
@@ -71,13 +75,17 @@ import {RegistrationComponent} from './components/registration/registration.comp
     MatChipsModule,
     MatToolbarModule,
     MatSidenavModule,
-    FlexLayoutModule
+    MatDialogModule,
+    FlexLayoutModule,
+    CdkStepperModule,
+    MatStepperModule
   ],
   providers: [MatDatepickerModule, {
     provide: HTTP_INTERCEPTORS,
     useClass: AuthInterceptor,
     multi: true
   }],
+  entryComponents: [DialogAddKid,DialogAddKidReg],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
