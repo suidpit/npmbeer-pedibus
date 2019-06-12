@@ -1,0 +1,16 @@
+<h1 mat-dialog-title>Aggiungi bambino a {{data.stop}}</h1>
+<div mat-dialog-content>
+  <mat-form-field>
+    <input matInput placeholder="Nome" [(ngModel)]="data.name">
+  </mat-form-field>
+  <mat-form-field>
+    <mat-select placeholder="Sesso" [(ngModel)]="data.gender">
+      <mat-option value="F">Femmina</mat-option>
+      <mat-option value="M">Maschio</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Annulla</button>
+  <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Ok</button>
+</div>
