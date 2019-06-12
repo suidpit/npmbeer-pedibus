@@ -7,7 +7,7 @@ import { Observable, of } from "rxjs";
 import { LocalTime, LocalDateTime} from "js-joda";
 import {Stop} from "../../models/stop";
 import {StopList} from "../../models/stop-list";
-import {Reservation} from "../../models/reservation";
+import {Reservation} from "../../models/reservations";
 import {User} from "../../models/user";
 import { ILine } from 'src/app/models/iline';
 import { IReservation } from 'src/app/models/ireservation';

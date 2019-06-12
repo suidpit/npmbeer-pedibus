@@ -7,6 +7,8 @@ import org.bson.types.ObjectId;
 import org.omg.CORBA.OBJ_ADAPTER;
 import org.springframework.stereotype.Service;
 
+import java.io.Console;
+import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -29,29 +31,36 @@ public class ReservationService {
         return reservationRepository.findAll();
     }
 
-    public HashMap<String, HashMap<String, ArrayList<String>>> getReservationStops(String lineName, String dateString) {
+    public HashMap<String, ArrayList<HashMap<String, ArrayList<String>>>> getReservationStops(String lineName, String dateString) {
 
         LocalDate date = LocalDate.parse(dateString, fmt);
 
         //ovvero <"Sale o Scende", <"Nome Fermata", [Lista di gente che sale o scende]>>
-        HashMap<String, HashMap<String, ArrayList<String>>> mappazza = new HashMap<>();
+        HashMap<String, ArrayList<HashMap<String, ArrayList<String>>>> mappazza = new HashMap<>();
 
         //<Fermata,<ListaBambini>>
-        HashMap<String, ArrayList<String>> innerMapOut = new HashMap<>();
-        HashMap<String, ArrayList<String>> innerMapBack = new HashMap<>();
+        ArrayList<HashMap<String,ArrayList<String>>> o = new ArrayList<>();
+        ArrayList<HashMap<String,ArrayList<String>>> b = new ArrayList<>();
 
         List<Reservation> listReservation = reservationRepository.findByLineNameAndDate(lineName, date);
         for (Reservation res : listReservation) {
             // Ugly repetition, but that's it for now.
             if (res.getDirection() == Reservation.Direction.OUTWARD) {
-                innerMapOut.computeIfAbsent(res.getStopName(), k -> new ArrayList<>()).add(res.getChildName());
+                while(res.getTripIndex()>=o.size()){
+                    o.add(new HashMap<>());
+                    System.err.println(o.size());
+                }
+                o.get(res.getTripIndex()).computeIfAbsent(res.getStopName(), k -> new ArrayList<>()).add(res.getChildName());
             } else if (res.getDirection() == Reservation.Direction.BACK) {
-                innerMapBack.computeIfAbsent(res.getStopName(), k -> new ArrayList<>()).add(res.getChildName());
+                while(res.getTripIndex()>=b.size()){
+                    b.add(new HashMap<>());
+                }
+                b.get(res.getTripIndex()).computeIfAbsent(res.getStopName(), k -> new ArrayList<>()).add(res.getChildName());
             }
         }
 
-        mappazza.put("Outward", innerMapOut);
-        mappazza.put("Backward", innerMapBack);
+        mappazza.put("outward", o);
+        mappazza.put("backward", b);
 
         // We don't need to cast a JSONObject since we are in a RESTController and the serialization is automagic.
         return mappazza;

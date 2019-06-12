@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@CrossOrigin
 @Validated
 @RestController
 @RequestMapping("/reservations")
@@ -51,7 +52,7 @@ public class ReservationController {
      * @return
      */
     @RequestMapping(value = "/{lineName}/{date}", method = RequestMethod.GET)
-    public HashMap<String, HashMap<String, ArrayList<String>>> getChildsForStop(@PathVariable("lineName") String lineName,
+    public HashMap<String, ArrayList<HashMap<String, ArrayList<String>>>> getChildsForStop(@PathVariable("lineName") String lineName,
                                                                                 @PathVariable("date") String dateString) {
         return reservationService.getReservationStops(lineName, dateString);
     }

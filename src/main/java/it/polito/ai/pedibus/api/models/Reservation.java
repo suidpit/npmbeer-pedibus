@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @Builder
 @Document(collection = "reservations")
 public class Reservation {
-    public enum Direction {OUTWARD, BACK};
+    public enum Direction {OUTWARD, BACK}
 
     @Id
     @JsonSerialize(using = ObjectIdSerializer.class)
@@ -26,9 +26,9 @@ public class Reservation {
     private LocalDate date;
     private String lineName;
     // We're not sure an ID is needed here, since every stop name, in the context of a direction and tripIndex number, is unique.
-    private String stopName;
     private String childName;
     private Direction direction;
+    private String stopName;
     // This just represents an index in the array of trips for that line, in that direction.
     private Integer tripIndex;
 }
