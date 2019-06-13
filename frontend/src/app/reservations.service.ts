@@ -23,11 +23,11 @@ export class ReservationsService {
         //TODO:  This will go in a config file
         let api_url = "http://127.0.0.1:8080/lines"
         console.log("Requesting from service...")
-        return this.http.get<Line[]>(api_url).pipe(map((data) => data.map((line) => {
+        return this.http.get<any[]>(api_url).pipe(map((data) => data.map((line) => {
             let outwards: Array<StopList> = [];
             let backs: Array<StopList> = [];
             // map outwards
-            for (let out of line.outward) {
+            for (let out of line.outward ) {
                 let stopList = Builder(StopList)
                     .stops(out.map(function (stop) {
                         let time = LocalTime.parse(stop.time);
@@ -70,7 +70,6 @@ export class ReservationsService {
     reservations(line: string, date): Observable<Reservations> {
         let api_url = "http://127.0.0.1:8080/reservations/" + line + "/" + date;
         return this.http.get<Reservations>(api_url).pipe(map(data => {
-
             let outwards: Array<Reservation[]> = [];
             let backs: Array<Reservation[]> = [];
             // map outwards
@@ -80,8 +79,8 @@ export class ReservationsService {
                     let childs: Child[] = [];
                     for (let c of out[stop]) {
                         let child = Builder(Child)
-                            .name(c.name)
-                            .present(c.present)
+                            .name(c)
+                            .present(false)
                             .build();
                         childs.push(child);
                     }

@@ -88,7 +88,6 @@ export class ReservationsComponent implements OnInit {
         this.reservationsService.reservations(this.selectedLine.lineName, date)
             .subscribe(data => {
                 this.reservations = data;
-                console.log(this.reservations);
             }, () => null, () => {
                 if(this.selectedLine != null){
 
