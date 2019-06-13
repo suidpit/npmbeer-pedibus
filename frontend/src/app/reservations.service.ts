@@ -10,7 +10,6 @@ import {StopList} from "./models/stop-list";
 import {LocalTime} from "js-joda";
 import {Stop} from "./models/stop";
 import {Reservation} from "./models/reservation";
-import {ReservationList} from "./models/reservation-list";
 
 @Injectable({
     providedIn: 'root'
@@ -24,7 +23,48 @@ export class ReservationsService {
         //TODO:  This will go in a config file
         let api_url = "http://127.0.0.1:8080/lines"
         console.log("Requesting from service...")
-        return this.http.get<Line[]>(api_url);
+        return this.http.get<Line[]>(api_url).pipe(map((data) => data.map((line) => {
+            let outwards: Array<StopList> = [];
+            let backs: Array<StopList> = [];
+            // map outwards
+            for (let out of line.outward) {
+                let stopList = Builder(StopList)
+                    .stops(out.map(function (stop) {
+                        let time = LocalTime.parse(stop.time);
+                        return Builder(Stop)
+                            .name(stop.name)
+                            .time(time)
+                            .position(stop.position)
+                            .build();
+                    }))
+                    .build();
+                outwards.push(stopList);
+            }
+
+            // map inwards
+            for (let b of line.back) {
+                let stopList = Builder(StopList)
+                    .stops(b.map(function (stop) {
+                        let time = LocalTime.parse(stop.time);
+                        return Builder(Stop)
+                            .name(stop.name)
+                            .time(time)
+                            .position(stop.position)
+                            .build();
+                    }))
+                    .build();
+                backs.push(stopList);
+            }
+
+            // finally build the Line
+            return Builder(Line)
+                .id(line.id)
+                .lineName(line.name)
+                .adminEmail(line.admin_email)
+                .outward(outwards)
+                .back(backs)
+                .build();
+        })));
     }
 
     reservations(line: string, date): Observable<Reservations> {

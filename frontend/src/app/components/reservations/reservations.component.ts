@@ -22,7 +22,7 @@ export class ReservationsComponent implements OnInit {
     selectedDate = null;
     selectedDirection = "outward";
 
-    reservations = [];
+    reservations ;
     reservedStops;
 
     isMobile = false;
@@ -46,54 +46,7 @@ export class ReservationsComponent implements OnInit {
         this.isMobile =
             /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(userAgent);
         this.reservationsService.lines().subscribe(data => {
-            this.lines = data.map((line) => {
-                let day = this.selectedDate.value.getDate();
-                let month = (this.selectedDate.value.getMonth() + 1).toString();
-                if (month.length < 2)
-                    month = "0" + month;
-                let year = this.selectedDate.value.getFullYear();
-                let date = day.toString() + month + year.toString();
-                let outwards: Array<StopList> = [];
-                let backs: Array<StopList> = [];
-                // map outwards
-                for (let out of line.outward) {
-                    let stopList = Builder(StopList)
-                        .stops(out.map(function (stop) {
-                            let time = LocalTime.parse(stop.time);
-                            return Builder(Stop)
-                                .name(stop.name)
-                                .time(time)
-                                .position(stop.position)
-                                .build();
-                        }))
-                        .build();
-                    outwards.push(stopList);
-                }
-
-                // map inwards
-                for (let b of line.back) {
-                    let stopList = Builder(StopList)
-                        .stops(b.map(function (stop) {
-                            let time = LocalTime.parse(stop.time);
-                            return Builder(Stop)
-                                .name(stop.name)
-                                .time(time)
-                                .position(stop.position)
-                                .build();
-                        }))
-                        .build();
-                    backs.push(stopList);
-                }
-
-                // finally build the Line
-                return Builder(Line)
-                    .id(line.id)
-                    .lineName(line.name)
-                    .adminEmail(line.admin_email)
-                    .outward(outwards)
-                    .back(backs)
-                    .build();
-            });
+            this.lines = data
         }, () => null, () => {
             this.selectedLine = this.lines[0];
             this.updateData()

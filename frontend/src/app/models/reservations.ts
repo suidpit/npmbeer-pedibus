@@ -1,5 +1,4 @@
 import {Reservation} from "./reservation";
-import {ReservationList} from "./reservation-list";
 
 export class Reservations {
     private _backward: Array<Reservation[]>;
