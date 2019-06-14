@@ -6,6 +6,7 @@ import {MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef, ErrorStateMat
 //import {DialogAddKid} from "../stop-row/stop-row.component";
 import {ChangeDetectionStrategy, EventEmitter, Inject, Input, Output} from '@angular/core';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
+import { longStackSupport } from 'q';
 //import {Kid} from "../stop-row/stop-row.component";
 
 /** Error when the parent is invalid */
@@ -35,6 +36,7 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
   error = false;
   emailFormGroup: FormGroup;
   passwordFormGroup: FormGroup;
+  
   // registerForm: FormGroup = this.fb.group({
   //   email: ["", [
   //     Validators.email,
@@ -82,23 +84,33 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
   }
 
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router,private dialog: MatDialog) {
+    auth.logout();
   }
 
 
 
   onSubmit(){
+    //debugger
+//     next: (res) => /*callback per successo*/,
+// err: (err) => /*callback per errore*/,
+// final: (res) => /*callback da eseguire per ultima come nel blocco finally*/
     let self = this;
-    this.auth.register(this.emailFormGroup.controls.email.value, 
-      this.passwordFormGroup.controls.password1.value,
-      this.passwordFormGroup.controls.confirmPassword.value)
-      .subscribe( () => {
+    this.auth.register(this.email.value, 
+      this.passwordFormGroup.controls.password.value,
+      this.passwordFormGroup.controls.confirmPassword.value)  
+      .subscribe( (res) => {
+                          console.log("success");
                           self.router.navigate(["/login"]);
                         },
-                        () => {
-                          console.log("error")
+                  (err) => {
+                          console.log("error"+ err)
                           self.error = true;
                           self.emailField.nativeElement.focus();
-                        }
+                        },
+                  // () => {
+                  //      console.log("finally")
+                  // }
+
      );
   
   }

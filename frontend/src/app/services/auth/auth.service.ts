@@ -40,11 +40,7 @@ export class AuthService {
   register(email: string, pass:string, repass:string){
     let self = this;
     console.log(email + pass + repass)
-    return this.http.post<any>(this.register_url, {"email" : email, "pass" : pass, "repass" : repass}).pipe(
-      map( user => {
-        return self.setSession(user)
-      })
-    );
+    return this.http.post<any>(this.register_url, {"email" : email, "pass" : pass, "repass" : repass});
   }
 
   logout() {
