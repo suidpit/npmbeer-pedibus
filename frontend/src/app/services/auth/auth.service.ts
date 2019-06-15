@@ -16,7 +16,9 @@ import { throwError } from 'rxjs';
 export class AuthService {
 
   login_url = "http://localhost:8080/login";  // http://localhost:4200/backend/login";
-  register_url = "http://localhost:8080/register";  
+  register_url = "http://localhost:8080/register";
+  email_check_url = "http://localhost:8080/exists";
+
   private currentUserSubject: BehaviorSubject<User>;
   public currentUser: Observable<User>;
 
@@ -40,10 +42,11 @@ export class AuthService {
   }
   register(email: string, pass:string, repass:string){
     let self = this;
-    console.log(email + pass + repass)
-    return this.http.post<any>(this.register_url, {"email" : email, "pass" : pass, "repass" : repass})
-          .pipe(catchError(this.handleError));
+    return this.http.post<any>(this.register_url, {"email" : email, "pass" : pass, "repass" : repass});
+          //.pipe(catchError(this.handleError));
   }
+
+
   private handleError(error: HttpErrorResponse) {
    // debugger
     if (error.error instanceof ErrorEvent) {
@@ -83,6 +86,7 @@ export class AuthService {
     return moment(expirationDate);
   }
 
+
   setSession(authResult){
     const arr = authResult["jwt"].split(".");
     const userInfo = JSON.parse(atob(arr[1]));
@@ -100,5 +104,9 @@ export class AuthService {
     localStorage.setItem("expires_at", expiresAt.toISOString());
     localStorage.setItem("not_before", notBefore.toISOString());
     return this.currentUser;
+  }
+
+  checkExists(email: string){
+    return this.http.post<boolean>(this.email_check_url, {"email": email});
   }
 }

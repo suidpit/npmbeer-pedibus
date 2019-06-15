@@ -13,7 +13,7 @@
       <span fxFlexAlign="start">
         <a routerLink="/presenze" mat-button class="menu-element">Presenze</a>
       </span>
-      <span>
+      <span *ngIf="user === null">
         <a routerLink="/registrazione" mat-button class="menu-element">Registrazione</a>
       </span>
       <span fxFlexAlign="end">

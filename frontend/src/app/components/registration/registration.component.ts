@@ -2,7 +2,7 @@ import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/
 import {FormBuilder, FormControl, FormGroup, Validators, FormGroupDirective, NgForm, ValidatorFn} from "@angular/forms";
 import {AuthService} from "../../services/auth/auth.service";
 import {Router} from "@angular/router";
-import {MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef, ErrorStateMatcher} from "@angular/material";
+import {MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef, ErrorStateMatcher, MatStepper} from "@angular/material";
 //import {DialogAddKid} from "../stop-row/stop-row.component";
 import {ChangeDetectionStrategy, EventEmitter, Inject, Input, Output} from '@angular/core';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
@@ -24,7 +24,8 @@ class CrossFieldErrorMatcher implements ErrorStateMatcher {
 })
 export class RegistrationComponent implements OnInit, AfterViewInit {
 
-   
+  @ViewChild("stepper", {static:true}) stepper: MatStepper;
+
   children = [];
   errorMatcher = new CrossFieldErrorMatcher();
   matcher = new MyErrorStateMatcher();
@@ -32,7 +33,7 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
   @Output("add-child") addChild: EventEmitter<KidReg> = new EventEmitter<KidReg>();
 
   @ViewChild("emailField", {static:true}) emailField : ElementRef;
-  isLinear = false;
+  isLinear = true;
   error = false;
   emailFormGroup = this.fb.group({
     email: ["", [
@@ -53,21 +54,37 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
 {validator: this.checkPasswords})
 
   ngOnInit() {
- 
+
   this.emailFormGroup.get('email').setValidators(Validators.email);
   }
 
   get email(){
     return this.emailFormGroup.get('email');
   }
-  
+
   //email = new FormControl('', [Validators.required, Validators.email]);
   getErrorMessage() {
     return this.email.hasError('required') ? 'Devi riempire questo campo' :
         this.email.hasError('email') ? 'Inserisci una email valida' :
-            'hhhhh';
+            this.email.hasError("exists")? "Questa mail è già stata utilizzata per un altro account":"";
   }
   ngAfterViewInit(){
+    this.emailFormGroup.controls.email.valueChanges.subscribe(
+      (value) => {
+        if(!this.emailFormGroup.controls.email.invalid){
+          this.auth.checkExists(value).subscribe((res) => {
+            if(res){
+              this.emailFormGroup.controls.email.setErrors({"exists" : true})
+            }
+            else{
+              if(this.emailFormGroup.controls.email.hasError("exists")){
+                this.emailFormGroup.controls.email.setErrors({"exists": null})
+              }
+            }
+          });
+        }
+      }
+    )
   }
 
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router,private dialog: MatDialog) {
@@ -78,7 +95,7 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
   let pass = group.controls.password.value;
   let confirmPass = group.controls.confirmPassword.value;
 
-  return pass === confirmPass ? null : { notSame: true }     
+  return pass === confirmPass ? null : { notSame: true }
 }
 
   onSubmit(){
@@ -87,18 +104,21 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
 // err: (err) => /*callback per errore*/,
 // final: (res) => /*callback da eseguire per ultima come nel blocco finally*/
     let self = this;
-    this.auth.register(this.email.value, 
+    this.auth.register(this.email.value,
       this.passwordFormGroup.controls.password.value,
-      this.passwordFormGroup.controls.confirmPassword.value)  
+      this.passwordFormGroup.controls.confirmPassword.value)
       .subscribe( (res) => {
-                          console.log("success");
-                          this.showPopupEmailSended();
+                          self.showPopupEmailSended();
                           self.router.navigate(["/login"]);
                         },
                   (err) => {
-                          console.log("error"+ err)
+                          if(err.status === 409){
+                            self.showPopupEmailExists();
+                            self.stepper.selectedIndex = 0;
+                            self.emailFormGroup.controls.email.setErrors({"exists": true})
+                          }
                           self.error = true;
-                
+
                           //self.emailField.nativeElement.focus();
                         },
                   // () => {
@@ -106,8 +126,9 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
                   // }
 
      );
-  
+
   }
+
   showPopupEmailSended(){
     const self = this;
     const dialogRef = this.dialog.open(DialogEmailSended, {
@@ -115,7 +136,15 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
       data: { }
     });
   }
-  
+
+  showPopupEmailExists(){
+    const self = this;
+    const dialogRef = this.dialog.open(DialogEmailExists, {
+      width: "350px",
+      data: { }
+    });
+  }
+
 
   emitChild(child){
     this.addChild.emit(child);
@@ -127,14 +156,13 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
       data: { name: "", gender: ""}
     });
     dialogRef.afterClosed().subscribe(result => {
-      console.log(result)
       if(result && result !== undefined){
         const child = {name: result.name};
         self.children.push(child);
         self.emitChild(child);
       }
     });
-    
+
   }
   reset(){
     this.children = [];
@@ -198,6 +226,21 @@ export class DialogAddKidReg {
   }
 }
 
+
+@Component({
+  selector: 'email-existing-popup-template',
+  templateUrl: 'email-existing-popup-template.html',
+})
+export class DialogEmailExists {
+
+  constructor(
+    public dialogRef: MatDialogRef<DialogEmailExists>,
+    @Inject(MAT_DIALOG_DATA) public data: null) {}
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+}
 
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
