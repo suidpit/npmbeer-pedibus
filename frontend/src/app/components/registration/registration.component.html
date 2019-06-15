@@ -1,34 +1,47 @@
+<h1 mat-dialog-title>Registrazione</h1>
+
 <mat-horizontal-stepper [linear]="isLinear" #stepper>
-    <div *ngIf="error" class="error">Email o password errati</div>
   <mat-step [stepControl]="emailFormGroup">
     <form [formGroup]="emailFormGroup">
-      <ng-template matStepLabel>Fill out your Email</ng-template>
+      <ng-template matStepLabel>Inserisci Email</ng-template>
       <mat-form-field>
-        <input matInput placeholder="Email" formControlName="email" required>
+        <input class="validate" [formControl]="email" matInput placeholder="Email" formControlName="email" >
+        <mat-error *ngIf="email.invalid">{{getErrorMessage()}}</mat-error>
       </mat-form-field>
       <div>
-        <button mat-button matStepperNext>Next</button>
+        <button mat-button matStepperNext>Avanti</button>
       </div>
     </form>
   </mat-step>
-  <mat-step [stepControl]="passwordFormGroup">
-    <form [formGroup]="passwordFormGroup">
-      <ng-template matStepLabel>Fill out your Password</ng-template>
-      <mat-form-field>
-        <input matInput [type]="'password'" placeholder="Password" formControlName="password1" required>
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput [type]="'password'" placeholder="Retype Password" formControlName="password2" required>
-      </mat-form-field>
-      <div>
-        <button mat-button matStepperPrevious>Back</button>
-        <button mat-button matStepperNext>Next</button>
-      </div>
-    </form>
-  </mat-step>
+
+
   <mat-step>
-    <ng-template matStepLabel>Done</ng-template>
-    Insert children
+    <form [formGroup]="passwordFormGroup">
+      <ng-template matStepLabel>Inserisci Password</ng-template>
+      <mat-form-field>
+        <input matInput [type]="'password'"  placeholder="Password" formControlName="password">
+        <mat-error *ngIf="passwordFormGroup.get('password').hasError('minlength')">
+            Almeno 8 caratteri
+          </mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput [type]="'password'"  placeholder="Password" formControlName="confirmPassword" [errorStateMatcher]="matcher">
+        <mat-error *ngIf="passwordFormGroup.hasError('notSame')">
+          Le password devono coincidere!
+        </mat-error>
+      </mat-form-field>
+      <div>
+        <button mat-button matStepperPrevious>Indietro</button>
+        <button mat-button matStepperNext>Avanti</button>
+      </div>
+    </form>
+  </mat-step>
+
+
+
+
+  <mat-step>
+    <ng-template matStepLabel>Inserisci Bambini</ng-template>
     <div>
         <mat-chip-list [selectable]="true" [multiple]="true">
             <div *ngIf="children && children.length !== 0">
@@ -37,14 +50,15 @@
             <mat-chip *ngIf="moreChildren()" (click)="showPopup()" [class.pointer]="true" style="background-color: transparent; ">
               <mat-icon svgIcon="add"></mat-icon>
             </mat-chip>
-            <ng-template #noKids>
-              <div> No Reservations </div>
-            </ng-template>
           </mat-chip-list>
-      <button mat-button matStepperPrevious>Back</button>
+      <button mat-button matStepperPrevious>Indietro</button>
       <button mat-button (click)="stepper.reset()" (click)="reset()">Reset</button>
       <button mat-raised-button 
-                         [type]="'submit'" (click)="onSubmit()">Register</button>
+                         [type]="'submit'" 
+                         (click)="onSubmit()"
+                         [disabled] = "!email.valid || !passwordFormGroup.valid || children.length < 1"
+                  
+                         >Registrati!</button>
     </div>
   </mat-step>
 </mat-horizontal-stepper>

@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import * as moment from "moment";
 import {not} from "rxjs/internal-compatibility";
 import {User} from "../../models/user";
 import {BehaviorSubject} from "rxjs/internal/BehaviorSubject";
 import {Observable} from "rxjs/internal/Observable";
 import {mapEntry} from "@angular/compiler/src/output/map_util";
-import {map} from "rxjs/operators";
+import {map, catchError} from "rxjs/operators";
+import { throwError } from 'rxjs';
 
 
 @Injectable({
@@ -40,12 +41,26 @@ export class AuthService {
   register(email: string, pass:string, repass:string){
     let self = this;
     console.log(email + pass + repass)
-    return this.http.post<any>(this.register_url, {"email" : email, "pass" : pass, "repass" : repass}).pipe(
-      map( user => {
-        return self.setSession(user)
-      })
-    );
+    return this.http.post<any>(this.register_url, {"email" : email, "pass" : pass, "repass" : repass})
+          .pipe(catchError(this.handleError));
   }
+  private handleError(error: HttpErrorResponse) {
+   // debugger
+    if (error.error instanceof ErrorEvent) {
+      // A client-side or network error occurred. Handle it accordingly.
+      console.error('An error occurred:', error.error.message);
+    } else {
+      // The backend returned an unsuccessful response code.
+      // The response body may contain clues as to what went wrong,
+      console.error(
+        `Backend returned code ${error.status}, ` +
+        `body was: ${error.error}` +
+        `message was: ${error.error.message}`);
+    }
+    // return an observable with a user-facing error message
+    return throwError(
+      'Something bad happened; please try again later.');
+  };
 
   logout() {
     localStorage.removeItem("user");
