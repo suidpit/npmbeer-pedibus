@@ -1,6 +1,5 @@
 import {Stop} from "./stop";
 import {LocalTime} from "js-joda";
-import {Local} from "protractor/built/driverProviders";
 
 /**
  * Comfort class which holds the starting time for a certain series of Stops
