@@ -1,0 +1,59 @@
+.container{
+  width: 350px;
+  min-height: 200px;
+  //position: absolute;
+  //top: 50%;
+  //left: 50%;
+  //-moz-transform: translateX(-50%) translateY(-50%);
+  //-webkit-transform: translateX(-50%) translateY(-50%);
+  //transform: translateX(-50%) translateY(-50%);
+}
+
+.form-container{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.mat-form-field.ng-dirty.ng-invalid .mat-form-field-underline{
+  background-color: red;
+}
+
+.mat-form-field.ng-dirty.ng-invalid .mat-form-field-label{
+  color: red;
+}
+
+.error{
+  padding: 4px;
+  border: 1px solid red;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  margin: 4px;
+}
+
+.btn-login{
+  border: 1px solid #0f1770;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  color: #0f1770;
+}
+
+
+.btn-login:hover, .btn-login:focus{
+  background-color: #0f1770a0;
+  color: white;
+}
+
+.btn-login:disabled{
+  border: 1px solid #c9c9c9;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  color: #c9c9c9;
+}
+.btn-login:disabled:hover, .btn-login:disabled:focus{
+  background-color: transparent;
+  color: #c9c9c9;
+}

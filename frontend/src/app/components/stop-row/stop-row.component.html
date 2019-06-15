@@ -13,13 +13,17 @@
         <div fxLayout="column" fxLayoutGap="4px">
           <div style="text-align: center;border-bottom: 1px solid #c9c9c9">{{stopName}}</div>
           <mat-chip-list [selectable]="true" [multiple]="true">
-            <div *ngIf="children && children.length !== 0; else noKids">
+            <div *ngIf="children && children.length !== 0">
               <mat-chip *ngFor="let child of children"
                         [class.mat-accent]="child.hadReservation"
                         [class.had-reservation]="child.hadReservation"
+                        [class.pointer]="true"
                         [selected]="child.isPresent"
                         (click)="togglePresence(child)">{{child.name}}</mat-chip>
             </div>
+            <mat-chip (click)="showPopup()" [class.pointer]="true" style="background-color: transparent; ">
+              <mat-icon svgIcon="add"></mat-icon>
+            </mat-chip>
             <ng-template #noKids>
               <div> No Reservations </div>
             </ng-template>

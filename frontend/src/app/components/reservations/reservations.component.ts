@@ -10,6 +10,7 @@ import {Stop} from "../../models/stop";
 import {Builder} from "builder-pattern";
 import {StopList} from "../../models/stop-list";
 import {CHILDS} from "../../services/mock-childs";
+import {AuthService} from "../../services/auth/auth.service";
 @Component({
     selector: 'app-reservations',
     templateUrl: './reservations.component.html',
@@ -37,9 +38,9 @@ export class ReservationsComponent implements OnInit {
     return !(dayNum === 0);
   };
 
-  constructor(private dataService: DataService) {
+  constructor(private dataService: DataService, private auth: AuthService) {
     this.selectedDate = new FormControl(new Date());
-
+    this.auth.login("n@palm.beer", "1234");
     // check if it is a mobile user, if so, use touchUI elements for better targeting
     // see https://stackoverflow.com/a/25394023/6945436 for userAgent checking
     // TODO: check this on mobile, seems to work on desktop
@@ -125,7 +126,7 @@ export class ReservationsComponent implements OnInit {
   }
 
   togglePresence(child: Child) {
-    console.log(child)
+    console.log(child);
     child.present = !child.present
   }
 

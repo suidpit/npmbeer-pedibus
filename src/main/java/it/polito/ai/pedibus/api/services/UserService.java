@@ -24,6 +24,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 
 @Service
 public class UserService implements IUserService {
@@ -49,7 +50,7 @@ public class UserService implements IUserService {
     Logger logger = LoggerFactory.getLogger(UserService.class);
 
     @Override
-    public String signin(String email, String password) {
+    public HashMap<String, String> signin(String email, String password) {
         try{
             authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(email, password));
 //            User user = getUserByEmail(email);
@@ -59,7 +60,12 @@ public class UserService implements IUserService {
 //            if(!encoder.encode(password).equals(user.getPassword())){
 //                throw new BadCredentialsException("Wrong Password");
 //            }
-            return jwtTokenProvider.createToken(email, null);
+
+            User user = userRepository.findByEmail(email);
+            String jwt = jwtTokenProvider.createToken(email, null, user.getId().toString());
+            HashMap<String, String> userInfo = new HashMap<>();
+            userInfo.put("jwt", jwt);
+            return userInfo;
         }catch(AuthenticationException e){
             logger.info(e.getMessage());
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized");

@@ -12,6 +12,24 @@
         "authority": 0
       }
     ],
+    "children": [
+      {
+        "name": "Francesca",
+        "gender": "F"
+      },
+      {
+        "name": "Liberata",
+        "gender": "F"
+      },
+      {
+        "name": "Berta",
+        "gender": "F"
+      },
+      {
+        "name": "Simone",
+        "gender": "M"
+      }
+    ],
     "enabled": true
   }
 ]

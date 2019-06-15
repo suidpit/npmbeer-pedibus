@@ -1,5 +1,7 @@
 package it.polito.ai.pedibus.api.controllers;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import it.polito.ai.pedibus.api.dtos.EmailDTO;
 import it.polito.ai.pedibus.api.dtos.LoginDTO;
 import it.polito.ai.pedibus.api.dtos.NewPasswordDTO;
 import it.polito.ai.pedibus.api.dtos.UserDTO;
@@ -25,6 +27,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import javax.validation.Valid;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
 
 @RestController
@@ -45,7 +48,7 @@ public class UserAuthController {
     IUserService service;
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String login(
+    public HashMap<String, String> login(
         @RequestBody LoginDTO loginDTO
     ){
         logger.info(loginDTO.getEmail());
@@ -113,7 +116,7 @@ public class UserAuthController {
 
         service.enableUser(user);
         service.expireRegistationToken(verificationToken);
-        return "";
+        return "Il tuo account è stato abilitato con successo! Può chiudere questa pagina.";
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -153,6 +156,13 @@ public class UserAuthController {
             throw new RecoveryTokenNotFoundException();
         }
         return "success:Cambio pwd";
+    }
+
+    @RequestMapping(value = "/exists", method = RequestMethod.POST)
+    public Boolean checkEmailExists(@RequestBody EmailDTO emailDTO){
+        logger.info("received email: "+emailDTO.getEmail());
+        User user = service.getUserByEmail(emailDTO.getEmail());
+        return user != null;
     }
 
 }

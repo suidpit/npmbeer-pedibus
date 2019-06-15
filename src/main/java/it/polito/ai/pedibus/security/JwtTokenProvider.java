@@ -6,6 +6,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,6 +39,8 @@ public class JwtTokenProvider {
 
     private CustomUserDetailsService userDetailsService;
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Autowired
     public JwtTokenProvider(CustomUserDetailsService userDetailsService){
         this.userDetailsService = userDetailsService;
@@ -48,7 +52,7 @@ public class JwtTokenProvider {
         this.signingAlgorithm = Algorithm.HMAC256(this.key);
     }
 
-    public String createToken(String username, List<String> Roles){
+    public String createToken(String username, List<String> Roles, String user_id){
         Date notBefore = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(notBefore);
@@ -56,6 +60,7 @@ public class JwtTokenProvider {
         Date expiresAt = calendar.getTime();
         return JWT.create() // returns a Builder
                 .withClaim("email", username)
+                .withClaim("user_id", user_id)
                 .withNotBefore(notBefore)
                 .withExpiresAt(expiresAt)
                 .withIssuer(this.issuer)

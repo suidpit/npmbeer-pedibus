@@ -16,25 +16,52 @@ import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatChipsModule } from "@angular/material";
+import {MatChipsModule, MatDialogModule} from "@angular/material";
+import { MatToolbarModule } from "@angular/material";
+import { MatSidenavModule } from "@angular/material";
 
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { FlexLayoutModule } from "@angular/flex-layout";
 
 import { AppComponent } from './app.component';
 import { ReservationsComponent } from './components/reservations/reservations.component';
-import {HttpClientModule} from "@angular/common/http";
-import { StopRowComponent } from './components/stop-row/stop-row.component';
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
+import {DialogAddKid, StopRowComponent} from './components/stop-row/stop-row.component';
+import { LoginComponent } from './components/auth/login/login.component';
+import {AuthInterceptor} from "./services/auth/auth-interceptor";
+import {RouterModule} from "@angular/router";
+import { ToolbarComponent } from './components/toolbar/toolbar.component';
+import {
+  RegistrationComponent,
+  DialogAddKidReg,
+  DialogEmailSended,
+  DialogEmailExists
+} from './components/registration/registration.component';
+import {CdkStepperModule} from '@angular/cdk/stepper';
+import {MatStepperModule} from '@angular/material/stepper';
 
 @NgModule({
   declarations: [
     AppComponent,
     ReservationsComponent,
-    StopRowComponent
+    StopRowComponent,
+    LoginComponent,
+    ToolbarComponent,
+    RegistrationComponent,
+    DialogAddKid,
+    DialogAddKidReg,
+    DialogEmailSended,
+    DialogEmailExists
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    RouterModule.forRoot([
+      { path: "login", component: LoginComponent},
+      { path: "presenze", component: ReservationsComponent},
+      { path: "registrazione", component: RegistrationComponent },
+      { path: "**", redirectTo: "login", pathMatch: "full"}
+    ]),
     HttpClientModule,
     MatButtonModule,
     MatIconModule,
@@ -53,9 +80,19 @@ import { StopRowComponent } from './components/stop-row/stop-row.component';
     MatTabsModule,
     MatListModule,
     MatChipsModule,
-    FlexLayoutModule
+    MatToolbarModule,
+    MatSidenavModule,
+    MatDialogModule,
+    FlexLayoutModule,
+    CdkStepperModule,
+    MatStepperModule
   ],
-  providers: [MatDatepickerModule],
+  providers: [MatDatepickerModule, {
+    provide: HTTP_INTERCEPTORS,
+    useClass: AuthInterceptor,
+    multi: true
+  }],
+  entryComponents: [DialogAddKid,DialogAddKidReg,DialogEmailSended, DialogEmailExists],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
