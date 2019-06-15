@@ -33,16 +33,25 @@ public class RegistrationListener implements
         service.createVerificationToken(user, token);
 
         String recipientAddress = user.getEmail();
-        String subject = "Registration Confirmation";
+        String username = user.getEmail().split("@")[0];
+        String subject = "Verifica Indirizzo Email";
         String confirmationUrl
                 = event.getAppUrl() + "/confirm/" + token;
        // String message = messages.getMessage("message.regSucc", null, event.getLocale());
 
-        String message = "message!!";
+        String message = "Ciao "+username+",\n\ngrazie per aver creato un account sulla nostra app Pedibus, " +
+                "benvenuto!\n" +
+                "Ti richiediamo soltanto un ultimo semplice passaggio per verificare che questo indizirro email sia " +
+                "valido, puoi farlo cliccando sul seguente link: \n\n";
+        String message_part2 = "\n\n(se il link non funziona copialo e incollalo nella barra degli indirizzi del tuo " +
+                "browser)"+
+                "\n\nUna volta fatto, sarai pronto per iniziare a usare Pedibus!\n\n" +
+                "Un saluto,\nIl Team di NapalmBeer";
         SimpleMailMessage email = new SimpleMailMessage();
+        email.setFrom("no-reply@napalm.beer");
         email.setTo(recipientAddress);
         email.setSubject(subject);
-        email.setText(message + " " + "http://localhost:8080" + confirmationUrl);
+        email.setText(message + " " + "http://localhost:8080" + confirmationUrl + message_part2);
         mailSender.send(email);
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.*;
+import java.util.HashMap;
 import java.util.List;
 
     @Data
@@ -23,6 +24,8 @@ import java.util.List;
     private String password;
 
     private List<String> roles;
+
+    private List<HashMap<String, String>> children;
 
     private List<SystemAuthority> authorities;
 
