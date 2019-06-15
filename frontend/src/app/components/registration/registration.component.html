@@ -5,7 +5,7 @@
     <form [formGroup]="emailFormGroup">
       <ng-template matStepLabel>Inserisci Email</ng-template>
       <mat-form-field>
-        <input class="validate" [formControl]="email" matInput placeholder="Email" formControlName="email"  required>
+        <input class="validate" [formControl]="email" matInput placeholder="Email" formControlName="email" >
         <mat-error *ngIf="email.invalid">{{getErrorMessage()}}</mat-error>
       </mat-form-field>
       <div>

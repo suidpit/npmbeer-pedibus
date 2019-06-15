@@ -65,7 +65,7 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
   getErrorMessage() {
     return this.email.hasError('required') ? 'Devi riempire questo campo' :
         this.email.hasError('email') ? 'Inserisci una email valida' :
-            '';
+            'hhhhh';
   }
   ngAfterViewInit(){
   }
@@ -98,6 +98,7 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
                   (err) => {
                           console.log("error"+ err)
                           self.error = true;
+                
                           //self.emailField.nativeElement.focus();
                         },
                   // () => {
