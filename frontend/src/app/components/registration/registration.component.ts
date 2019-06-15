@@ -6,7 +6,7 @@ import {MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef, ErrorStateMat
 //import {DialogAddKid} from "../stop-row/stop-row.component";
 import {ChangeDetectionStrategy, EventEmitter, Inject, Input, Output} from '@angular/core';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
-import { longStackSupport } from 'q';
+import { longStackSupport, fbind } from 'q';
 //import {Kid} from "../stop-row/stop-row.component";
 
 /** Error when the parent is invalid */
@@ -26,59 +26,46 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
 
    
   children = [];
-  errors = errorMessages;
   errorMatcher = new CrossFieldErrorMatcher();
+  matcher = new MyErrorStateMatcher();
 
   @Output("add-child") addChild: EventEmitter<KidReg> = new EventEmitter<KidReg>();
 
   @ViewChild("emailField", {static:true}) emailField : ElementRef;
   isLinear = false;
   error = false;
-  emailFormGroup: FormGroup;
-  passwordFormGroup: FormGroup;
-  
-  // registerForm: FormGroup = this.fb.group({
-  //   email: ["", [
-  //     Validators.email,
-  //     Validators.required]
-  //   ],
-  //   password1: ["", Validators.required],
-  //   confirmPassword: ["", Validators.required]
-  // });
-  ngOnInit() {
-    this.emailFormGroup = this.fb.group({
-      email: ["", [
-        Validators.email,
-        Validators.required]
-      ]
-    });
-    this.passwordFormGroup = this.fb.group(
-      {
-      password: ['', [
-          Validators.required
-          //,Validators.pattern(regExps.password)
-      ]],
-      confirmPassword: ['', Validators.required]
-  },
-  {validator: this.passwordValidator})
-  }
-  
-  email = new FormControl('', [Validators.required, Validators.email]);
-  getErrorMessage() {
-    return this.email.hasError('required') ? 'You must enter a value' :
-        this.email.hasError('email') ? 'Not a valid email' :
-            '';
-  }
- passwordValidator(form: FormGroup) {
-  const password: string = form.get('password').value; // get password from our password form control
-  const confirmPassword: string = form.get('confirmPassword').value; // get password from our confirmPassword form control
-    // const condition = form.get('password').value !== form.get('confirmPassword').value;
+  emailFormGroup = this.fb.group({
+    email: ["", [
+      Validators.email,
+      Validators.required,
+      Validators.pattern('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$')]
+    ]
+  });
+  passwordFormGroup = this.fb.group(
+    {
+    password: ['', [
+        Validators.required,
+        Validators.minLength(8)
+        //,Validators.pattern(regExps.password)
+    ]],
+    confirmPassword: ['']
+},
+{validator: this.checkPasswords})
 
-    // return condition ? { passwordsDoNotMatch: true} : null;
-    if (password !== confirmPassword) {
-      // if they don't match, set an error in our confirmPassword form control
-      form.get('confirmPassword').setErrors({ NoPassswordMatch: true });
-    }
+  ngOnInit() {
+ 
+  this.emailFormGroup.get('email').setValidators(Validators.email);
+  }
+
+  get email(){
+    return this.emailFormGroup.get('email');
+  }
+  
+  //email = new FormControl('', [Validators.required, Validators.email]);
+  getErrorMessage() {
+    return this.email.hasError('required') ? 'Devi riempire questo campo' :
+        this.email.hasError('email') ? 'Inserisci una email valida' :
+            '';
   }
   ngAfterViewInit(){
   }
@@ -87,7 +74,12 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
     auth.logout();
   }
 
+  checkPasswords(group: FormGroup) { // here we have the 'passwords' group
+  let pass = group.controls.password.value;
+  let confirmPass = group.controls.confirmPassword.value;
 
+  return pass === confirmPass ? null : { notSame: true }     
+}
 
   onSubmit(){
     //debugger
@@ -100,12 +92,13 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
       this.passwordFormGroup.controls.confirmPassword.value)  
       .subscribe( (res) => {
                           console.log("success");
+                          this.showPopupEmailSended();
                           self.router.navigate(["/login"]);
                         },
                   (err) => {
                           console.log("error"+ err)
                           self.error = true;
-                          self.emailField.nativeElement.focus();
+                          //self.emailField.nativeElement.focus();
                         },
                   // () => {
                   //      console.log("finally")
@@ -114,6 +107,15 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
      );
   
   }
+  showPopupEmailSended(){
+    const self = this;
+    const dialogRef = this.dialog.open(DialogEmailSended, {
+      width: "350px",
+      data: { }
+    });
+  }
+  
+
   emitChild(child){
     this.addChild.emit(child);
   }
@@ -146,6 +148,22 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
     return false
   }
 
+}
+
+///FINE CLASSE
+@Component({
+  selector: 'email-sended-template',
+  templateUrl: 'email-sended-template.html',
+})
+export class DialogEmailSended {
+
+  constructor(
+    public dialogRef: MatDialogRef<DialogEmailSended>,
+    @Inject(MAT_DIALOG_DATA) public data: null) {}
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
 }
 export interface KidReg{
   name: string;
@@ -180,47 +198,12 @@ export class DialogAddKidReg {
 }
 
 
-export class CustomValidators {
-  /**
-   * Validates that child controls in the form group are equal
-   */
-  static childrenEqual: ValidatorFn = (formGroup: FormGroup) => {
-      const [firstControlName, ...otherControlNames] = Object.keys(formGroup.controls || {});
-      const isValid = otherControlNames.every(controlName => formGroup.get(controlName).value === formGroup.get(firstControlName).value);
-      return isValid ? null : { childrenNotEqual: true };
-  }
-}
 
-/**
-* Custom ErrorStateMatcher which returns true (error exists) when the parent form group is invalid and the control has been touched
-*/
-export class ConfirmValidParentMatcher implements ErrorStateMatcher {
+export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-      return control.parent.invalid && control.touched;
+    const invalidCtrl = !!(control && control.invalid && control.parent.dirty);
+    const invalidParent = !!(control && control.parent && control.parent.invalid && control.parent.dirty);
+
+    return (invalidCtrl || invalidParent);
   }
-}
-
-/**
-* Collection of reusable RegExps
-*/
-export const regExps: { [key: string]: RegExp } = {
- password: /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{7,15}$/
-};
-
-/**
-* Collection of reusable error messages
-*/
-export const errorMessages: { [key: string]: string } = {
-  fullName: 'Full name must be between 1 and 128 characters',
-  email: 'Email must be a valid email address (username@domain)',
-  confirmEmail: 'Email addresses must match',
-  password: 'Password must be between 7 and 15 characters, and contain at least one number and special character',
-  confirmPassword: 'Passwords must match'
-};
-
-
-function passwordMatchValidator(g: FormGroup) {
-  const password = g.get('password').value;
-  const confirm = g.get('confirmPassword').value
-  return password === confirm ? null : { mismatch: true };
 }
