@@ -1,7 +1,7 @@
 <div *ngIf="type === 'intermediate'; else startOrEnd">
 
   <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="8px">
-    <div fxFlexOrder="0" fxFlexAlign="center">
+    <div fxFlexOrder="0" fxFlexAlign="center start">
       <mat-icon svgIcon="{{icon}}"></mat-icon>
     </div>
     <div fxFlexOrder="1" fxFlexAlign="start">
@@ -11,14 +11,14 @@
         </div>
 
         <div fxLayout="column" fxLayoutGap="4px">
-          <div style="text-align: center;border-bottom: 1px solid #c9c9c9">{{stopName}}</div>
-          <mat-chip-list [selectable]="true" [multiple]="true">
-            <div *ngIf="children && children.length !== 0">
+          <div class="border-bottom" style="text-align: center">{{stopName}}</div>
+          <mat-chip-list fxLayoutAlign="center center" class="border-bottom p-4" [selectable]="true" [multiple]="true">
+            <div class="grid" *ngIf="children && children.length !== 0">
               <mat-chip *ngFor="let child of children"
-                        [class.mat-accent]="child.hadReservation"
-                        [class.had-reservation]="child.hadReservation"
+                        [class.mat-accent]="child.booked"
+                        [class.had-reservation]="child.booked"
                         [class.pointer]="true"
-                        [selected]="child.isPresent"
+                        [selected]="child.present"
                         (click)="togglePresence(child)">{{child.name}}</mat-chip>
             </div>
             <mat-chip (click)="showPopup()" [class.pointer]="true" style="background-color: transparent; ">

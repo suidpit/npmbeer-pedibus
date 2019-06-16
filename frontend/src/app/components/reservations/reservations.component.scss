@@ -26,7 +26,15 @@ mat-list-item{
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  height: auto!important;
 }
+
+mat-list-item:nth-child(even) {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+
 
 .present {
   color: blue;

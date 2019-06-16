@@ -1,5 +1,8 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Inject, Input, OnInit, Output} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef} from "@angular/material";
+import { ChangeDetectionStrategy, Component, EventEmitter, Inject, Input, OnInit, Output } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from "@angular/material";
+import { Child } from "../../models/child";
+import { Builder } from "builder-pattern";
+import { ReservationDTO } from 'src/app/models/reservationDTO';
 
 @Component({
   selector: 'app-stop-row',
@@ -15,11 +18,15 @@ export class StopRowComponent implements OnInit {
 
   @Input("stop-time") stopTime;
 
-  @Input("children") children;
+  @Input("direction") direction: string;
 
-  @Output("child-presence") change: EventEmitter<Kid> = new EventEmitter<Kid>();
+  @Input("trip-index") tripIndex;
 
-  @Output("add-child") addChild: EventEmitter<Kid> = new EventEmitter<Kid>();
+  @Input("children") children: Child[];
+
+  @Output("child-presence") change: EventEmitter<Child> = new EventEmitter<Child>();
+
+  @Output("add-child") addChild: EventEmitter<ReservationDTO> = new EventEmitter<ReservationDTO>();
 
   icon = "dot";
 
@@ -29,42 +36,44 @@ export class StopRowComponent implements OnInit {
   ngOnInit() {
   }
 
-  togglePresence(child){
-    child.isPresent = !child.isPresent;
+  togglePresence(child) {
+    child.present = !child.present;
     this.change.emit(child);
   }
 
-  emitChild(child){
-    this.addChild.emit(child);
+  emitChild(c: Child) {
+    let res: ReservationDTO = Builder(ReservationDTO)
+      .child(c.name)
+      .stopName(this.stopName)
+      .direction(this.direction.toUpperCase())
+      .tripIndex(this.tripIndex)
+      .booked(c.booked)
+      .present(c.present)
+      .build()
+    console.log(res)
+    this.addChild.emit(res);
   }
 
-  showPopup(){
+  showPopup() {
     const self = this;
     const dialogRef = this.dialog.open(DialogAddKid, {
       width: "350px",
-      data: { name: "", gender: "", stop:self.stopName}
+      data: { name: "", gender: "", stop: self.stopName }
     });
     dialogRef.afterClosed().subscribe(result => {
-      if(result && result !== undefined){
-        const child = {name: result.name, hadReservation: false, isPresent: true};
-        self.children.push(child);
+      if (result && result !== undefined) {
+        let child: Child = Builder(Child)
+          .name(result.name)
+          .present(true)
+          .booked(false)
+          .resId("")
+          .build();
         self.emitChild(child);
       }
     });
   }
 }
 
-export interface Kid{
-  name: string;
-  hadReservation: false;
-  isPresent: false;
-
-  // constructor(name, hadReservation, isPresent){
-  //   this.name = name;
-  //   this.hadReservation = hadReservation;
-  //   this.isPresent = isPresent;
-  // }
-}
 
 export interface DialogAddKidData {
   name: string;
@@ -80,7 +89,7 @@ export class DialogAddKid {
 
   constructor(
     public dialogRef: MatDialogRef<DialogAddKid>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogAddKidData) {}
+    @Inject(MAT_DIALOG_DATA) public data: DialogAddKidData) { }
 
   onNoClick(): void {
     this.dialogRef.close();

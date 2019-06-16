@@ -66,10 +66,12 @@
                  <app-stop-row *ngIf="reservedStops"
                                [type]="'intermediate'"
                                [children]="reservedStops['outward'][i][j]"
+                               [direction]="'outward'"
+                               [trip-index]="i"
                                [stop-name]="stop.name"
                                [stop-time]="stop.time"
-                               (child-presence)="logEvent($event)"
-                               (add-child)="logEvent($event)"></app-stop-row>
+                               (child-presence)="setPresence($event)"
+                               (add-child)="addChild($event)"></app-stop-row>
                </mat-list-item>
                <mat-list-item>
                  <app-stop-row [type]="'dots'"></app-stop-row>
@@ -93,10 +95,12 @@
                  <app-stop-row *ngIf="reservedStops"
                                [type]="'intermediate'"
                                [children]="reservedStops['back'][i][j]"
+                               [direction]="'back'"
+                               [trip-index]=i
                                [stop-name]="stop.name"
                                [stop-time]="stop.time"
-                               (child-presence)="logEvent($event)"
-                               (add-child)="logEvent($event)"></app-stop-row>
+                               (child-presence)="setPresence($event)"
+                               (add-child)="addChild($event)"></app-stop-row>
                </mat-list-item>
                <mat-list-item>
                  <app-stop-row [type]="'dots'"></app-stop-row>

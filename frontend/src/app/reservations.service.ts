@@ -1,15 +1,16 @@
-import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
-import {Line} from './models/line';
-import {HttpClient} from '@angular/common/http';
-import {map, tap} from 'rxjs/operators'
-import {Reservations} from "./models/reservations";
-import {Child} from "./models/child";
-import {Builder} from "builder-pattern";
-import {StopList} from "./models/stop-list";
-import {LocalTime} from "js-joda";
-import {Stop} from "./models/stop";
-import {Reservation} from "./models/reservation";
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Line } from './models/line';
+import { HttpClient } from '@angular/common/http';
+import { map, tap } from 'rxjs/operators'
+import { Reservations } from "./models/reservations";
+import { Child } from "./models/child";
+import { Builder } from "builder-pattern";
+import { StopList } from "./models/stop-list";
+import { LocalTime, LocalDate } from "js-joda";
+import { Stop } from "./models/stop";
+import { Reservation } from "./models/reservation";
+import { ReservationDTO } from './models/reservationDTO';
 
 @Injectable({
     providedIn: 'root'
@@ -21,13 +22,13 @@ export class ReservationsService {
 
     lines(): Observable<Line[]> {
         //TODO:  This will go in a config file
-        let api_url = "http://127.0.0.1:8080/lines"
+        let api_url = "http://localhost:8080/lines"
         console.log("Requesting from service...")
         return this.http.get<any[]>(api_url).pipe(map((data) => data.map((line) => {
             let outwards: Array<StopList> = [];
             let backs: Array<StopList> = [];
             // map outwards
-            for (let out of line.outward ) {
+            for (let out of line.outward) {
                 let stopList = Builder(StopList)
                     .stops(out.map(function (stop) {
                         let time = LocalTime.parse(stop.time);
@@ -68,7 +69,7 @@ export class ReservationsService {
     }
 
     reservations(line: string, date): Observable<Reservations> {
-        let api_url = "http://127.0.0.1:8080/reservations/" + line + "/" + date;
+        let api_url = "http://localhost:8080/reservations/" + line + "/" + date;
         return this.http.get<Reservations>(api_url).pipe(map(data => {
             let outwards: Array<Reservation[]> = [];
             let backs: Array<Reservation[]> = [];
@@ -79,8 +80,10 @@ export class ReservationsService {
                     let childs: Child[] = [];
                     for (let c of out[stop]) {
                         let child = Builder(Child)
-                            .name(c)
-                            .present(false)
+                            .name(c.name)
+                            .present(c.present)
+                            .booked(c.booked)
+                            .resId(c.resId)
                             .build();
                         childs.push(child);
                     }
@@ -98,8 +101,10 @@ export class ReservationsService {
                     let childs: Child[] = [];
                     for (let c of back[stop]) {
                         let child = Builder(Child)
-                            .name(c)
-                            .present(false)
+                            .name(c.name)
+                            .present(c.present)
+                            .booked(c.booked)
+                            .resId(c.resId)
                             .build();
                         childs.push(child);
                     }
@@ -116,5 +121,29 @@ export class ReservationsService {
                 .backward(backs)
                 .build();
         }));
+    }
+
+    setPresence(child: Child, lineName: string, date: string) {
+        let api_url: string = "http://localhost:8080/reservations/" + lineName + "/" + date + "/" + child.resId
+        let d = {
+            "present": true
+        }
+        this.http.patch(api_url, d, {responseType: 'text'})
+            .subscribe(
+                (val) => {
+                    console.log("PATCH call successful value returned in body",
+                        val);
+                },
+                response => {
+                    console.log("PATCH call in error", response);
+                },
+                () => {
+                    console.log("The PATCH observable is now completed.");
+                });
+    }
+
+    addUnbookedReservation(lineName: string, dateString: string, pReservation: ReservationDTO) {
+        let api_url: string = "http://localhost:8080/reservations/" + lineName + "/" + dateString
+        return this.http.post(api_url, JSON.stringify(pReservation),{responseType: 'text'})
     }
 }

@@ -1,6 +1,8 @@
 export class Child {
-    private _name: String
+    private _name: string
     private _present: boolean
+    private _booked: boolean
+    private _resId: string
 
     get name(){
         return this._name;
@@ -16,5 +18,21 @@ export class Child {
 
     set present(value){
         this._present = value;
+    }
+
+    get booked(){
+        return this._booked;
+    }
+
+    set booked(value){
+        this._booked = value;
+    }
+
+    get resId() {
+        return this._resId;
+    }
+
+    set resId(value) {
+        this._resId = value;
     }
 }
