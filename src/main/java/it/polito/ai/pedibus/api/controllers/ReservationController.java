@@ -4,23 +4,20 @@ package it.polito.ai.pedibus.api.controllers;
 import it.polito.ai.pedibus.api.constraints.ReservationPostFields;
 import it.polito.ai.pedibus.api.constraints.ReservationPutFields;
 import it.polito.ai.pedibus.api.dtos.ReservationDTO;
+import it.polito.ai.pedibus.api.dtos.ChildDTO;
+import it.polito.ai.pedibus.api.dtos.ReservationPresenceDTO;
 import it.polito.ai.pedibus.api.models.Reservation;
-import it.polito.ai.pedibus.api.repositories.LineRepository;
-import it.polito.ai.pedibus.api.repositories.ReservationRepository;
 import it.polito.ai.pedibus.api.services.ReservationService;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin
 @Validated
@@ -52,8 +49,8 @@ public class ReservationController {
      * @return
      */
     @RequestMapping(value = "/{lineName}/{date}", method = RequestMethod.GET)
-    public HashMap<String, ArrayList<HashMap<String, ArrayList<String>>>> getChildsForStop(@PathVariable("lineName") String lineName,
-                                                                                @PathVariable("date") String dateString) {
+    public HashMap<String, ArrayList<HashMap<String, ArrayList<ChildDTO>>>> getChildsForStop(@PathVariable("lineName") String lineName,
+                                                                                             @PathVariable("date") String dateString) {
         return reservationService.getReservationStops(lineName, dateString);
     }
 
@@ -92,6 +89,24 @@ public class ReservationController {
                        @RequestBody ReservationDTO resd) {
 
         reservationService.updateReservation(lineName, dateString, resd, id);
+    }
+    /**
+     * PATCH /reservations/{nome_linea}/{data}/{reservation_id} – permette di modificare
+     * il campo presenza di una reservation.
+     *
+     * @param lineName
+     * @param dateString
+     * @param id
+     */
+    @Transactional
+    @ReservationPutFields
+    @RequestMapping(value = "/{lineName}/{date}/{id}", method = RequestMethod.PATCH)
+    public void patch(@PathVariable("lineName") String lineName,
+                       @PathVariable("date") String dateString,
+                       @PathVariable("id") ObjectId id,
+                       @RequestBody ReservationPresenceDTO partialUpdate) {
+
+        reservationService.updateReservationPresence(lineName, dateString, id, partialUpdate);
     }
 
     /**

@@ -16,4 +16,6 @@ public class ReservationDTO {
     private Reservation.Direction direction;
     @NotNull
     private Integer tripIndex;
+    private Boolean booked;
+    private Boolean present;
 }

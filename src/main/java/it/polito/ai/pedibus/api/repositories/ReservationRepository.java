@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface ReservationRepository extends MongoRepository<Reservation, String> {
+    Reservation findById(ObjectId resId);
     List<Reservation> findByLineNameAndDate(String lineName, LocalDate date);
     Reservation findByLineNameAndDateAndId(String lineName, LocalDate date, ObjectId objectId);
     void deleteByIdAndLineNameAndDate(ObjectId id, String lineName, LocalDate date);

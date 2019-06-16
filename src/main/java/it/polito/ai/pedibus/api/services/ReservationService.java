@@ -1,19 +1,23 @@
 package it.polito.ai.pedibus.api.services;
 
 import it.polito.ai.pedibus.api.dtos.ReservationDTO;
+import it.polito.ai.pedibus.api.dtos.ChildDTO;
+import it.polito.ai.pedibus.api.dtos.ReservationPresenceDTO;
 import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.repositories.ReservationRepository;
+import org.assertj.core.api.ObjectEnumerableAssert;
 import org.bson.types.ObjectId;
-import org.omg.CORBA.OBJ_ADAPTER;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
-import java.io.Console;
-import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ReservationService {
@@ -31,31 +35,41 @@ public class ReservationService {
         return reservationRepository.findAll();
     }
 
-    public HashMap<String, ArrayList<HashMap<String, ArrayList<String>>>> getReservationStops(String lineName, String dateString) {
+    public HashMap<String, ArrayList<HashMap<String, ArrayList<ChildDTO>>>> getReservationStops(String lineName, String dateString) {
 
         LocalDate date = LocalDate.parse(dateString, fmt);
 
         //ovvero <"Sale o Scende", <"Nome Fermata", [Lista di gente che sale o scende]>>
-        HashMap<String, ArrayList<HashMap<String, ArrayList<String>>>> mappazza = new HashMap<>();
+        HashMap<String, ArrayList<HashMap<String, ArrayList<ChildDTO>>>> mappazza = new HashMap<>();
 
         //<Fermata,<ListaBambini>>
-        ArrayList<HashMap<String,ArrayList<String>>> o = new ArrayList<>();
-        ArrayList<HashMap<String,ArrayList<String>>> b = new ArrayList<>();
+        ArrayList<HashMap<String, ArrayList<ChildDTO>>> o = new ArrayList<>();
+        ArrayList<HashMap<String, ArrayList<ChildDTO>>> b = new ArrayList<>();
 
         List<Reservation> listReservation = reservationRepository.findByLineNameAndDate(lineName, date);
         for (Reservation res : listReservation) {
             // Ugly repetition, but that's it for now.
             if (res.getDirection() == Reservation.Direction.OUTWARD) {
-                while(res.getTripIndex()>=o.size()){
+                while (res.getTripIndex() >= o.size()) {
                     o.add(new HashMap<>());
                     System.err.println(o.size());
                 }
-                o.get(res.getTripIndex()).computeIfAbsent(res.getStopName(), k -> new ArrayList<>()).add(res.getChildName());
+                o.get(res.getTripIndex()).computeIfAbsent(res.getStopName(), k -> new ArrayList<>())
+                        .add(ChildDTO.builder()
+                                .name(res.getChildName())
+                                .booked(res.getBooked())
+                                .present(res.getPresent())
+                                .resId(res.getId()).build());
             } else if (res.getDirection() == Reservation.Direction.BACK) {
-                while(res.getTripIndex()>=b.size()){
+                while (res.getTripIndex() >= b.size()) {
                     b.add(new HashMap<>());
                 }
-                b.get(res.getTripIndex()).computeIfAbsent(res.getStopName(), k -> new ArrayList<>()).add(res.getChildName());
+                b.get(res.getTripIndex()).computeIfAbsent(res.getStopName(), k -> new ArrayList<>())
+                        .add(ChildDTO.builder()
+                                .name(res.getChildName())
+                                .booked(res.getBooked())
+                                .present(res.getPresent())
+                                .resId(res.getId()).build());
             }
         }
 
@@ -77,6 +91,8 @@ public class ReservationService {
                 .childName(resd.getChild())
                 .direction(resd.getDirection())
                 .tripIndex(resd.getTripIndex())
+                .booked(resd.getBooked())
+                .present(false)
                 .build();
         reservationRepository.insert(res);
         return res.getId().toString();
@@ -96,6 +112,13 @@ public class ReservationService {
         reservationRepository.save(res);
     }
 
+    public void updateReservationPresence(String lineName, String dateString, ObjectId id, ReservationPresenceDTO partialUpdate) {
+        LocalDate date = LocalDate.parse(dateString, fmt);
+        Reservation res = reservationRepository.findByLineNameAndDateAndId(lineName, date, id);
+        res.setPresent(partialUpdate.getPresent());
+        reservationRepository.save(res);
+    }
+
     public void deleteReservation(String lineName, String dateString, ObjectId id) {
         LocalDate date = LocalDate.parse(dateString, fmt);
         reservationRepository.deleteByIdAndLineNameAndDate(id, lineName, date);
@@ -104,7 +127,6 @@ public class ReservationService {
     public Reservation getReservation(String lineName, String dateString, ObjectId id) {
         LocalDate date = LocalDate.parse(dateString, fmt);
         //Should be one element
-        Reservation res = reservationRepository.findByLineNameAndDateAndId(lineName, date, id);
-        return res;
+        return reservationRepository.findByLineNameAndDateAndId(lineName, date, id);
     }
 }

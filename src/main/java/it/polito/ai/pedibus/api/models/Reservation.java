@@ -31,4 +31,6 @@ public class Reservation {
     private String stopName;
     // This just represents an index in the array of trips for that line, in that direction.
     private Integer tripIndex;
+    private Boolean booked;
+    private Boolean present;
 }
