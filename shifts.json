@@ -1,0 +1,11 @@
+[
+  {
+    "date": "11-11-2011",
+    "lineName": "linea2",
+    "companionId": "5d419c8d46ee032d40ae822d",
+    "direction": "BACK",
+    "tripIndex": 0,
+    "availabilities": ["5d419c8d46ee032d40ae822d"],
+    "open": true
+  }
+]

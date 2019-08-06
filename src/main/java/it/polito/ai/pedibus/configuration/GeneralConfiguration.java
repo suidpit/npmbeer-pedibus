@@ -3,8 +3,10 @@ package it.polito.ai.pedibus.configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.polito.ai.pedibus.api.models.Line;
+import it.polito.ai.pedibus.api.models.Shift;
 import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.LineRepository;
+import it.polito.ai.pedibus.api.repositories.ShiftRepository;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -24,9 +26,19 @@ public class GeneralConfiguration {
 
     private static String initDataFileName = "init.json";
     private static String userInitDataFileName = "user_init.json";
+    private static String shiftsInitDataFileName = "shifts.json";
+
+
+    @Bean
+    public DateTimeFormatter fmt(){
+        return DateTimeFormatter.ofPattern("ddMMyyyy");
+    }
+
     @Bean
     @Autowired
-    public ObjectMapper objectMapper(LineRepository lineRepository, UserRepository userRepository)
+    public ObjectMapper objectMapper(LineRepository lineRepository,
+                                     UserRepository userRepository,
+                                     ShiftRepository shiftRepository)
             throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -51,12 +63,14 @@ public class GeneralConfiguration {
             userRepository.insert(users);
         }
 
-        return mapper;
-    }
+        List<Shift> shifts = mapper.readValue(new File(shiftsInitDataFileName),
+                mapper.getTypeFactory().constructCollectionType(List.class, Shift.class));
 
-    @Bean
-    public DateTimeFormatter fmt(){
-        return DateTimeFormatter.ofPattern("ddMMyyyy");
+        if(shiftRepository.findAll().size() == 0){
+            shiftRepository.insert(shifts);
+        }
+
+        return mapper;
     }
 
 }

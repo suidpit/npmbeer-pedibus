@@ -16,10 +16,10 @@ import java.util.List;
     @Document(collection = "users")
     public class User {
 
-        @Id
-        @JsonSerialize(using = ObjectIdSerializer.class)
-        ObjectId id;
-        @Email
+    @Id
+    @JsonSerialize(using = ObjectIdSerializer.class)
+    ObjectId id;
+    @Email
     private String email;
     private String password;
 
