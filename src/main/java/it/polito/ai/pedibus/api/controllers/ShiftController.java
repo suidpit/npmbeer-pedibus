@@ -2,6 +2,7 @@ package it.polito.ai.pedibus.api.controllers;
 
 import it.polito.ai.pedibus.api.models.Shift;
 import it.polito.ai.pedibus.api.repositories.ShiftRepository;
+import it.polito.ai.pedibus.security.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,6 +31,9 @@ public class ShiftController {
     @RequestMapping(value = "/{lineName}/{date}", method = RequestMethod.GET)
     public List<Shift> getShifts(@PathVariable("lineName") String lineName,
                                  @PathVariable("date") String dateString){
+
+        LocalDate date = LocalDate.parse(dateString, this.fmt);
+        List<Shift> shifts = shiftRepository.findByLineNameAndDate(lineName, date);
         List<String> authorities = SecurityContextHolder
             .getContext()
             .getAuthentication()
@@ -38,10 +42,11 @@ public class ShiftController {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
         if(!authorities.contains("SYSTEM_ADMIN")){
-            // TODO remove list of availabilities from response.
+            CustomUserDetails usr = ((CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+            for(Shift s: shifts){
+
+            }
         }
-        LocalDate date = LocalDate.parse(dateString, this.fmt);
-        List<Shift> shifts = shiftRepository.findByLineNameAndDate(lineName, date);
         return shifts;
     }
 

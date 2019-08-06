@@ -36,11 +36,15 @@ public class CustomUserDetailsService implements UserDetailsService {
             authorities.add(new SimpleGrantedAuthority(role));
         }
 
-        return org.springframework.security.core.userdetails.User.builder()
+        return CustomUserDetails.builder()
+                .id(user.getId())
                 .username(email)
                 .password(user.getPassword())
                 .authorities(authorities)
-                .disabled(!user.isEnabled())
+                .isAccountNonExpired(true)
+                .isAccountNonLocked(true)
+                .isCredentialsNonExpired(true)
+                .isEnabled(user.isEnabled())
                 .build();
     }
 
