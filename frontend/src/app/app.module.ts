@@ -44,6 +44,7 @@ import {
   DialogEmailExistsNewReg,
   DialogEmailSendedNewReg 
 } from './components/new-registration-email/new-registration-email.component';
+import { ImpostaPasswordComponent } from './components/imposta-password/imposta-password.component';
 
 @NgModule({
   declarations: [
@@ -59,7 +60,8 @@ import {
     DialogEmailExists,
     NewRegistrationEmailComponent,
     DialogEmailExistsNewReg,
-    DialogEmailSendedNewReg
+    DialogEmailSendedNewReg,
+    ImpostaPasswordComponent
   ],
   imports: [
     BrowserModule,
@@ -69,6 +71,7 @@ import {
       { path: "presenze", component: ReservationsComponent},
       { path: "registrazione", component: RegistrationComponent },
       { path: "registrazioneEmail", component: NewRegistrationEmailComponent},
+      { path : "impostaPassword/:token", component: ImpostaPasswordComponent},
       { path: "**", redirectTo: "login", pathMatch: "full"}
     ]),
     HttpClientModule,

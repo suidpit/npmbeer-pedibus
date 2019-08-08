@@ -36,7 +36,7 @@ public class RegistrationListener implements
         String username = user.getEmail().split("@")[0];
         String subject = "Verifica Indirizzo Email";
         String confirmationUrl
-                = event.getAppUrl() + "/confirm/" + token;
+                = event.getAppUrl() + "/" + token;
        // String message = messages.getMessage("message.regSucc", null, event.getLocale());
 
         String message = "Ciao "+username+",\n\ngrazie per aver creato un account sulla nostra app Pedibus, " +
@@ -51,7 +51,7 @@ public class RegistrationListener implements
         email.setFrom("no-reply@napalm.beer");
         email.setTo(recipientAddress);
         email.setSubject(subject);
-        email.setText(message + " " + "http://localhost:4200/impostaPassword"  + message_part2);
+        email.setText(message + " " + "http://localhost:4200/impostaPassword" + confirmationUrl + message_part2);
         mailSender.send(email);
     }
 }
