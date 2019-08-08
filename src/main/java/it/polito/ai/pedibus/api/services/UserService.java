@@ -98,6 +98,7 @@ public class UserService implements IUserService {
         return userRepository.insert(user);
     }
 
+    //TODO : We don't need it anymore
     @Override
     public User registerNewUserAccount(UserDTO accountDto)
             throws EmailExistsException {

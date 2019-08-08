@@ -133,6 +133,7 @@ public class UserAdministrationController {
         return hasAuthority;
     }
 
+    //TODO : Must to be authorized
     /*Admin adds an e-mail for the new user*/
     //@PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN')")
     @RequestMapping(value = "/addNewUser", method = RequestMethod.POST)

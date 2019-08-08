@@ -39,6 +39,11 @@ import {
 } from './components/registration/registration.component';
 import {CdkStepperModule} from '@angular/cdk/stepper';
 import {MatStepperModule} from '@angular/material/stepper';
+import { 
+  NewRegistrationEmailComponent,
+  DialogEmailExistsNewReg,
+  DialogEmailSendedNewReg 
+} from './components/new-registration-email/new-registration-email.component';
 
 @NgModule({
   declarations: [
@@ -51,7 +56,10 @@ import {MatStepperModule} from '@angular/material/stepper';
     DialogAddKid,
     DialogAddKidReg,
     DialogEmailSended,
-    DialogEmailExists
+    DialogEmailExists,
+    NewRegistrationEmailComponent,
+    DialogEmailExistsNewReg,
+    DialogEmailSendedNewReg
   ],
   imports: [
     BrowserModule,
@@ -60,6 +68,7 @@ import {MatStepperModule} from '@angular/material/stepper';
       { path: "login", component: LoginComponent},
       { path: "presenze", component: ReservationsComponent},
       { path: "registrazione", component: RegistrationComponent },
+      { path: "registrazioneEmail", component: NewRegistrationEmailComponent},
       { path: "**", redirectTo: "login", pathMatch: "full"}
     ]),
     HttpClientModule,
@@ -92,7 +101,8 @@ import {MatStepperModule} from '@angular/material/stepper';
     useClass: AuthInterceptor,
     multi: true
   }],
-  entryComponents: [DialogAddKid,DialogAddKidReg,DialogEmailSended, DialogEmailExists],
+  entryComponents: [DialogAddKid,DialogAddKidReg,DialogEmailSended, DialogEmailExists,DialogEmailExistsNewReg,
+                    DialogEmailSendedNewReg],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

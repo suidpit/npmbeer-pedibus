@@ -18,6 +18,7 @@ export class AuthService {
   login_url = "http://localhost:8080/login";  // http://localhost:4200/backend/login";
   register_url = "http://localhost:8080/register";
   email_check_url = "http://localhost:8080/exists";
+  register_email_url = "http://localhost:8080/users/addNewUser"
 
   private currentUserSubject: BehaviorSubject<User>;
   public currentUser: Observable<User>;
@@ -44,6 +45,10 @@ export class AuthService {
     let self = this;
     return this.http.post<any>(this.register_url, {"email" : email, "pass" : pass, "repass" : repass});
           //.pipe(catchError(this.handleError));
+  }
+
+  registerEmail(email:string){
+    return this.http.post<any>(this.register_email_url, {"email" : email});
   }
 
 

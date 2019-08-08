@@ -41,8 +41,8 @@ public class RegistrationListener implements
 
         String message = "Ciao "+username+",\n\ngrazie per aver creato un account sulla nostra app Pedibus, " +
                 "benvenuto!\n" +
-                "Ti richiediamo soltanto un ultimo semplice passaggio per verificare che questo indizirro email sia " +
-                "valido, puoi farlo cliccando sul seguente link: \n\n";
+                "Ti richiediamo soltanto un ultimo semplice passaggio per verificare che questo indirizzo email sia " +
+                "valido e per impostare la tua password, puoi farlo cliccando sul seguente link: \n\n";
         String message_part2 = "\n\n(se il link non funziona copialo e incollalo nella barra degli indirizzi del tuo " +
                 "browser)"+
                 "\n\nUna volta fatto, sarai pronto per iniziare a usare Pedibus!\n\n" +
@@ -51,7 +51,7 @@ public class RegistrationListener implements
         email.setFrom("no-reply@napalm.beer");
         email.setTo(recipientAddress);
         email.setSubject(subject);
-        email.setText(message + " " + "http://localhost:8080" + confirmationUrl + message_part2);
+        email.setText(message + " " + "http://localhost:4200/impostaPassword"  + message_part2);
         mailSender.send(email);
     }
 }

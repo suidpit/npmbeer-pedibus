@@ -1,0 +1,26 @@
+<mat-card class="container">
+  <mat-card-title>
+    Aggiungi nuovo account
+  </mat-card-title>
+  <mat-card-content>
+    <div *ngIf="error" class="error">Email errata errati</div>
+    <div class="form-container">
+      <form [formGroup]="emailFormGroup" (ngSubmit)="onSubmit()">
+        <table>
+          <tr>
+            <td>
+              <mat-form-field>
+                <input class="validate" [formControl]="email" matInput placeholder="Email" formControlName="email" required>
+                <mat-error *ngIf="email.invalid">{{getErrorMessage()}}</mat-error>
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td> <button mat-raised-button class="btn-login"
+                         [type]="'submit'" [disabled]="!email.valid">Aggiungi</button> </td>
+          </tr>
+        </table>
+      </form>
+    </div>
+  </mat-card-content>
+</mat-card>
