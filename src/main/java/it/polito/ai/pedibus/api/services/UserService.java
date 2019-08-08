@@ -1,5 +1,6 @@
 package it.polito.ai.pedibus.api.services;
 
+import it.polito.ai.pedibus.api.dtos.EmailDTO;
 import it.polito.ai.pedibus.api.dtos.UserDTO;
 import it.polito.ai.pedibus.api.exceptions.EmailExistsException;
 import it.polito.ai.pedibus.api.models.EmailVerificationToken;
@@ -70,6 +71,31 @@ public class UserService implements IUserService {
             logger.info(e.getMessage());
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized");
         }
+    }
+
+    @Override
+    public User registerNewUserEmail(EmailDTO emailDTO)
+            throws EmailExistsException {
+        if (emailExist(emailDTO.getEmail())) {
+            throw new EmailExistsException(
+                    "There is an account with that email address: "
+                            + emailDTO.getEmail());
+        }
+        ArrayList<String> roles = new ArrayList<>();
+        roles.add("USER");
+        ArrayList<SystemAuthority> authorities = new ArrayList<>();
+        SystemAuthority authority = new SystemAuthority();
+        authority.setAuthority(SystemAuthority.Authority.USER);
+        authority.setLine_names(new ArrayList<>());
+        authorities.add(authority);
+
+        User user = new User();
+        user.setEmail(emailDTO.getEmail());
+        user.setPassword(null);
+        user.setRoles(roles);
+        user.setAuthorities(authorities);
+        user.setEnabled(false);
+        return userRepository.insert(user);
     }
 
     @Override
@@ -203,6 +229,13 @@ public class UserService implements IUserService {
         if(userPwd.equals(pwdTocheck))
             return true;
         return false;
+    }
+
+    @Override
+    public void enableUserAndAddPassword(User user, String pass) {
+        user.setEnabled(true);
+        user.setPassword(encoder.encode(pass));
+        userRepository.save(user);
     }
 
 

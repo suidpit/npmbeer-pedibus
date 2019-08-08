@@ -56,6 +56,7 @@ public class UserAuthController {
         return service.signin(loginDTO.getEmail(), loginDTO.getPassword());
     }
 
+    //TODO: This endpoint can be erased
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public String registerUserAccount(
             @RequestBody @Valid UserDTO accountDto,
@@ -91,14 +92,29 @@ public class UserAuthController {
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/confirm/{randomUUID}", method = RequestMethod.GET)
-    public String confirmRegistration
-            (WebRequest request, Model model, @PathVariable("randomUUID") String token)
-            throws EmailTokenNotFoundException
+    public String confirmRegistration()
     {
 
+        return "Password confirm form";
+    }
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping(value = "/confirm/{randomUUID}", method = RequestMethod.POST)
+    public String completeRegistrationWithPwd(WebRequest request, Model model,
+                                              @PathVariable("randomUUID") String token,
+                                              @RequestBody @Valid NewPasswordDTO newPasswordDTO,
+                                              BindingResult result)
+            throws EmailTokenNotFoundException{
+        if (result.hasErrors()) {
+            StringBuilder sb = new StringBuilder("Failure - Reason:\n");
+            for(FieldError fe: result.getFieldErrors()){
+                sb.append("Field: ").append(fe.getField());
+                sb.append(" - Error: ").append(fe.getDefaultMessage()).append("\n");
+            }
+            return sb.toString();
+        }
         Locale locale = request.getLocale();
 
-        logger.info("In /regitrationConfirm");
+        logger.info("In /completeRegistrationWithPwd");
         EmailVerificationToken verificationToken = service.getVerificationToken(token);
         if (verificationToken == null) {
             /*String message = messages.getMessage("auth.message.invalidToken", null, locale);
@@ -106,7 +122,6 @@ public class UserAuthController {
             //return "redirect:/badUser.html?lang=" + locale.getLanguage();
             throw new EmailTokenNotFoundException();
         }
-
         User user = verificationToken.getUser();
         Calendar cal = Calendar.getInstance();
         if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
@@ -114,10 +129,12 @@ public class UserAuthController {
             throw new EmailTokenNotFoundException();
         }
 
-        service.enableUser(user);
+        service.enableUserAndAddPassword(user,newPasswordDTO.getPass());
         service.expireRegistationToken(verificationToken);
         return "Il tuo account è stato abilitato con successo! Può chiudere questa pagina.";
     }
+
+
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/recover/{randomUUID}", method = RequestMethod.POST)
