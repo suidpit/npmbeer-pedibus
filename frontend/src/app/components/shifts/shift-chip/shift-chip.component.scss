@@ -1,0 +1,37 @@
+.shift-container{
+  min-width: 95px;
+  height:100%;
+  border-radius: 5px;
+  border: 1px solid #a1a1a1;
+  margin: 4px;
+}
+
+.datetime-container{
+  font-family: Garamond;
+  color: #FFFFFF;
+  -webkit-border-radius: 4px 4px 0 0;
+  -moz-border-radius: 4px 4px 0 0;
+  border-radius: 4px 4px 0 0;
+  background-color: #2C3E50;
+}
+
+.line-container{
+  font-family: "Bookman Old Style";
+  font-weight: bold;
+  color: #429e9a;
+  background-color: #FFFFFF;
+}
+
+.direction-container{
+  font-family: "Bookman Old Style";
+  font-style: italic;
+  height: available;
+  background-color: #FFFFFF;
+  -webkit-border-radius: 0 0 4px 4px;
+  -moz-border-radius: 0 0 4px 4px;
+  border-radius: 0 0 4px 4px;
+}
+
+.p-4{
+  padding: 4px;
+}

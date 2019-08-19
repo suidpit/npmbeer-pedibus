@@ -1,9 +1,9 @@
 export class User {
 
-  _id;
-  private _email;
-  roles :Array<string>;
-  authorities:Array<string>;
+  private readonly _id;
+  private readonly _email;
+  private _role : Role = Role.USER;
+  // authorities: Array<string>;
 
   constructor(id: string, email:string){
     this._id = id;
@@ -13,4 +13,18 @@ export class User {
   get email(){
     return this._email;
   }
+
+  set role(role: Role){
+    this._role = role;
+  }
+
+  get role() {
+    return this._role;
+  }
+}
+
+export enum Role{
+  USER = "user",
+  COMPANION = "companion",
+  ADMIN = "admin"
 }

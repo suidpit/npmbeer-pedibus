@@ -1,0 +1,16 @@
+.events-list{
+  @media (max-width: 600px){
+    padding-bottom: 8px;
+    display: flex;
+    flex-direction: row;
+    align-content: stretch;
+    overflow-x: scroll;
+    overflow-y: hidden;
+
+    .child{
+      margin: auto;
+      flex: 1 0 100%;
+    }
+  }
+}
+

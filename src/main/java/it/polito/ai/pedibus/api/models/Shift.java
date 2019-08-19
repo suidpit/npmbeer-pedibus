@@ -33,6 +33,7 @@ public class Shift {
     @JsonSerialize(using = ObjectIdSerializer.class)
     private ObjectId companionId;
 
-private List<ObjectId> availabilities;
+    private List<ObjectId> availabilities;
+
     private boolean open;
 }

@@ -5,6 +5,7 @@ import it.polito.ai.pedibus.api.dtos.UserPrivilegesDTO;
 import it.polito.ai.pedibus.api.models.SystemAuthority;
 import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
+import it.polito.ai.pedibus.security.LineGrantedAuthority;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;

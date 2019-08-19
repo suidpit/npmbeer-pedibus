@@ -1,5 +1,5 @@
-<div style="height: 100vh;">
-  <mat-toolbar color="primary">
+<div>
+  <mat-toolbar style="background-color: #2C3E50; color: white;">
     <div fxHide.gt-sm="true" style="display: inline-block;">
       <mat-icon class="pointer" style="vertical-align: middle"
                 (click)="sidenav.toggle()">menu</mat-icon>
@@ -11,7 +11,7 @@
     <div fxShow="true" fxHide.lt-md="true" fxLayout="row" fxLayoutAlign="center center" style="width:100%">
       <!-- The following menu items will be hidden on both SM and XS screen sizes -->
       <span fxFlexAlign="start">
-        <a routerLink="/presenze" mat-button class="menu-element">Presenze</a>
+        <a *ngFor="let link of entries" [routerLink]="link.url" mat-button class="menu-element">{{link.displayName}}</a>
       </span>
       <span *ngIf="user === null">
         <a routerLink="/registrazione" mat-button class="menu-element">Registrazione</a>
@@ -28,12 +28,12 @@
 
   </mat-toolbar>
 
-  <mat-sidenav-container fxFlexFill>
+  <mat-sidenav-container>
     <mat-sidenav #sidenav fxLayout="column">
       <div fxLayout="column" fxLayoutAlign="center">
         <a (click)="sidenav.toggle()" class="pointer" mat-button>Close</a>
         <span>
-          <a routerLink="/presenze" mat-button class="menu-element">Presenze</a>
+          <a *ngFor="let link of entries" [routerLink]="link.url" mat-button class="menu-element">{{link.displayName}}</a>
         </span>
         <span>
           <a *ngIf="user === null" routerLink="/login" mat-button class="menu-element">Login</a>
@@ -45,8 +45,13 @@
         </span>
       </div>
     </mat-sidenav>
-    <mat-sidenav-content fxFill fxLayoutAlign="center center" style="overflow: hidden;">
-      <router-outlet></router-outlet>
+    <mat-sidenav-content style="width: 100%; height: 100vh;">
+      <div style="margin: auto;">
+        <router-outlet></router-outlet>
+      </div>
     </mat-sidenav-content>
   </mat-sidenav-container>
+  <mat-toolbar style="background-color: #2C3E50; color: white;">
+    <span class="pointer"> FOOTER</span>
+  </mat-toolbar>
 </div>

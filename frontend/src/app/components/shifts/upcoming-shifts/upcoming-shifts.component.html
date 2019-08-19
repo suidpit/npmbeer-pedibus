@@ -1,0 +1,12 @@
+<div class="container">
+  <mat-card role="group">
+    <mat-card-header fxLayout="column" fxLayoutAlign="center center">
+      <mat-card-title> Prossimi Turni</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content class="events-list">
+      <app-shift-chip *ngFor="let shift of shiftService.getShifts() | async | slice:0:6" [shift]="shift">
+      </app-shift-chip>
+    </mat-card-content>
+  </mat-card>
+</div>

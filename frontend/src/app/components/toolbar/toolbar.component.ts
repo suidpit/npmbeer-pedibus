@@ -15,6 +15,19 @@ export class ToolbarComponent implements OnInit {
   template_styles = null;
   template: Observable<ElementRef>;
 
+  entries = [
+    {
+      displayName: "Presenze",
+      url: "/presenze",
+      roles: []
+    },
+    {
+      displayName: "Turni",
+      url: "/admin/turni",
+      roles: []
+    }
+  ];
+
   constructor(private auth: AuthService) {
     this.auth.currentUser.subscribe(
       (user) =>

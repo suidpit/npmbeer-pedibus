@@ -12,7 +12,7 @@ public class SystemAuthority {
     private List<String> line_names;
     private Authority authority;
 
-    public enum Authority {SYSTEM_ADMIN, ADMIN, USER}
+    public enum Authority {SYSTEM_ADMIN, ADMIN, COMPANION, USER}
 
     @Override
     public String toString(){

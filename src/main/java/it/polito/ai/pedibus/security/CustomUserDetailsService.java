@@ -47,31 +47,5 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .isEnabled(user.isEnabled())
                 .build();
     }
-
-    public class LineGrantedAuthority implements GrantedAuthority{
-
-        private SystemAuthority.Authority authority;
-
-        //TODO: line list
-        private List<String> lineNames;
-
-        public LineGrantedAuthority(SystemAuthority.Authority authority, List<String> lineNames){
-            this.authority = authority;
-            this.lineNames = lineNames;
-        }
-
-        @Override
-        public String getAuthority() {
-            return this.authority.name();
-        }
-
-        public List<String> getLineNames(){
-            return this.lineNames;
-        }
-
-        @Override
-        public String toString(){
-            return this.authority.name()+": "+this.lineNames.toString();
-        }
-    }
 }
+

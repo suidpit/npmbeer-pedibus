@@ -1,0 +1,21 @@
+.shift-tab-container{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  @media (max-width: 600px){
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.upcoming{
+  flex: 1 1 auto;
+  max-width: 75%;
+  margin: 5px;
+}
+
+.calendar{
+  flex: 2 2 auto;
+  max-width: 75%;
+  margin: 5px;
+}
