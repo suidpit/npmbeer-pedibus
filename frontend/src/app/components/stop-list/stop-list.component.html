@@ -1,0 +1,8 @@
+<app-stop-list-row *ngFor="let row of stops; let j = index"
+                   [direction]=direction(j)
+                   [no_bottom]="j==0"
+                   [no_top]="j==stops.length-1"
+                   [selected_stop]="selected_stop"
+                   [stops]=row>
+</app-stop-list-row>
+

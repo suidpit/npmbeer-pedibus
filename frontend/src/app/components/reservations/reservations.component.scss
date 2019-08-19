@@ -1,38 +1,65 @@
-.container{
-  width: 350px;
-  height: 100%;
+.container {
+  height: calc(100% - 80px);
+  margin: auto;
+  width: 100%;
+  display: flex;
+}
+
+.main {
+  width: 80%;
+  overflow: auto;
+}
+
+.children {
+  width: 20%;
+  height: fit-content;
   margin: auto;
 }
 
-.row{
-  display: flex;
-  justify-content: flex-start;
-  align-items: left;
+.element {
+  margin: auto;
 }
 
-.fill-row{
+.row {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.fill-row {
   flex: 1 1 auto;
 }
 
-mat-form-field{
+mat-form-field {
   width: 160px;
 }
 
-.mt-4{
+.mt-4 {
   margin-top: 4px;
-}
-
-mat-list-item{
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
 }
 
 .present {
   color: blue;
 }
 
-.custom-list .mat-list-item{
+.custom-list .mat-list-item {
   height: auto;
   min-height: 48px;
+}
+
+.dummy {
+  position: absolute;
+  visibility: hidden;
+  top: 0px;
+  left: 0px;
+  width: fit-content;
+  margin: 0px;
+  white-space: nowrap;
+}
+
+.stops {
+  width: 100%;
+}
+
+mat-tab-group{
+  height: auto;
 }

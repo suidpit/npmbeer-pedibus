@@ -1,0 +1,23 @@
+div {
+  box-sizing: content-box;
+  margin: 0;
+  padding: 0;
+  min-width: 1px;
+}
+
+.element{
+  margin: 2px;
+}
+
+.stop {
+  text-align: center;
+  border-bottom: 1px solid #c9c9c9;
+  font-family: Roboto;
+  font-size: 14px
+}
+
+.selected{
+  border-radius: 5px;
+  background-color: orange;
+  border: 1px solid black;
+}

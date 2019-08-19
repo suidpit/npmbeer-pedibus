@@ -10,18 +10,18 @@
 
     <div fxShow="true" fxHide.lt-md="true" fxLayout="row" fxLayoutAlign="center center" style="width:100%">
       <!-- The following menu items will be hidden on both SM and XS screen sizes -->
-      <span fxFlexAlign="start">
-        <a routerLink="/presenze" mat-button class="menu-element">Presenze</a>
-      </span>
-      <span *ngIf="user === null">
-        <a routerLink="/registrazione" mat-button class="menu-element">Registrazione</a>
-      </span>
-      <span fxFlexAlign="end">
-        <a *ngIf="user === null" routerLink="/login" mat-button class="menu-element">Login</a>
-        <span *ngIf="user !== null" class="menu-element">
-          Benvenuto, {{user._email}} |
-              <a (click)="auth.logout()" routerLink="/login" mat-button class="pointer">Logout</a>
-
+          <span fxFlexAlign="start">
+            <a routerLink="/presenze" mat-button class="menu-element">Presenze</a>
+            <a routerLink="/prenotazione" mat-button class="menu-element">Prenotazione</a>
+          </span>
+          <span *ngIf="user === null">
+            <a routerLink="/registrazione" mat-button class="menu-element">Registrazione</a>
+          </span>
+          <span fxFlexAlign="end">
+            <a *ngIf="user === null" routerLink="/login" mat-button class="menu-element">Login</a>
+            <span *ngIf="user !== null" class="menu-element">
+              Benvenuto, {{user._email}} |
+                  <a (click)="auth.logout()" routerLink="/login" mat-button class="pointer">Logout</a>
         </span>
       </span>
     </div>
@@ -46,7 +46,9 @@
       </div>
     </mat-sidenav>
     <mat-sidenav-content fxFill fxLayoutAlign="center center" style="overflow: hidden;">
+      <div fxFill>
       <router-outlet></router-outlet>
+      </div>
     </mat-sidenav-content>
   </mat-sidenav-container>
 </div>

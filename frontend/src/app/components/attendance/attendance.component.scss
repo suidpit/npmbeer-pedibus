@@ -1,0 +1,38 @@
+.container{
+  width: 350px;
+  height: 100%;
+  margin: auto;
+}
+
+.row{
+  display: flex;
+  justify-content: flex-start;
+  align-items: left;
+}
+
+.fill-row{
+  flex: 1 1 auto;
+}
+
+mat-form-field{
+  width: 160px;
+}
+
+.mt-4{
+  margin-top: 4px;
+}
+
+mat-list-item{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.present {
+  color: blue;
+}
+
+.custom-list .mat-list-item{
+  height: auto;
+  min-height: 48px;
+}

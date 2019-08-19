@@ -33,6 +33,42 @@ export class AppComponent {
     {
       "name": "add",
       "path": "add.svg"
+    },
+    {
+      "name": "dots_left",
+      "path": "dots_left.svg"
+    },
+    {
+      "name": "dots_top_left",
+      "path": "dots_top_left.svg"
+    },
+    {
+      "name": "dots_bottom_left",
+      "path": "dots_bottom_left.svg"
+    },
+    {
+      "name": "dots_right",
+      "path": "dots_right.svg"
+    },
+    {
+      "name": "dots_top_right",
+      "path": "dots_top_right.svg"
+    },
+    {
+      "name": "dots_bottom_right",
+      "path": "dots_bottom_right.svg"
+    },
+    {
+      "name": "dots",
+      "path": "dots.svg"
+    },
+    {
+      "name": "dots_down_left",
+      "path": "dots_down_left.svg"
+    },
+    {
+      "name": "dots_down_right",
+      "path": "dots_down_right.svg"
     }
   ];
   constructor(private matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer){

@@ -1,0 +1,32 @@
+<div fxLayout="row nowrap">
+    <div *ngIf="no_bottom==false && direction=='start'" fxFlex="none">
+        <app-stop-element
+                [stop]="{startOrEnd: 'dot_bottom_left'}"></app-stop-element>
+    </div>
+    <div *ngIf="no_top==false && direction=='end'" fxFlex="none">
+        <app-stop-element
+                [stop]="{startOrEnd: 'dot_top_right'}"></app-stop-element>
+    </div>
+
+    <div fxLayout="row" fxFlex="grow" [fxLayoutAlign]="align()">
+        <!-- pair element - dots -->
+        <div fxLayout="row" *ngFor="let stop of stops; let j=index">
+            <app-stop-element *ngIf="direction=='end' && j!=0 && !(stop.startOrEnd && stop.startOrEnd==='dots')"
+                              [stop]="{startOrEnd: 'dot_left'}"></app-stop-element>
+            <app-stop-element *ngIf="direction=='start' && j!=0 && !(stop.startOrEnd && stop.startOrEnd==='dots')"
+                              [stop]="{startOrEnd: 'dot_right'}"></app-stop-element>
+            <app-stop-element
+                    [selected]="selected_stop===stop"
+                    [stop]=stop></app-stop-element>
+        </div>
+    </div>
+
+    <div *ngIf="no_top==false && direction=='start'" fxFlex="none">
+        <app-stop-element
+                [stop]="{startOrEnd: 'dot_top_left'}"></app-stop-element>
+    </div>
+    <div *ngIf="no_bottom==false && direction=='end'" fxFlex="none">
+        <app-stop-element
+                [stop]="{startOrEnd: 'dot_bottom_right'}"></app-stop-element>
+    </div>
+</div>

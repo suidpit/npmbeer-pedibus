@@ -1,0 +1,37 @@
+<div class="container" fxLayout="column" #container>
+    <div fxLayout="column" fxFlexAlign="space-betwen" *ngIf="stop.startOrEnd; else intermediate">
+        <mat-icon *ngIf="stop.startOrEnd==='start'" svgIcon="start"></mat-icon>
+        <mat-icon *ngIf="stop.startOrEnd==='end'" svgIcon="finish_green"></mat-icon>
+        <mat-icon *ngIf="stop.startOrEnd==='dots'" svgIcon="dots"></mat-icon>
+        <mat-icon *ngIf="stop.startOrEnd==='dots_down'" svgIcon="dots_down"></mat-icon>
+        <mat-icon *ngIf="stop.startOrEnd==='dot_left'" svgIcon="dots_left"></mat-icon>
+        <mat-icon *ngIf="stop.startOrEnd==='dot_top_left'" svgIcon="dots_top_left"></mat-icon>
+        <div *ngIf="stop.startOrEnd==='dot_top_left'" fxFlex="stretch" fxFlexAlign="center center">
+            <mat-icon svgIcon="dots_down_left"></mat-icon>
+        </div>
+        <mat-icon *ngIf="stop.startOrEnd==='dot_bottom_left'" svgIcon="dots_bottom_left"></mat-icon>
+        <mat-icon *ngIf="stop.startOrEnd==='dot_right'" svgIcon="dots_right"></mat-icon>
+        <mat-icon *ngIf="stop.startOrEnd==='dot_top_right'" svgIcon="dots_top_right"></mat-icon>
+        <mat-icon *ngIf="stop.startOrEnd==='dot_top_right'" svgIcon="dots_down_right"></mat-icon>
+        <mat-icon *ngIf="stop.startOrEnd==='dot_bottom_right'" svgIcon="dots_bottom_right"></mat-icon>
+    </div>
+</div>
+
+<ng-template #intermediate>
+    <div [ngClass]="selected? 'selected' : 'not-selected'" (click)="selectStop()" *ngIf="stop.name">
+        <div class="element" fxFlex="none" fxLayout="column" fxLayoutAlign="start" *ngIf="stop.startOrEnd==undefined"
+             fxLayout.gt-lg="center center">
+            <div fxFlexOrder="0" fxFlexAlign="center">
+                <mat-icon svgIcon="dot"></mat-icon>
+            </div>
+            <div fxFlexOrder="1" fxFlexAlign="center">
+                <div fxLayout="row">
+                    <div class="stop">{{stop.name}}</div>
+                </div>
+                <div fxLayout="row">
+                    <div>{{stop.time}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
