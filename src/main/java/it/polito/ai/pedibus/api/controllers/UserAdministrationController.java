@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import it.polito.ai.pedibus.security.CustomUserDetailsService.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.WebRequest;
@@ -45,6 +44,7 @@ public class UserAdministrationController {
     ApplicationEventPublisher eventPublisher;
     @Autowired
     IUserService service;
+
 
     @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN')")
     @RequestMapping(value = "", method = RequestMethod.GET)

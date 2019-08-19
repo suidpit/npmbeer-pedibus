@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, FormControl, FormGroupDirective, NgForm } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { ErrorStateMatcher } from '@angular/material';
+import { ErrorStateMatcher, MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-imposta-password',
@@ -33,7 +33,7 @@ return pass === confirmPass ? null : { notSame: true }
 }
 
 
-  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router,private activatedRoute: ActivatedRoute) { }
+  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router,private activatedRoute: ActivatedRoute,private _snackBar: MatSnackBar) { }
 
   ngOnInit() {
   }
@@ -51,16 +51,25 @@ return pass === confirmPass ? null : { notSame: true }
       this.passwordFormGroup.controls.password.value,
       this.passwordFormGroup.controls.confirmPassword.value,
       this.activatedRoute.snapshot.params['token'])
-      .subscribe( (res) => {
+      .subscribe( 
+                  (data) => {
+                          console.log("%cAttivazione account","color:green");
+                          this.openSnackBar();
+
                           self.router.navigate(["/login"]);
-                        },
-                  (err) => {
-                          if(err.status === 409){
-                          }
-                          self.error = true;
-                          console.log("error in sendPassword")
 
                           //self.emailField.nativeElement.focus();
+                        },
+                  (error) => {
+                    if(error==200){
+                      console.log("%cAttivazione account","color:green");
+                      this.openSnackBar();
+
+                      self.router.navigate(["/login"]);
+                    }else{
+                      console.log("%cErrore codice:"  + error,"color:red");
+
+                    }
                         }
                   // () => {
                   //      console.log("finally")
@@ -70,7 +79,26 @@ return pass === confirmPass ? null : { notSame: true }
 
   }
 
+  durationInSeconds = 5;
+  openSnackBar() {
+    this._snackBar.openFromComponent(PizzaPartyComponent, {
+      duration: this.durationInSeconds * 1000,
+    });
+  }
+
 }
+
+@Component({
+  selector: 'account-attivato-snack-bar',
+  templateUrl: 'account-attivato-snack-bar.html',
+  styles: [`
+    .example-pizza-party {
+      color: hotpink;
+    }
+  `],
+})
+export class PizzaPartyComponent {}
+
 
 export class MyErrorStateMatcherNew implements ErrorStateMatcher {
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {

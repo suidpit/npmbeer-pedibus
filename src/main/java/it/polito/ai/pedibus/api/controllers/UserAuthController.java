@@ -1,6 +1,4 @@
 package it.polito.ai.pedibus.api.controllers;
-
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import it.polito.ai.pedibus.api.dtos.EmailDTO;
 import it.polito.ai.pedibus.api.dtos.LoginDTO;
 import it.polito.ai.pedibus.api.dtos.NewPasswordDTO;

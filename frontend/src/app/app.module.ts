@@ -16,7 +16,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
-import {MatChipsModule, MatDialogModule} from "@angular/material";
+import {MatChipsModule, MatDialogModule, MatSnackBarModule} from "@angular/material";
 import { MatToolbarModule } from "@angular/material";
 import { MatSidenavModule } from "@angular/material";
 
@@ -44,7 +44,7 @@ import {
   DialogEmailExistsNewReg,
   DialogEmailSendedNewReg 
 } from './components/new-registration-email/new-registration-email.component';
-import { ImpostaPasswordComponent } from './components/imposta-password/imposta-password.component';
+import { ImpostaPasswordComponent, PizzaPartyComponent } from './components/imposta-password/imposta-password.component';
 
 @NgModule({
   declarations: [
@@ -61,7 +61,8 @@ import { ImpostaPasswordComponent } from './components/imposta-password/imposta-
     NewRegistrationEmailComponent,
     DialogEmailExistsNewReg,
     DialogEmailSendedNewReg,
-    ImpostaPasswordComponent
+    ImpostaPasswordComponent,
+    PizzaPartyComponent
   ],
   imports: [
     BrowserModule,
@@ -97,7 +98,8 @@ import { ImpostaPasswordComponent } from './components/imposta-password/imposta-
     MatDialogModule,
     FlexLayoutModule,
     CdkStepperModule,
-    MatStepperModule
+    MatStepperModule,
+    MatSnackBarModule
   ],
   providers: [MatDatepickerModule, {
     provide: HTTP_INTERCEPTORS,
@@ -105,7 +107,7 @@ import { ImpostaPasswordComponent } from './components/imposta-password/imposta-
     multi: true
   }],
   entryComponents: [DialogAddKid,DialogAddKidReg,DialogEmailSended, DialogEmailExists,DialogEmailExistsNewReg,
-                    DialogEmailSendedNewReg],
+                    DialogEmailSendedNewReg,PizzaPartyComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
