@@ -71,15 +71,9 @@ export class ReservationsService {
         return of(children);
     }
 
-    selected_stop_observer$: Subject<any> = new BehaviorSubject({});
-    last_selected = {};
+    selected_stop_observer$: Subject<any> = new BehaviorSubject(undefined);
 
-    selectStop(s){
-        if(this.last_selected==s){
-            this.last_selected = {};
-        }else{
-            this.last_selected = s;
-        }
-        this.selected_stop_observer$.next(this.last_selected);
+    selectStop(s) {
+        this.selected_stop_observer$.next(s);
     }
 }

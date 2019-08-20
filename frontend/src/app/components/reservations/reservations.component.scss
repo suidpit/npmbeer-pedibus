@@ -1,4 +1,5 @@
 .container {
+  position: relative;
   height: calc(100% - 80px);
   margin: auto;
   width: 100%;
@@ -6,14 +7,8 @@
 }
 
 .main {
-  width: 80%;
+  min-height: 0px;
   overflow: auto;
-}
-
-.children {
-  width: 20%;
-  height: fit-content;
-  margin: auto;
 }
 
 .element {
@@ -57,9 +52,14 @@ mat-form-field {
 }
 
 .stops {
-  width: 100%;
+  margin: auto;
+  width: fit-content;
 }
 
 mat-tab-group{
   height: auto;
+}
+
+mat-tab-body{
+  place-content: center;
 }

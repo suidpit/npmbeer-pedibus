@@ -1,8 +1,8 @@
 import {
-    AfterViewChecked,
+    AfterViewChecked, ChangeDetectionStrategy,
     Component,
-    ElementRef,
-    OnInit,
+    ElementRef, EventEmitter, Inject,
+    OnInit, Output,
     ViewChild
 } from '@angular/core';
 import {LocalTime} from "js-joda";
@@ -10,6 +10,8 @@ import {ReservationsService} from "../../services/reservations/reservations.serv
 import {FormControl} from "@angular/forms";
 import {StopService} from "../../services/stop/stop.service";
 import {ResizedEvent} from "angular-resize-event";
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material";
+import {DialogAddKidData, Kid} from "../stop-row/stop-row.component";
 
 @Component({
     selector: 'app-reservations',
@@ -18,29 +20,24 @@ import {ResizedEvent} from "angular-resize-event";
 })
 export class ReservationsComponent implements OnInit {
 
+
     stops = [];
     lines = [];
     selectedLine = null;
     oldSelectedLine = null;
-    selected_stop = {};
 
     selectedRun = 0;
     selectedDate = null;
     selectedDirection = "outward";
 
-    stop_rows = undefined;
-    dummy_stop = {};
-    completed = false;
-    dot = {startOrEnd: 'dot_left'};
-    children = [];
-    selectedChild = undefined;
-
+    stopRows = undefined;
     allowedDaysFilter = (d: Date): boolean => {
         let dayNum = d.getDay();
         return !(dayNum === 0);
     };
+    private previousWidth = 0;
 
-    constructor(private reservationsService: ReservationsService, private stopService: StopService) {
+    constructor(private dialog: MatDialog, private reservationsService: ReservationsService, private stopService: StopService) {
         this.selectedDate = new FormControl(new Date());
     }
 
@@ -53,27 +50,30 @@ export class ReservationsComponent implements OnInit {
             }
         );
 
-        this.reservationsService.children().subscribe(
-            (children) => {
-                this.children = children;
-            }
-        );
-        this.stopService.stops_observer$.subscribe((data) => {
-            this.completed = true;
-            setTimeout(()=>{this.stop_rows = data});
+        this.stopService.stopsObserver$.subscribe((data) => {
+            this.stopRows = data;
         });
-        this.stopService.dummy_observer$.subscribe((data) => {
-            setTimeout(()=>{this.dummy_stop = data});
-        });
+
         this.reservationsService.selected_stop_observer$.subscribe(
             (stop) => {
-                this.selected_stop = stop;
+                if (stop != undefined) {
+                    let dialogRef = this.dialog.open(BookingDialog, {
+                        data: {
+                            line: this.selectedLine,
+                            stop: stop,
+                            date: this.selectedDate
+                        }
+                    });
+
+                    dialogRef.afterClosed().subscribe(result => {
+                        //ACTION AFTER CLOSE
+                    })
+                }
             }
         )
     }
 
     updateData() {
-        this.selected_stop = {};
         if (this.selectedLine != null) {
             if (this.selectedLine.outward[0].endsAt.isAfter(LocalTime.now()) || this.selectedDirection === 'outward') {
                 this.selectedRun = 0;
@@ -90,37 +90,99 @@ export class ReservationsComponent implements OnInit {
                 this.selectedDate.setValue(today);
             }
             if (this.oldSelectedLine != this.selectedLine) {
-                this.stop_rows = undefined;
+                this.stopRows = undefined;
                 this.oldSelectedLine = this.selectedLine;
+                if (this.previousWidth > 0) {
+                    this.setStops(this.previousWidth);
+                }
             }
         }
     }
 
     onResize(event: ResizedEvent) {
-        if (this.selectedLine != null)
+        this.stopRows = undefined;
+        if (this.selectedLine != null) {
+            this.previousWidth = event.newWidth;
             this.setStops(event.newWidth);
+        }
     }
 
     setStops(width) {
         let temp_stops = [];
+
         for (let r of this.selectedLine.outward) {
-            let temp = [];
-            temp.push({startOrEnd: 'start'});
-            temp = temp.concat(r.stops);
-            temp.push({startOrEnd: 'end'});
-            temp_stops.push(temp);
+            temp_stops.push(r.stops);
         }
         for (let r of this.selectedLine.back) {
-            let temp = [];
-            temp.push({startOrEnd: 'start'});
-            temp = temp.concat(r.stops);
-            temp.push({startOrEnd: 'end'});
-            temp_stops.push(temp);
+            temp_stops.push(r.stops);
         }
-        this.stopService.initialize(temp_stops, this.dot, width);
+
+        this.stopService.initialize(temp_stops, width, window.innerWidth <= 600);
+    }
+
+}
+
+export interface BookingData {
+    line: string;
+    stop: string;
+    date: string;
+}
+
+@Component({
+        selector: 'booking-dialog-template',
+        templateUrl: './booking-dialog.template.html',
+        changeDetection: ChangeDetectionStrategy.OnPush
+    }
+)
+
+export class BookingDialog implements OnInit {
+    children = new Map();
+    errorMsg = null;
+
+    @Output("child-presence") change: EventEmitter<Kid> = new EventEmitter<Kid>();
+
+    ngOnInit(): void {
+        this.reservationsService.children().subscribe(
+            (children) => {
+                this.children = new Map();
+                for (let c of children) {
+                    this.children.set(c, false);
+                }
+            }
+        );
+
+    }
+
+    constructor(
+        private reservationsService: ReservationsService,
+        @Inject(MAT_DIALOG_DATA) public data: BookingData,
+        public dialogRef: MatDialogRef<BookingDialog>) {
+    }
+
+    closeDialog() {
+        this.dialogRef.close();
     }
 
     selectChild(child) {
-        this.selectedChild = child;
+        this.children.set(child, !this.children.get(child))
+    }
+
+    book() {
+        let check = false;
+        for (let v of this.children.values()) {
+            if (v) {
+                check = true;
+                break;
+            }
+        }
+
+        if (!check) {
+            this.errorMsg = "Per favore seleziona almeno un bambino";
+            return;
+        } else {
+            this.errorMsg = null;
+            //SEND REQUEST
+            this.closeDialog();
+        }
     }
 }

@@ -24,7 +24,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {FlexLayoutModule} from "@angular/flex-layout";
 
 import {AppComponent} from './app.component';
-import {ReservationsComponent} from './components/reservations/reservations.component';
+import {BookingDialog, ReservationsComponent} from './components/reservations/reservations.component';
 import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {DialogAddKid, StopRowComponent} from './components/stop-row/stop-row.component';
 import {LoginComponent} from './components/auth/login/login.component';
@@ -55,13 +55,14 @@ import {SpinnerComponent} from './components/spinner/spinner.component';
         RegistrationComponent,
         DialogAddKid,
         DialogAddKidReg,
+        BookingDialog,
         DialogEmailSended,
         DialogEmailExists,
         AttendanceComponent,
         StopListRowComponent,
         StopListComponent,
         StopElementComponent,
-        SpinnerComponent
+        SpinnerComponent,
     ],
     imports: [
         BrowserModule,
@@ -87,17 +88,17 @@ import {SpinnerComponent} from './components/spinner/spinner.component';
         MatNativeDateModule,
         MatDatepickerModule,
         FormsModule,
+        MatDialogModule,
         ReactiveFormsModule,
         MatTabsModule,
         MatListModule,
         MatChipsModule,
         MatToolbarModule,
         MatSidenavModule,
-        MatDialogModule,
         FlexLayoutModule,
         CdkStepperModule,
         MatStepperModule,
-        AngularResizedEventModule
+        AngularResizedEventModule,
 
     ],
     providers: [MatDatepickerModule, {
@@ -105,7 +106,7 @@ import {SpinnerComponent} from './components/spinner/spinner.component';
         useClass: AuthInterceptor,
         multi: true
     }],
-    entryComponents: [DialogAddKid, DialogAddKidReg, DialogEmailSended, DialogEmailExists],
+    entryComponents: [DialogAddKid, DialogAddKidReg, DialogEmailSended, DialogEmailExists, BookingDialog],
     bootstrap: [AppComponent]
 })
 export class AppModule {

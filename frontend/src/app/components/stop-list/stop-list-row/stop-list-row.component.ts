@@ -13,7 +13,6 @@ export class StopListRowComponent implements OnInit{
     @Input("direction") direction;
     @Input("no_top") no_top;
     @Input("no_bottom") no_bottom;
-    @Input("selected_stop") selected_stop;
 
     ngOnInit(): void {
         if (this.direction == "end") {

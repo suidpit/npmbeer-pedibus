@@ -1,32 +1,46 @@
-<div fxLayout="row nowrap">
-    <div *ngIf="no_bottom==false && direction=='start'" fxFlex="none">
-        <app-stop-element
-                [stop]="{startOrEnd: 'dot_bottom_left'}"></app-stop-element>
-    </div>
-    <div *ngIf="no_top==false && direction=='end'" fxFlex="none">
-        <app-stop-element
-                [stop]="{startOrEnd: 'dot_top_right'}"></app-stop-element>
-    </div>
+<!--flags-->
+<div class="row" fxLayout="row" [fxLayoutAlign]="no_top ? direction : 'end'"
+     [ngStyle.gt-xs]="{'padding-left': no_bottom ? (no_top ? '270px' : '90px'): '0px'}"
+     [ngStyle.lt-sm]="{'padding-left': no_bottom? (no_top ? '135px' : '90px'): '0px'}">
 
-    <div fxLayout="row" fxFlex="grow" [fxLayoutAlign]="align()">
-        <!-- pair element - dots -->
-        <div fxLayout="row" *ngFor="let stop of stops; let j=index">
-            <app-stop-element *ngIf="direction=='end' && j!=0 && !(stop.startOrEnd && stop.startOrEnd==='dots')"
-                              [stop]="{startOrEnd: 'dot_left'}"></app-stop-element>
-            <app-stop-element *ngIf="direction=='start' && j!=0 && !(stop.startOrEnd && stop.startOrEnd==='dots')"
-                              [stop]="{startOrEnd: 'dot_right'}"></app-stop-element>
-            <app-stop-element
-                    [selected]="selected_stop===stop"
-                    [stop]=stop></app-stop-element>
-        </div>
-    </div>
+    <!--wrap-->
+    <app-stop-element ngClass="down_left" ngClass.lt-sm="down_left_small"
+                      *ngIf="!no_bottom && direction=='start'"
+                      [type]="'down'"></app-stop-element>
+    <app-stop-element ngClass="down_right" *ngIf="!no_bottom && direction=='end'"
+                      [type]="'down'"></app-stop-element>
+    <app-stop-element *ngFor="let stop of stops"
+                      [type]="'intermediate'"
+                      [stop]="stop"></app-stop-element>
+</div>
 
-    <div *ngIf="no_top==false && direction=='start'" fxFlex="none">
-        <app-stop-element
-                [stop]="{startOrEnd: 'dot_top_left'}"></app-stop-element>
-    </div>
-    <div *ngIf="no_bottom==false && direction=='end'" fxFlex="none">
-        <app-stop-element
-                [stop]="{startOrEnd: 'dot_bottom_right'}"></app-stop-element>
-    </div>
+
+<div fxLayout="row" [fxLayoutAlign]="no_top ? direction : 'end'">
+    <!--wrap-->
+
+    <app-stop-element *ngIf="no_bottom"
+                      [type]="'start'"></app-stop-element>
+    <app-stop-element *ngIf="!no_bottom && direction=='start'"
+                      [type]="'bottom_left'"></app-stop-element>
+    <app-stop-element *ngIf="!no_top && direction=='end'"
+                      [type]="'top_right'"></app-stop-element>
+    <app-stop-element *ngIf="no_top && direction=='end'"
+                      [type]="'end_right'"></app-stop-element>
+
+    <!--intermediate-->
+
+    <app-stop-element *ngFor="let stop of stops"
+                      [type]="'intermediate_icon'"
+                      [stop]="stop"></app-stop-element>
+
+
+    <!--wrap-->
+    <app-stop-element *ngIf="!no_top && direction=='start'"
+                      [type]="'top_left'"></app-stop-element>
+    <app-stop-element *ngIf="!no_bottom && direction=='end'"
+                      [type]="'bottom_right'"></app-stop-element>
+    <app-stop-element *ngIf="no_top && direction=='start'"
+                      [type]="'end_left'"></app-stop-element>
+
+
 </div>
