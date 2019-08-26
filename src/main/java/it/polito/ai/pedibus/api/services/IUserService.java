@@ -1,5 +1,6 @@
 package it.polito.ai.pedibus.api.services;
 
+import it.polito.ai.pedibus.api.dtos.EmailDTO;
 import it.polito.ai.pedibus.api.dtos.UserDTO;
 import it.polito.ai.pedibus.api.exceptions.EmailExistsException;
 import it.polito.ai.pedibus.api.models.EmailVerificationToken;
@@ -11,6 +12,9 @@ import java.util.HashMap;
 public interface IUserService {
 
     HashMap<String, String> signin(String email, String password);
+
+    User registerNewUserEmail(EmailDTO emailDTO)
+            throws EmailExistsException;
 
     User registerNewUserAccount(UserDTO accountDto)
             throws EmailExistsException;
@@ -42,4 +46,6 @@ public interface IUserService {
     boolean isUserEnabled(User user);
 
     boolean checkPwd(User user, String pwdTocheck);
+
+    void enableUserAndAddPassword(User user, String pass);
 }

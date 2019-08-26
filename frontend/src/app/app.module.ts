@@ -16,7 +16,7 @@ import {MatListModule} from '@angular/material/list';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatSelectModule} from '@angular/material/select';
 import {MatTabsModule} from '@angular/material/tabs';
-import {MatChipsModule, MatDialogModule} from "@angular/material";
+import {MatChipsModule, MatDialogModule, MatSnackBarModule} from "@angular/material";
 import {MatToolbarModule} from "@angular/material";
 import {MatSidenavModule} from "@angular/material";
 
@@ -39,6 +39,7 @@ import {
 } from './components/registration/registration.component';
 import {CdkStepperModule} from '@angular/cdk/stepper';
 import {MatStepperModule} from '@angular/material/stepper';
+
 import {AttendanceComponent} from './components/attendance/attendance.component';
 import {StopListRowComponent} from './components/stop-list/stop-list-row/stop-list-row.component';
 import {StopListComponent} from './components/stop-list/stop-list.component';
@@ -63,6 +64,9 @@ import {SpinnerComponent} from './components/spinner/spinner.component';
         StopListComponent,
         StopElementComponent,
         SpinnerComponent,
+        NewRegistrationEmailComponent,
+        ImpostaPasswordComponent,
+        PizzaPartyComponent
     ],
     imports: [
         BrowserModule,
@@ -71,6 +75,8 @@ import {SpinnerComponent} from './components/spinner/spinner.component';
             {path: "login", component: LoginComponent},
             {path: "presenze", component: AttendanceComponent},
             {path: "registrazione", component: RegistrationComponent},
+            {path: "registrazioneEmail", component: NewRegistrationEmailComponent},
+            {path: "impostaPassword/:token", component: ImpostaPasswordComponent},
             {path: "prenotazione", component: ReservationsComponent},
             {path: "**", redirectTo: "login", pathMatch: "full"}
         ]),
@@ -98,6 +104,7 @@ import {SpinnerComponent} from './components/spinner/spinner.component';
         FlexLayoutModule,
         CdkStepperModule,
         MatStepperModule,
+        MatSnackBarModule,
         AngularResizedEventModule,
 
     ],
@@ -106,8 +113,10 @@ import {SpinnerComponent} from './components/spinner/spinner.component';
         useClass: AuthInterceptor,
         multi: true
     }],
-    entryComponents: [DialogAddKid, DialogAddKidReg, DialogEmailSended, DialogEmailExists, BookingDialog],
+    entryComponents: [DialogAddKid, DialogAddKidReg, DialogEmailSended, DialogEmailExists, DialogEmailExistsNewReg, 
+                      DialogEmailSendedNewReg, PizzaPartyComponent, BookingDialog],
     bootstrap: [AppComponent]
+
 })
 export class AppModule {
 }
