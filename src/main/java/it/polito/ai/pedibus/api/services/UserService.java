@@ -77,9 +77,7 @@ public class UserService implements IUserService {
     public User registerNewUserEmail(EmailDTO emailDTO)
             throws EmailExistsException {
         if (emailExist(emailDTO.getEmail())) {
-            throw new EmailExistsException(
-                    "There is an account with that email address: "
-                            + emailDTO.getEmail());
+            throw new EmailExistsException();
         }
         ArrayList<String> roles = new ArrayList<>();
         roles.add("USER");
@@ -104,9 +102,7 @@ public class UserService implements IUserService {
             throws EmailExistsException {
 
         if (emailExist(accountDto.getEmail())) {
-            throw new EmailExistsException(
-                    "There is an account with that email address: "
-                            + accountDto.getEmail());
+            throw new EmailExistsException();
         }
         ArrayList<String> roles = new ArrayList<>();
         roles.add("USER");

@@ -3,7 +3,6 @@
     Aggiungi nuovo account
   </mat-card-title>
   <mat-card-content>
-    <div *ngIf="error" class="error">Email errata errati</div>
     <div class="form-container">
       <form [formGroup]="emailFormGroup" (ngSubmit)="onSubmit()">
         <table>

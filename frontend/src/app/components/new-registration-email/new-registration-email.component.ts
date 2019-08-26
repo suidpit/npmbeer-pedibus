@@ -65,6 +65,10 @@ onSubmit(){
                             self.showPopupEmailExists();
                             self.emailFormGroup.controls.email.setErrors({"exists": true})
                           }
+                          else if(err.status === 403){
+                            console.log("%cAzione proibita","color:red");
+
+                          }
                           self.error = true;
 
                           //self.emailField.nativeElement.focus();

@@ -133,9 +133,8 @@ public class UserAdministrationController {
         return hasAuthority;
     }
 
-    //TODO : Must to be authorized
     /*Admin adds an e-mail for the new user*/
-    //@PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN')")
     @RequestMapping(value = "/addNewUser", method = RequestMethod.POST)
     public String addNewUser(@RequestBody @Valid EmailDTO emailDTO,
                              BindingResult result,
@@ -153,6 +152,7 @@ public class UserAdministrationController {
         //email già inserita
         if (res != null) {
             result.rejectValue("email", "message.regError");
+            throw  new EmailExistsException();
         }
         try {
 

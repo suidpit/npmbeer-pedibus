@@ -87,14 +87,14 @@ public class UserAuthController {
         return "";
     }
 
-
+/*
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/confirm/{randomUUID}", method = RequestMethod.GET)
     public String confirmRegistration()
     {
 
         return "Password confirm form";
-    }
+    }*/
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/confirm/{randomUUID}", method = RequestMethod.POST)
     public String completeRegistrationWithPwd(WebRequest request, Model model,
