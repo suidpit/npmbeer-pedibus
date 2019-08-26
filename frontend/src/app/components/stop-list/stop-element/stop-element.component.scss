@@ -1,0 +1,119 @@
+.stop {
+  text-align: center;
+  border-bottom: 1px solid #c9c9c9;
+  font-family: Roboto;
+  font-size: 14px
+}
+
+.container mat-icon {
+  width: 180px;
+  height: 135px;
+}
+
+.container .smaller_icon {
+  width: 90px;
+  height: 135px;
+}
+
+.small_container mat-icon {
+  width: 90px;
+  height: 67.5px;
+}
+
+.small_container .smaller_icon {
+  width: 45px;
+  height: 67.5px;
+}
+
+.container {
+  position: relative;
+  height: 135px;
+}
+
+.small_container {
+  position: relative;
+  height: 67.5px;
+}
+
+.red {
+  fill: grey;
+}
+
+.text {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 180px;
+  word-wrap: break-word;
+}
+
+.small_text {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 90px;
+  word-wrap: break-word;
+}
+
+.time {
+  font-size: 14px;
+  position: absolute;
+  text-align: center;
+  bottom: 0;
+  width: 100%;
+  margin: auto;
+  word-wrap: break-word;
+}
+
+.small_time {
+  font-size: 10px;
+  position: absolute;
+  text-align: center;
+  bottom: 0;
+  width: 100%;
+  margin: auto;
+  word-wrap: break-word;
+}
+
+/* mixin for multiline */
+@mixin multiLineEllipsis($lineHeight: 1.2em, $lineCount: 1, $bgColor: white) {
+  overflow: hidden;
+  position: relative;
+  line-height: $lineHeight;
+  max-height: $lineHeight * $lineCount;
+  text-align: justify;
+  margin-right: -1em;
+  padding-right: 1em;
+  &:before {
+    content: '...';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+  }
+  &:after {
+    content: '';
+    position: absolute;
+    right: 0;
+    width: 1em;
+    height: 1em;
+    margin-top: 0.2em;
+    background: $bgColor;
+  }
+}
+
+//change color with flag
+.text p {
+  @include multiLineEllipsis($lineHeight: 1.2em, $lineCount: 6, $bgColor: #00C3E9);
+  margin: 22px 20px 5px 5px;
+  font-size: 14px;
+}
+
+.small_text p {
+  @include multiLineEllipsis($lineHeight: 1.2em, $lineCount: 4, $bgColor: #00C3E9);
+  font-size: 10px;
+  margin: 11px 10px 2.5px 2.5px;
+}

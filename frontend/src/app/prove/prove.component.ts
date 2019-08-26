@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ReservationsService } from '../reservations.service';
+import { AttendanceService } from '../services/attendance/attendance.service';
 
 @Component({
   selector: 'app-prove',
@@ -8,7 +8,7 @@ import { ReservationsService } from '../reservations.service';
 })
 export class ProveComponent implements OnInit {
 
-  constructor(private resService: ReservationsService) { }
+  constructor(private resService: AttendanceService) { }
 
   ngOnInit() {
     console.log("Initializing component!")

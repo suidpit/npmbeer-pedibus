@@ -21,6 +21,11 @@ export class ToolbarComponent implements OnInit {
       roles: []
     },
     {
+      displayName: "Prenotazione",
+      url: "/prenotazione",
+      roles: []
+    },
+    {
       displayName: "Turni",
       url: "/admin/turni",
       roles: []

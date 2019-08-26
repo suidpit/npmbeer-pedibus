@@ -53,13 +53,18 @@
         </span>
       </div>
     </mat-sidenav>
-    <mat-sidenav-content style="width: 100%; height: 100vh;">
+
+    <!--mat-sidenav-content style="width: 100%; height: 100vh;">
       <div style="margin: auto;">
-        <router-outlet></router-outlet>
+        <router-outlet></router-outlet-->
+    <!--mat-sidenav-content fxFill fxLayoutAlign="center center" style="overflow: hidden;"-->
+    <mat-sidenav-content style="width: 100%; height: 100vh;">
+      <div fxFill>
+      <router-outlet></router-outlet>
       </div>
     </mat-sidenav-content>
   </mat-sidenav-container>
   <mat-toolbar style="background-color: #2C3E50; color: white;">
-    <span class="pointer"> FOOTER</span>
+    <span class="pointer">Powered by NapalmBeer Inc. &copy;</span>
   </mat-toolbar>
 </div>

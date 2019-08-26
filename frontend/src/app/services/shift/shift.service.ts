@@ -4,7 +4,7 @@ import {Shift} from "../../models/shift";
 import {Subject} from "rxjs/internal/Subject";
 import {BehaviorSubject} from "rxjs/internal/BehaviorSubject";
 import {Observable} from "rxjs/internal/Observable";
-import {ReservationsService} from "../../reservations.service";
+import { ReservationsService } from "../reservations/reservations.service";
 
 @Injectable({
   providedIn: 'root'
