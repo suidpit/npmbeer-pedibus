@@ -16,7 +16,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
-import {MatChipsModule, MatDialogModule} from "@angular/material";
+import {MatChipsModule, MatDialogModule, MatSnackBarModule} from "@angular/material";
 import { MatToolbarModule } from "@angular/material";
 import { MatSidenavModule } from "@angular/material";
 
@@ -39,6 +39,12 @@ import {
 } from './components/registration/registration.component';
 import {CdkStepperModule} from '@angular/cdk/stepper';
 import {MatStepperModule} from '@angular/material/stepper';
+import { 
+  NewRegistrationEmailComponent,
+  DialogEmailExistsNewReg,
+  DialogEmailSendedNewReg 
+} from './components/new-registration-email/new-registration-email.component';
+import { ImpostaPasswordComponent, PizzaPartyComponent } from './components/imposta-password/imposta-password.component';
 
 @NgModule({
   declarations: [
@@ -51,7 +57,12 @@ import {MatStepperModule} from '@angular/material/stepper';
     DialogAddKid,
     DialogAddKidReg,
     DialogEmailSended,
-    DialogEmailExists
+    DialogEmailExists,
+    NewRegistrationEmailComponent,
+    DialogEmailExistsNewReg,
+    DialogEmailSendedNewReg,
+    ImpostaPasswordComponent,
+    PizzaPartyComponent
   ],
   imports: [
     BrowserModule,
@@ -60,6 +71,8 @@ import {MatStepperModule} from '@angular/material/stepper';
       { path: "login", component: LoginComponent},
       { path: "presenze", component: ReservationsComponent},
       { path: "registrazione", component: RegistrationComponent },
+      { path: "registrazioneEmail", component: NewRegistrationEmailComponent},
+      { path : "impostaPassword/:token", component: ImpostaPasswordComponent},
       { path: "**", redirectTo: "login", pathMatch: "full"}
     ]),
     HttpClientModule,
@@ -85,14 +98,16 @@ import {MatStepperModule} from '@angular/material/stepper';
     MatDialogModule,
     FlexLayoutModule,
     CdkStepperModule,
-    MatStepperModule
+    MatStepperModule,
+    MatSnackBarModule
   ],
   providers: [MatDatepickerModule, {
     provide: HTTP_INTERCEPTORS,
     useClass: AuthInterceptor,
     multi: true
   }],
-  entryComponents: [DialogAddKid,DialogAddKidReg,DialogEmailSended, DialogEmailExists],
+  entryComponents: [DialogAddKid,DialogAddKidReg,DialogEmailSended, DialogEmailExists,DialogEmailExistsNewReg,
+                    DialogEmailSendedNewReg,PizzaPartyComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
