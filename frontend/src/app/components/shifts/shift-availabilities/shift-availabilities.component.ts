@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import {MatDialog} from "@angular/material";
+import {ShiftService} from "../../../services/shift/shift.service";
+import dayGridPlugin from "@fullcalendar/daygrid";
 
 @Component({
   selector: 'app-shift-availabilities',
@@ -7,7 +10,10 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ShiftAvailabilitiesComponent implements OnInit {
 
-  constructor() { }
+  plugins = [dayGridPlugin];
+  events = [];
+
+  constructor(public shiftService: ShiftService, public dialog: MatDialog) { }
 
   ngOnInit() {
   }

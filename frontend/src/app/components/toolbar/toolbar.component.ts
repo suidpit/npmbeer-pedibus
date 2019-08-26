@@ -11,9 +11,8 @@ import {Observable} from "rxjs/internal/Observable";
 })
 export class ToolbarComponent implements OnInit {
 
-  user: User = null;
-  template_styles = null;
-  template: Observable<ElementRef>;
+  isAuthenticated: boolean;
+  user: User;
 
   entries = [
     {
@@ -28,16 +27,19 @@ export class ToolbarComponent implements OnInit {
     }
   ];
 
-  constructor(private auth: AuthService) {
-    this.auth.currentUser.subscribe(
-      (user) =>
-      {
-        this.user = user;
-      }
-    )
+  constructor(public auth: AuthService) {
   }
 
   ngOnInit() {
-  }
+    this.isAuthenticated = false;
+    this.user = null;
 
+    this.auth.currentUser$.subscribe(
+      (user) =>
+      {
+        this.user = user;
+        this.isAuthenticated = user !== null && user !== undefined;
+      }
+    )
+  }
 }

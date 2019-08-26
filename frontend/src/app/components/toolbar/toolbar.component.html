@@ -4,27 +4,35 @@
       <mat-icon class="pointer" style="vertical-align: middle"
                 (click)="sidenav.toggle()">menu</mat-icon>
     </div>
-    <span class="pointer" routerLink="/" style="margin-left: 8px">Pedibus</span>
+    <span class="pointer site-name side-container" routerLink="/" >Pedibus</span>
 
-    <span class="example-spacer"></span>
-
-    <div fxShow="true" fxHide.lt-md="true" fxLayout="row" fxLayoutAlign="center center" style="width:100%">
+    <div fxShow="true" fxHide.lt-md="true" fxLayout="row"  fxLayoutAlign="center center"  class="menu-container" style="width:100%">
       <!-- The following menu items will be hidden on both SM and XS screen sizes -->
-      <span fxFlexAlign="start">
+      <span fxFlexAlign="start" fxFlex="2 1 80%" fxLayoutAlign="center center">
         <a *ngFor="let link of entries" [routerLink]="link.url" mat-button class="menu-element">{{link.displayName}}</a>
       </span>
-      <span *ngIf="user === null">
-        <a routerLink="/registrazione" mat-button class="menu-element">Registrazione</a>
-      </span>
-      <span fxFlexAlign="end">
-        <a *ngIf="user === null" routerLink="/login" mat-button class="menu-element">Login</a>
-        <span *ngIf="user !== null" class="menu-element">
-          Benvenuto, {{user._email}} |
-              <a (click)="auth.logout()" routerLink="/login" mat-button class="pointer">Logout</a>
-
-        </span>
-      </span>
     </div>
+
+    <span fxShow="true" fxHide.lt-md="true" fxLayoutAlign="space-evenly center"
+          *ngIf="auth.isLoggedIn$ | async" class="side-container">
+
+        <div mat-card-avatar class="avatar"></div>
+        <div fxLayout="column" fxLayoutAlign="center center">
+          <span class="logged-user-style" *ngIf="auth.currentUser$ | async as user">
+            <span class="user-email">{{user.email}}</span>
+          </span>
+          <a (click)="auth.logout()" routerLink="/login" mat-button class="pointer logged-user-style">Logout</a>
+        </div>
+
+    </span>
+
+    <span fxShow="true" fxHide.lt-md="true" fxLayoutAlign="end center" class="side-container" *ngIf="!(auth.isLoggedIn$ | async)">
+
+      <a routerLink="/registrazione" mat-button class="menu-element">Registrazione</a>
+
+      <a routerLink="/login" mat-button class="menu-element">Login</a>
+
+    </span>
 
   </mat-toolbar>
 
@@ -38,7 +46,7 @@
         <span>
           <a *ngIf="user === null" routerLink="/login" mat-button class="menu-element">Login</a>
           <span *ngIf="user !== null" class="menu-element">
-            Benvenuto, {{user._email}}<br>
+            {{user._email}}<br>
               <a (click)="auth.logout()" routerLink="/login" mat-button class="pointer">Logout</a>
 
           </span>

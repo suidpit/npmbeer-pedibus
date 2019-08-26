@@ -4,6 +4,7 @@ import {Shift} from "../../models/shift";
 import {Subject} from "rxjs/internal/Subject";
 import {BehaviorSubject} from "rxjs/internal/BehaviorSubject";
 import {Observable} from "rxjs/internal/Observable";
+import {ReservationsService} from "../../reservations.service";
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +23,7 @@ export class ShiftService {
   private calendar_shifts_subject: Subject<any[]> = new BehaviorSubject([]);
   calendar_shifts$ : Observable<any[]> = this.calendar_shifts_subject.asObservable();
 
-  constructor() {
+  constructor(private lineService: ReservationsService) {
     for(let j = 0; j < 10; j++){
       let shift = new Shift();
 

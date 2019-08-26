@@ -1,3 +1,17 @@
-<p>
-  shift-availabilities works!
-</p>
+<mat-card role="group" fxLayout="column" fxLayoutAlign="center center">
+  <mat-card-header>
+    <mat-card-title style="text-align: center;">
+      Calendario Disponibilità
+    </mat-card-title>
+    <mat-card-subtitle>
+      Seleziona destra o sinistra per scorrere le settimane
+    </mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content fxLayoutAlign="center center">
+    <div class="calendar-container" >
+      <full-calendar defaultView="dayGridWeek" (eventClick)="eventShowPopup($event)"
+                     [plugins]="plugins" [hiddenDays]="[0]"
+                     [events]="shiftService.getCalendarShifts() | async"></full-calendar>
+    </div>
+  </mat-card-content>
+</mat-card>
