@@ -1,38 +1,65 @@
-.container{
-  width: 350px;
-  height: 100%;
+.container {
+  position: relative;
+  height: calc(100% - 80px);
+  margin: auto;
+  width: 100%;
+  display: flex;
+}
+
+.main {
+  min-height: 0px;
+  overflow: auto;
+}
+
+.element {
   margin: auto;
 }
 
-.row{
+.row {
   display: flex;
   justify-content: flex-start;
-  align-items: left;
 }
 
-.fill-row{
+.fill-row {
   flex: 1 1 auto;
 }
 
-mat-form-field{
+mat-form-field {
   width: 160px;
 }
 
-.mt-4{
+.mt-4 {
   margin-top: 4px;
-}
-
-mat-list-item{
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
 }
 
 .present {
   color: blue;
 }
 
-.custom-list .mat-list-item{
+.custom-list .mat-list-item {
   height: auto;
   min-height: 48px;
+}
+
+.dummy {
+  position: absolute;
+  visibility: hidden;
+  top: 0px;
+  left: 0px;
+  width: fit-content;
+  margin: 0px;
+  white-space: nowrap;
+}
+
+.stops {
+  margin: auto;
+  width: fit-content;
+}
+
+mat-tab-group{
+  height: auto;
+}
+
+mat-tab-body{
+  place-content: center;
 }

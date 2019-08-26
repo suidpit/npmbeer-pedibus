@@ -1,0 +1,30 @@
+<div #container ngClass.lt-sm="small_container" ngClass.gt-xs="container">
+    <div (click)="selectStop()"
+         *ngIf="type==='intermediate'; else others">
+        <mat-icon svgIcon="flag"></mat-icon>
+        <div ngClass.lt-sm="small_text" ngClass.gt-xs="text">
+            <p>
+                {{stop.name}}
+            </p>
+        </div>
+    </div>
+</div>
+
+<ng-template #others>
+    <div>
+        <mat-icon class="red" *ngIf="type==='start'" svgIcon="start_line"></mat-icon>
+        <mat-icon *ngIf="type==='intermediate_icon'" svgIcon="intermediate_line"></mat-icon>
+        <div *ngIf="type==='intermediate_icon'" ngClass.gt-xs="time" ngClass.lt-sm="small_time">
+            {{stop.time}}
+        </div>
+        <mat-icon class="red" *ngIf="type==='end_left'" svgIcon="end_left"></mat-icon>
+        <mat-icon class="red" *ngIf="type==='end_right'" svgIcon="end_right"></mat-icon>
+        <mat-icon class="red" *ngIf="type==='right'" svgIcon="right"></mat-icon>
+        <mat-icon class="smaller_icon" *ngIf="type==='top_left'" svgIcon="top_left"></mat-icon>
+        <mat-icon class="smaller_icon" *ngIf="type==='top_right'" svgIcon="top_right"></mat-icon>
+        <mat-icon class="smaller_icon" *ngIf="type==='down'" svgIcon="down"></mat-icon>
+        <mat-icon class="smaller_icon" *ngIf="type==='bottom_left'" svgIcon="bottom_left"></mat-icon>
+        <mat-icon class="smaller_icon" *ngIf="type==='bottom_right'" svgIcon="bottom_right"></mat-icon>
+    </div>
+</ng-template>
+

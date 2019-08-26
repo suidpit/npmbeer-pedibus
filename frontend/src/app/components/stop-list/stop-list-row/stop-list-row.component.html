@@ -1,0 +1,46 @@
+<!--flags-->
+<div class="row" fxLayout="row" [fxLayoutAlign]="no_top ? direction : 'end'"
+     [ngStyle.gt-xs]="{'padding-left': no_bottom ? (no_top ? '270px' : '90px'): '0px'}"
+     [ngStyle.lt-sm]="{'padding-left': no_bottom? (no_top ? '135px' : '90px'): '0px'}">
+
+    <!--wrap-->
+    <app-stop-element ngClass="down_left" ngClass.lt-sm="down_left_small"
+                      *ngIf="!no_bottom && direction=='start'"
+                      [type]="'down'"></app-stop-element>
+    <app-stop-element ngClass="down_right" *ngIf="!no_bottom && direction=='end'"
+                      [type]="'down'"></app-stop-element>
+    <app-stop-element *ngFor="let stop of stops"
+                      [type]="'intermediate'"
+                      [stop]="stop"></app-stop-element>
+</div>
+
+
+<div fxLayout="row" [fxLayoutAlign]="no_top ? direction : 'end'">
+    <!--wrap-->
+
+    <app-stop-element *ngIf="no_bottom"
+                      [type]="'start'"></app-stop-element>
+    <app-stop-element *ngIf="!no_bottom && direction=='start'"
+                      [type]="'bottom_left'"></app-stop-element>
+    <app-stop-element *ngIf="!no_top && direction=='end'"
+                      [type]="'top_right'"></app-stop-element>
+    <app-stop-element *ngIf="no_top && direction=='end'"
+                      [type]="'end_right'"></app-stop-element>
+
+    <!--intermediate-->
+
+    <app-stop-element *ngFor="let stop of stops"
+                      [type]="'intermediate_icon'"
+                      [stop]="stop"></app-stop-element>
+
+
+    <!--wrap-->
+    <app-stop-element *ngIf="!no_top && direction=='start'"
+                      [type]="'top_left'"></app-stop-element>
+    <app-stop-element *ngIf="!no_bottom && direction=='end'"
+                      [type]="'bottom_right'"></app-stop-element>
+    <app-stop-element *ngIf="no_top && direction=='start'"
+                      [type]="'end_left'"></app-stop-element>
+
+
+</div>
