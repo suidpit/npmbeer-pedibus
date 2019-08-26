@@ -18,6 +18,8 @@ export class AuthService {
   login_url = "http://localhost:8080/login";  // http://localhost:4200/backend/login";
   register_url = "http://localhost:8080/register";
   email_check_url = "http://localhost:8080/exists";
+  register_email_url = "http://localhost:8080/users/addNewUser";
+  send_pwd_url = "http://localhost:8080/confirm/";
 
   private currentUserSubject: BehaviorSubject<User>;
   public currentUser$: Observable<User>;
@@ -58,6 +60,15 @@ export class AuthService {
           //.pipe(catchError(this.handleError));
   }
 
+  registerEmail(email:string){
+    return this.http.post<any>(this.register_email_url, {"email" : email});
+  }
+
+  sendPassword(pass:string, repass:string,token:string){
+    console.log("invio pwd to " +this.send_pwd_url+token);
+    return this.http.post<any>(this.send_pwd_url+token, { "pass" : pass, "repass" : repass}).pipe(catchError(err=>this.handleError(err)));
+  }
+
 
   private handleError(error: HttpErrorResponse) {
    // debugger
@@ -73,8 +84,7 @@ export class AuthService {
         `message was: ${error.error.message}`);
     }
     // return an observable with a user-facing error message
-    return throwError(
-      'Something bad happened; please try again later.');
+    return throwError(error.status);
   };
 
   logout() {

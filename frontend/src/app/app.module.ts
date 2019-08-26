@@ -16,7 +16,8 @@ import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatChipsModule, MatDialogModule} from "@angular/material";
+import {MatChipsModule, MatDialogModule, MatSnackBarModule} from "@angular/material";
+
 import { MatToolbarModule } from "@angular/material";
 import { MatSidenavModule } from "@angular/material";
 import { MatTooltipModule } from "@angular/material";
@@ -50,6 +51,13 @@ import { ShiftPageComponent } from './components/shifts/shift-page/shift-page.co
 import { ShiftAvailabilitiesComponent } from './components/shifts/shift-availabilities/shift-availabilities.component';
 import {AuthGuard} from "./guards/auth-guard/auth-guard";
 import {Role} from "./models/user";
+import {
+  NewRegistrationEmailComponent,
+  DialogEmailExistsNewReg,
+  DialogEmailSendedNewReg
+} from './components/new-registration-email/new-registration-email.component';
+import { UserPasswordSetupComponent, PizzaPartyComponent } from './components/user-password-setup/user-password-setup.component';
+
 
 @NgModule({
   declarations: [
@@ -68,7 +76,12 @@ import {Role} from "./models/user";
     ShiftChipComponent,
     ShiftCalendarComponent,
     ShiftPageComponent,
-    ShiftAvailabilitiesComponent
+    ShiftAvailabilitiesComponent,
+    NewRegistrationEmailComponent,
+    DialogEmailExistsNewReg,
+    DialogEmailSendedNewReg,
+    UserPasswordSetupComponent,
+    PizzaPartyComponent
   ],
   imports: [
     BrowserModule,
@@ -78,6 +91,8 @@ import {Role} from "./models/user";
       { path: "presenze", component: ReservationsComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
       { path: "registrazione", component: RegistrationComponent },
       { path: "admin/turni", component: ShiftPageComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
+      { path: "registrazioneEmail", component: NewRegistrationEmailComponent},
+      { path : "impostaPassword/:token", component: UserPasswordSetupComponent},
       { path: "**", redirectTo: "login", pathMatch: "full"}
     ]),
     HttpClientModule,
@@ -105,14 +120,16 @@ import {Role} from "./models/user";
     FlexLayoutModule,
     CdkStepperModule,
     MatStepperModule,
-    FullCalendarModule
+    FullCalendarModule,
+    MatSnackBarModule
   ],
   providers: [MatDatepickerModule, {
     provide: HTTP_INTERCEPTORS,
     useClass: AuthInterceptor,
     multi: true
   }],
-  entryComponents: [DialogAddKid,DialogAddKidReg,DialogEmailSended, DialogEmailExists, DialogEventInfo],
+  entryComponents: [DialogAddKid,DialogAddKidReg,DialogEmailSended, DialogEmailExists, DialogEmailExistsNewReg,
+                    DialogEventInfo, DialogEmailSendedNewReg,PizzaPartyComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

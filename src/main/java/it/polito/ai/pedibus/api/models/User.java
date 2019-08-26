@@ -1,6 +1,7 @@
 package it.polito.ai.pedibus.api.models;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.mongodb.lang.Nullable;
 import it.polito.ai.pedibus.api.serializers.ObjectIdSerializer;
 import lombok.Data;
 import org.bson.types.ObjectId;
@@ -18,8 +19,11 @@ import java.util.List;
     @Id
     @JsonSerialize(using = ObjectIdSerializer.class)
     ObjectId id;
+
     @Email
     private String email;
+
+    @Nullable
     private String password;
 
     private List<String> roles;
