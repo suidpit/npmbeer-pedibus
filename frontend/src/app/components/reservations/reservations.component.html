@@ -32,11 +32,11 @@
                     </div>
                 </div>
                 <div #tabs *ngIf="selectedLine">
-                    <mat-divider></mat-divider>
-                    <div>
+                    <mat-divider [inset]="true"></mat-divider>
+                    <p style="font-weight: bold;">
                         Clicca su una fermata per selezionarla
-                    </div>
-                    <mat-divider></mat-divider>
+                    </p>
+                    <mat-divider [inset]="true"></mat-divider>
                     <mat-tab-group dynamicHeight class="tabs" (resized)="onResize($event)" mat-stretch-tabs
                                    [(selectedIndex)]="selectedRun">
                         <div>
@@ -58,8 +58,6 @@
                         </div>
                     </mat-tab-group>
                 </div>
-                <mat-card-footer>
-                </mat-card-footer>
             </mat-card-content>
         </mat-card>
     </div>

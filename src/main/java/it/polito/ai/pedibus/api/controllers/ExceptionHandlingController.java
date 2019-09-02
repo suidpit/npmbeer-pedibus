@@ -7,12 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.format.DateTimeParseException;
 
 @RestControllerAdvice
 public class ExceptionHandlingController extends ResponseEntityExceptionHandler {
@@ -28,5 +28,12 @@ public class ExceptionHandlingController extends ResponseEntityExceptionHandler 
         String bodyOfResponse = ex.getMessage();
         return handleExceptionInternal(ex, bodyOfResponse,
                 new HttpHeaders(), HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler(value = {DateTimeParseException.class})
+    protected ResponseEntity<Object> handleDateTimeParseException(RuntimeException ex,
+                                                                WebRequest request) throws IOException{
+        String bodyOfResponse = "Bad Request. Date string format should be ddMMyyyy";
+        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 }

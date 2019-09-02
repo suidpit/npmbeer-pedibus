@@ -1,31 +1,29 @@
 package it.polito.ai.pedibus.api.controllers;
 
 import it.polito.ai.pedibus.api.dtos.ShiftRequestDTO;
-import it.polito.ai.pedibus.api.models.Line;
 import it.polito.ai.pedibus.api.models.Shift;
 import it.polito.ai.pedibus.api.repositories.ShiftRepository;
 import it.polito.ai.pedibus.security.CustomUserDetails;
-import it.polito.ai.pedibus.security.CustomUserDetailsService;
 import it.polito.ai.pedibus.security.LineGrantedAuthority;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Array;
-import java.security.Principal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin/shifts")
 public class ShiftController {
 
     private final ShiftRepository shiftRepository;
+
+    @Qualifier("fmt")
     private final DateTimeFormatter fmt;
     
     @Autowired

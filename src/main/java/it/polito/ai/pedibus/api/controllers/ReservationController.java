@@ -29,11 +29,9 @@ import java.util.List;
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final DateTimeFormatter fmt;
 
-    public ReservationController(ReservationService reservationService, DateTimeFormatter fmt) {
+    public ReservationController(ReservationService reservationService) {
         this.reservationService = reservationService;
-        this.fmt = fmt;
     }
 
     //TODO: delete this

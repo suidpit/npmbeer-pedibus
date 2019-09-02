@@ -28,7 +28,6 @@ public class GeneralConfiguration {
     private static String userInitDataFileName = "user_init.json";
     private static String shiftsInitDataFileName = "shifts.json";
 
-
     @Bean
     public DateTimeFormatter fmt(){
         return DateTimeFormatter.ofPattern("ddMMyyyy");

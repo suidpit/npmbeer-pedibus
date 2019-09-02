@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {AuthService} from "../../../services/auth/auth.service";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 
 @Component({
   selector: 'app-login',
@@ -12,6 +12,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
   @ViewChild("emailField", {static:true}) emailField : ElementRef;
 
   error = false;
+  return = "";
 
   loginForm: FormGroup = this.fb.group({
     email: ["", [
@@ -21,14 +22,19 @@ export class LoginComponent implements OnInit, AfterViewInit {
     password: ["", Validators.required]
   });
 
-  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
+  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router, private route: ActivatedRoute) {
   }
 
   ngAfterViewInit(){
   }
 
   ngOnInit() {
-    this.auth.logout()
+    // TODO: remove this
+    this.auth.logout();
+    let self = this;
+    this.route.queryParams.subscribe((params) =>{
+      self.return = params["returnUrl"] || "/presenze";
+    })
   }
 
   onSubmit(){
@@ -36,7 +42,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
     this.auth.login(this.loginForm.controls.email.value, this.loginForm.controls.password.value).subscribe(
       () => {
         // successful login
-        self.router.navigate(["/presenze"]);
+        self.router.navigate([self.return]);
       },
       () => {
         self.error = true;

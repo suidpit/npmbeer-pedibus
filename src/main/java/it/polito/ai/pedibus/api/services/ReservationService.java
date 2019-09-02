@@ -4,11 +4,9 @@ import it.polito.ai.pedibus.api.dtos.ReservationDTO;
 import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.repositories.ReservationRepository;
 import org.bson.types.ObjectId;
-import org.omg.CORBA.OBJ_ADAPTER;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.io.Console;
-import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -19,8 +17,8 @@ import java.util.List;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
-    private final DateTimeFormatter fmt;
 
+    private final DateTimeFormatter fmt;
 
     public ReservationService(ReservationRepository reservationRepository, DateTimeFormatter fmt) {
         this.reservationRepository = reservationRepository;
