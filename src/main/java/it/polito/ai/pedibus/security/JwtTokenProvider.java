@@ -88,7 +88,7 @@ public class JwtTokenProvider {
         String authHeader = req.getHeader("Authorization");
         if(authHeader != null) {
             String[] split = authHeader.split(" ");
-            if(split[0].equals("bearer")){
+            if(split[0].toLowerCase().equals("bearer")){
                 return split[1];
             }
         }

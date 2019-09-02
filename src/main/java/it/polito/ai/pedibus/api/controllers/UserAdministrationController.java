@@ -8,6 +8,7 @@ import it.polito.ai.pedibus.api.exceptions.EmailExistsException;
 import it.polito.ai.pedibus.api.models.SystemAuthority;
 import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
+import it.polito.ai.pedibus.security.LineGrantedAuthority;
 import it.polito.ai.pedibus.api.services.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -26,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import it.polito.ai.pedibus.security.CustomUserDetailsService.*;
+
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.WebRequest;
 
@@ -42,8 +43,9 @@ public class UserAdministrationController {
 
     @Autowired
     ApplicationEventPublisher eventPublisher;
+
     @Autowired
-    IUserService service;
+    IUserService userService;
 
 
     @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN')")
@@ -148,7 +150,7 @@ public class UserAdministrationController {
             }
             return sb.toString();
         }
-        User res = service.getUserByEmail(emailDTO.getEmail());
+        User res = userService.getUserByEmail(emailDTO.getEmail());
         //email già inserita
         if (res != null) {
             result.rejectValue("email", "message.regError");
@@ -156,7 +158,7 @@ public class UserAdministrationController {
         }
         try {
 
-            User registered = service.registerNewUserEmail(emailDTO);
+            User registered = userService.registerNewUserEmail(emailDTO);
             String appUrl = request.getContextPath();
 
             eventPublisher.publishEvent(new OnRegistrationCompleteEvent

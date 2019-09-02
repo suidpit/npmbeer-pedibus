@@ -1,41 +1,42 @@
-<mat-card class="container">
-  <mat-card-title>
-    Presenze
-  </mat-card-title>
-  <mat-card-content>
-    <div>
-      <mat-grid-list cols="1" rowHeight="4:1">
-        <mat-grid-tile class="row">
-          <mat-form-field>
-            <mat-label>Seleziona una linea</mat-label>
-            <mat-select [(value)]="selectedLine" (valueChange)="updateData()">
-              <mat-option *ngFor="let line of lines" [value]="line">{{line.lineName}}</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <span class="fill-row"></span>
+<div style="width: 100%; height: 100%;" fxLayoutAlign="center center">
+  <mat-card class="container">
+    <mat-card-title>
+      Presenze
+    </mat-card-title>
+    <mat-card-content>
+      <div>
+        <mat-grid-list cols="1" rowHeight="4:1">
+          <mat-grid-tile class="row">
+            <mat-form-field>
+              <mat-label>Seleziona una linea</mat-label>
+              <mat-select [(value)]="selectedLine" (valueChange)="updateData()">
+                <mat-option *ngFor="let line of lines" [value]="line">{{line.lineName}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <span class="fill-row"></span>
 
-          <mat-form-field>
-            <mat-label>Direzione</mat-label>
-            <mat-select [(value)]="selectedDirection" (valueChange)="updateData()">
-              <mat-option value="outward">Scuola</mat-option>
-              <mat-option value="back">Casa</mat-option>
-            </mat-select>
-          </mat-form-field>
+            <mat-form-field>
+              <mat-label>Direzione</mat-label>
+              <mat-select [(value)]="selectedDirection" (valueChange)="updateData()">
+                <mat-option value="outward">Scuola</mat-option>
+                <mat-option value="back">Casa</mat-option>
+              </mat-select>
+            </mat-form-field>
 
-        </mat-grid-tile>
+          </mat-grid-tile>
 
-        <mat-grid-tile class="row">
-          <mat-form-field>
-            <input matInput [matDatepickerFilter]="allowedDaysFilter" [matDatepicker]="picker"
-                   placeholder="Seleziona una data" [formControl]="selectedDate"
-                   (dateChange)="updateData()" #date>
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker [touchUi]="isMobile" #picker></mat-datepicker>
-          </mat-form-field>
+          <mat-grid-tile class="row">
+            <mat-form-field>
+              <input matInput [matDatepickerFilter]="allowedDaysFilter" [matDatepicker]="picker"
+                     placeholder="Seleziona una data" [formControl]="selectedDate"
+                     (dateChange)="updateData()" #date>
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker [touchUi]="isMobile" #picker></mat-datepicker>
+            </mat-form-field>
 
-          <span class="fill-row"></span>
+            <span class="fill-row"></span>
 
-          <span>
+            <span>
             <button mat-icon-button>
               <mat-icon>chevron_left</mat-icon>
             </button>
@@ -44,76 +45,74 @@
               <mat-icon>chevron_right</mat-icon>
             </button>
           </span>
-        </mat-grid-tile>
+          </mat-grid-tile>
 
-      </mat-grid-list>
+        </mat-grid-list>
 
-    </div>
-    <mat-divider></mat-divider>
-    <div>
-      <mat-tab-group mat-align-tabs="center" [(selectedIndex)]="selectedRun">
-        <div *ngIf="selectedLine">
-          <mat-tab *ngFor="let run of selectedLine.outward; let i = index" label="Andata {{i+1}}">
-            <mat-list dense>
-              <mat-list-item>
-                <app-stop-row [stop-name]="'Partenza'"[type]="'start'"></app-stop-row>
-              </mat-list-item>
-              <mat-list-item>
-                <app-stop-row [type]="'dots'"></app-stop-row>
-              </mat-list-item>
-              <div *ngFor="let stop of run.stops; let j = index">
+      </div>
+      <mat-divider></mat-divider>
+      <div>
+        <mat-tab-group mat-align-tabs="center" [(selectedIndex)]="selectedRun">
+          <div *ngIf="selectedLine">
+            <mat-tab *ngFor="let run of selectedLine.outward; let i = index" label="Andata {{i+1}}">
+              <mat-list dense>
                 <mat-list-item>
-                  <app-stop-row *ngIf="reservedStops"
-                                [type]="'intermediate'"
-                                [children]="reservedStops['outward'][i][j]"
-                                [stop-name]="stop.name"
-                                [stop-time]="stop.time"
-                                (child-presence)="logEvent($event)"
-                                (add-child)="logEvent($event)"></app-stop-row>
+                  <app-stop-row [stop-name]="'Partenza'"[type]="'start'"></app-stop-row>
                 </mat-list-item>
                 <mat-list-item>
                   <app-stop-row [type]="'dots'"></app-stop-row>
                 </mat-list-item>
-              </div>
-              <mat-list-item>
-                <app-stop-row [stop-name]="'Scuola'" [type]="'end'"></app-stop-row>
-              </mat-list-item>
-            </mat-list>
-          </mat-tab>
-          <mat-tab *ngFor="let run of selectedLine.back; let i = index" label="Ritorno {{i+1}}">
-            <mat-list dense>
-              <mat-list-item>
-                <app-stop-row [stop-name]="'Scuola'" [type]="'start'"></app-stop-row>
-              </mat-list-item>
-              <mat-list-item>
-                <app-stop-row [type]="'dots'"></app-stop-row>
-              </mat-list-item>
-              <div *ngFor="let stop of run.stops; let j = index">
+                <div *ngFor="let stop of run.stops; let j = index">
+                  <mat-list-item>
+                    <app-stop-row *ngIf="reservedStops"
+                                  [type]="'intermediate'"
+                                  [children]="reservedStops['outward'][i][j]"
+                                  [stop-name]="stop.name"
+                                  [stop-time]="stop.time"
+                                  (child-presence)="logEvent($event)"
+                                  (add-child)="logEvent($event)"></app-stop-row>
+                  </mat-list-item>
+                  <mat-list-item>
+                    <app-stop-row [type]="'dots'"></app-stop-row>
+                  </mat-list-item>
+                </div>
                 <mat-list-item>
-                  <app-stop-row *ngIf="reservedStops"
-                                [type]="'intermediate'"
-                                [children]="reservedStops['back'][i][j]"
-                                [stop-name]="stop.name"
-                                [stop-time]="stop.time"
-                                (child-presence)="logEvent($event)"
-                                (add-child)="logEvent($event)"></app-stop-row>
+                  <app-stop-row [stop-name]="'Scuola'" [type]="'end'"></app-stop-row>
+                </mat-list-item>
+              </mat-list>
+            </mat-tab>
+            <mat-tab *ngFor="let run of selectedLine.back; let i = index" label="Ritorno {{i+1}}">
+              <mat-list dense>
+                <mat-list-item>
+                  <app-stop-row [stop-name]="'Scuola'" [type]="'start'"></app-stop-row>
                 </mat-list-item>
                 <mat-list-item>
                   <app-stop-row [type]="'dots'"></app-stop-row>
                 </mat-list-item>
-              </div>
-              <mat-list-item>
-                <app-stop-row [stop-name]="'Arrivo'" [type]="'end'"></app-stop-row>
-              </mat-list-item>
-            </mat-list>
-          </mat-tab>
-        </div>
-      </mat-tab-group>
-    </div>
-
-
-    <mat-card-footer>
-      Powered by NapalmBeer Inc. &copy;
-    </mat-card-footer>
-  </mat-card-content>
-</mat-card>
+                <div *ngFor="let stop of run.stops; let j = index">
+                  <mat-list-item>
+                    <app-stop-row *ngIf="reservedStops"
+                                  [type]="'intermediate'"
+                                  [children]="reservedStops['back'][i][j]"
+                                  [stop-name]="stop.name"
+                                  [stop-time]="stop.time"
+                                  (child-presence)="logEvent($event)"
+                                  (add-child)="logEvent($event)"></app-stop-row>
+                  </mat-list-item>
+                  <mat-list-item>
+                    <app-stop-row [type]="'dots'"></app-stop-row>
+                  </mat-list-item>
+                </div>
+                <mat-list-item>
+                  <app-stop-row [stop-name]="'Arrivo'" [type]="'end'"></app-stop-row>
+                </mat-list-item>
+              </mat-list>
+            </mat-tab>
+          </div>
+        </mat-tab-group>
+      </div>
+      <mat-card-footer>
+      </mat-card-footer>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -79,10 +79,17 @@ export class AttendanceComponent implements OnInit {
   }
 
   updateReservation() {
-    let day = this.selectedDate.value.getDate();
+    let day = this.selectedDate.value.getDate().toString();
     let month = (this.selectedDate.value.getMonth() + 1).toString();
-    if (month.length < 2)
+
+    if(day.length < 2){
+      day = "0" + day;
+    }
+
+    if (month.length < 2){
       month = "0" + month;
+    }
+
     let year = this.selectedDate.value.getFullYear();
     let date = day.toString() + month + year.toString();
     this.attendanceService.reservations(this.selectedLine.lineName, date)

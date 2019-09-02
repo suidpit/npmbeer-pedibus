@@ -22,12 +22,23 @@ export class AuthService {
   send_pwd_url = "http://localhost:8080/confirm/";
 
   private currentUserSubject: BehaviorSubject<User>;
-  public currentUser: Observable<User>;
+  public currentUser$: Observable<User>;
+  private isLoggedInSubject: BehaviorSubject<boolean>;
+  public isLoggedIn$: Observable<boolean>;
 
   constructor(private http: HttpClient) {
     // TODO check jwt validity before loading user, if not call logout
-    this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem("user")));
-    this.currentUser = this.currentUserSubject.asObservable();
+    if(this.checkLoginState()){
+      this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem("user")));
+      this.isLoggedInSubject = new BehaviorSubject<boolean>(true);
+    }
+    else{
+      this.currentUserSubject = new BehaviorSubject<User>(null);
+      this.isLoggedInSubject = new BehaviorSubject<boolean>(false);
+    }
+
+    this.currentUser$ = this.currentUserSubject.asObservable();
+    this.isLoggedIn$ = this.isLoggedInSubject.asObservable();
   }
 
   login(email: string, password: string){
@@ -42,6 +53,7 @@ export class AuthService {
         self.setSession(res);
       }, (err) => null );*/
   }
+
   register(email: string, pass:string, repass:string){
     let self = this;
     return this.http.post<any>(this.register_url, {"email" : email, "pass" : pass, "repass" : repass});
@@ -81,9 +93,11 @@ export class AuthService {
     localStorage.removeItem("expires_at");
     localStorage.removeItem("not_before");
     this.currentUserSubject.next(null);
+    this.isLoggedInSubject.next(false);
   }
 
-  isLoggedIn(){
+  // TODO: VERIFY correct functioning
+  checkLoginState(){
     return moment().isBefore(this.getExpiration());
   }
 
@@ -104,7 +118,6 @@ export class AuthService {
     const nbf = userInfo["nbf"];
 
     let user = new User(userInfo["user_id"], userInfo["email"]);
-    this.currentUserSubject.next(user);
 
     // add seconds to moment 0 ( 1 Jan 1970 00:00:00)
     const expiresAt = moment(0).add(exp, "second");
@@ -113,7 +126,10 @@ export class AuthService {
     localStorage.setItem("token_id", authResult["jwt"]);
     localStorage.setItem("expires_at", expiresAt.toISOString());
     localStorage.setItem("not_before", notBefore.toISOString());
-    return this.currentUser;
+
+    this.currentUserSubject.next(user);
+    this.isLoggedInSubject.next(true);
+    return this.currentUser$;
   }
 
   checkExists(email: string){

@@ -6,10 +6,10 @@ import { ErrorStateMatcher, MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-imposta-password',
-  templateUrl: './imposta-password.component.html',
-  styleUrls: ['./imposta-password.component.scss']
+  templateUrl: './user-password-setup.component.html',
+  styleUrls: ['./user-password-setup.component.scss']
 })
-export class ImpostaPasswordComponent implements OnInit {
+export class UserPasswordSetupComponent implements OnInit {
 
   matcher = new MyErrorStateMatcherNew();
   error = false;
@@ -51,7 +51,7 @@ return pass === confirmPass ? null : { notSame: true }
       this.passwordFormGroup.controls.password.value,
       this.passwordFormGroup.controls.confirmPassword.value,
       this.activatedRoute.snapshot.params['token'])
-      .subscribe( 
+      .subscribe(
                   (data) => {
                           console.log("%cAttivazione account","color:green");
                           this.openSnackBar();
@@ -89,8 +89,8 @@ return pass === confirmPass ? null : { notSame: true }
 }
 
 @Component({
-  selector: 'account-attivato-snack-bar',
-  templateUrl: 'account-attivato-snack-bar.html',
+  selector: 'account-activated-snack-bar',
+  templateUrl: 'account-activated-snack-bar.html',
   styles: [`
     .example-pizza-party {
       color: hotpink;

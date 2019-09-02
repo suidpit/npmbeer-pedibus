@@ -1,8 +1,8 @@
 <div #container ngClass.lt-sm="small_container" ngClass.gt-xs="container">
     <div (click)="selectStop()"
-         *ngIf="type==='intermediate'; else others">
+         *ngIf="type==='intermediate'; else others" class="clickable">
         <mat-icon svgIcon="flag"></mat-icon>
-        <div ngClass.lt-sm="small_text" ngClass.gt-xs="text">
+        <div ngClass.lt-sm="small_text" ngClass.gt-xs="text" class="text-container">
             <p>
                 {{stop.name}}
             </p>

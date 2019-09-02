@@ -1,33 +1,36 @@
-<mat-card class="container">
-  <mat-card-title>
-    Login
-  </mat-card-title>
-  <mat-card-content>
-    <div *ngIf="error" class="error">Email o password errati</div>
-    <div class="form-container">
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <table>
-          <tr>
-            <td>
-              <mat-form-field>
-                <input matInput placeholder="E-mail*" #emailField formControlName="email">
-              </mat-form-field>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <mat-form-field>
-                <input matInput [type]="'password'" placeholder="Password*" formControlName="password">
-              </mat-form-field>
-            </td>
-          </tr>
-          <tr>
-            <td> <button mat-raised-button class="btn-login"
-                         [type]="'submit'" [disabled]="!loginForm.valid">Login</button> </td>
-          </tr>
-        </table>
+<div style="height: 100vh; width: 100%;" fxLayoutAlign="center center">
+  <mat-card class="container">
+    <mat-card-title>
+      Login
+    </mat-card-title>
+    <mat-card-content>
+      <div *ngIf="error" class="error">Email o password errati</div>
+      <div class="form-container">
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <table>
+            <tr>
+              <td>
+                <mat-form-field>
+                  <input matInput placeholder="E-mail*" #emailField formControlName="email">
+                </mat-form-field>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <mat-form-field>
+                  <input matInput [type]="'password'" placeholder="Password*" formControlName="password">
+                </mat-form-field>
+              </td>
+            </tr>
+            <tr>
+              <td> <button mat-raised-button class="btn-login"
+                           [type]="'submit'" [disabled]="!loginForm.valid">Login</button> </td>
+            </tr>
+          </table>
 
-      </form>
-    </div>
-  </mat-card-content>
-</mat-card>
+        </form>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+</div>

@@ -3,7 +3,6 @@ package it.polito.ai.pedibus.api.models;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.mongodb.lang.Nullable;
 import it.polito.ai.pedibus.api.serializers.ObjectIdSerializer;
-import lombok.Builder;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;

@@ -1,0 +1,8 @@
+<div class="shift-container">
+  <div class="datetime-container p-4">{{shift.dateAndTime.dayOfWeek()}} {{shift.dateAndTime.dayOfMonth()}} {{shift.dateAndTime.month()}}
+    ore {{("0"+shift.dateAndTime.hour()).slice(-2)}}:{{("0"+shift.dateAndTime.minute()).slice(-2)}}</div>
+  <mat-divider [inset]="true"></mat-divider>
+
+  <div class="line-container p-4">{{shift.lineName}}</div>
+  <div class="direction-container p-4">Direzione: {{shift.direction}}</div>
+</div>

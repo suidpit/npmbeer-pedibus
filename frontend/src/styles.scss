@@ -4,3 +4,19 @@
 //indigo-pink.css
 //pink-bluegrey.css
 //purple-green.css
+// full-calendar styles need to be here (see docs)
+@import '~@fullcalendar/core/main.css';
+@import '~@fullcalendar/daygrid/main.css';
+
+
+
+.event-dialog .mat-dialog-container{
+  background-color: #2C3E50;
+  color: white;
+  border-radius: 8px;
+}
+
+.fc-content{
+  cursor: pointer !important;
+}
+
