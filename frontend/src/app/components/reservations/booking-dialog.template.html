@@ -1,6 +1,6 @@
-<div style="margin: auto; width: 100%; word-break: break-word" fxLayout="row" >
-    <mat-card class="children" style="width: 30%">
-        <mat-card-title>
+<div style="margin: auto; width: 100%; word-break: break-word; background-color: transparent" fxLayout="row">
+    <mat-card class="children blue-background" style="width: 30%;margin-right: 10px;">
+        <mat-card-title style="color: #fc463d">
             Bambini
         </mat-card-title>
         <mat-card-content fxLayout="column" fxLayoutGap="16px">
@@ -13,21 +13,21 @@
             </mat-chip-list>
         </mat-card-content>
     </mat-card>
-    <mat-card fxFlex>
+    <mat-card fxFlex class="blue-background">
 
-        <mat-card-title>
-            Stop details
+        <mat-card-title style="color: #fc463d">
+            Dettagli Fermata
         </mat-card-title>
         <mat-card-content>
 
             <h2>
-                Stop name:
+                Nome Fermata:
             </h2>
             <p>
                 {{data.stop.name}}
             </p>
             <h3>
-                Time:
+                Orario:
             </h3>
             <p>
                 {{data.stop.time}}
@@ -36,10 +36,10 @@
                 {{errorMsg}}
             </div>
             <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="space-between">
-                <button (click)="closeDialog()">
+                <button mat-raised-button (click)="closeDialog()">
                     Indietro
                 </button>
-                <button (click)="book()">
+                <button mat-raised-button (click)="book()">
                     Prenota
                 </button>
             </div>

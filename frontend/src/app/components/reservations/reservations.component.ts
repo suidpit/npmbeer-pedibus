@@ -58,10 +58,11 @@ export class ReservationsComponent implements OnInit {
             (stop) => {
                 if (stop != undefined) {
                     let dialogRef = this.dialog.open(BookingDialog, {
-                        data: {
+                      panelClass: "reservation-dialog",
+                      data: {
                             line: this.selectedLine,
                             stop: stop,
-                            date: this.selectedDate
+                            date: this.selectedDate,
                         }
                     });
 
