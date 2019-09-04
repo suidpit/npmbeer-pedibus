@@ -1,7 +1,7 @@
 import {
     AfterViewChecked, ChangeDetectionStrategy,
     Component,
-    ElementRef, EventEmitter, Inject,
+    ElementRef, EventEmitter, Inject, OnDestroy,
     OnInit, Output,
     ViewChild
 } from '@angular/core';
@@ -12,14 +12,18 @@ import {StopService} from "../../services/stop/stop.service";
 import {ResizedEvent} from "angular-resize-event";
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material";
 import {DialogAddKidData, Kid} from "../stop-row/stop-row.component";
+import {Subject} from "rxjs";
+import {takeUntil} from "rxjs/operators";
 
 @Component({
     selector: 'app-reservations',
     templateUrl: './reservations.component.html',
     styleUrls: ['./reservations.component.scss']
 })
-export class ReservationsComponent implements OnInit {
+export class ReservationsComponent implements OnInit, OnDestroy {
 
+
+    private unsubscribe$ = new Subject<void>();
 
     stops = [];
     lines = [];
@@ -41,6 +45,7 @@ export class ReservationsComponent implements OnInit {
         this.selectedDate = new FormControl(new Date());
     }
 
+
     ngOnInit() {
         this.reservationsService.lines().subscribe(
             (lines) => {
@@ -50,28 +55,34 @@ export class ReservationsComponent implements OnInit {
             }
         );
 
-        this.stopService.stopsObserver$.subscribe((data) => {
-            this.stopRows = data;
-        });
+        this.stopService.stopsObserver$
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe((data) => {
+                this.stopRows = data;
+            });
 
-        this.reservationsService.selected_stop_observer$.subscribe(
-            (stop) => {
-                if (stop != undefined) {
-                    let dialogRef = this.dialog.open(BookingDialog, {
-                        data: {
-                            line: this.selectedLine,
-                            stop: stop,
-                            date: this.selectedDate
-                        }
-                    });
+        this.reservationsService.selected_stop_observer$
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe(
+                (stop) => {
+                    if (stop != undefined) {
+                        let dialogRef = this.dialog.open(BookingDialog, {
+                            data: {
+                                line: this.selectedLine,
+                                stop: stop,
+                                date: this.selectedDate
+                            }
+                        });
 
-                    dialogRef.afterClosed().subscribe(result => {
-                        //ACTION AFTER CLOSE
-                    })
+                        dialogRef.afterClosed().subscribe(result => {
+                            this.reservationsService.closePopup();
+                            //ACTION AFTER CLOSE
+                        })
+                    }
                 }
-            }
-        )
+            )
     }
+
 
     updateData() {
         if (this.selectedLine != null) {
@@ -120,6 +131,11 @@ export class ReservationsComponent implements OnInit {
         this.stopService.initialize(temp_stops, width, window.innerWidth <= 600);
     }
 
+    ngOnDestroy(): void {
+        this.unsubscribe$.next();
+        this.unsubscribe$.complete();
+    }
+
 }
 
 export interface BookingData {
@@ -135,22 +151,30 @@ export interface BookingData {
     }
 )
 
-export class BookingDialog implements OnInit {
+export class BookingDialog implements OnInit, OnDestroy {
+    private unsubscribe$ = new Subject<void>();
     children = new Map();
+
     errorMsg = null;
 
     @Output("child-presence") change: EventEmitter<Kid> = new EventEmitter<Kid>();
 
-    ngOnInit(): void {
-        this.reservationsService.children().subscribe(
-            (children) => {
-                this.children = new Map();
-                for (let c of children) {
-                    this.children.set(c, false);
-                }
-            }
-        );
+    ngOnDestroy(): void {
+        this.unsubscribe$.next();
+        this.unsubscribe$.complete();
+    }
 
+    ngOnInit(): void {
+        this.reservationsService.children()
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe(
+                (children) => {
+                    this.children = new Map();
+                    for (let c of children) {
+                        this.children.set(c, false);
+                    }
+                }
+            );
     }
 
     constructor(

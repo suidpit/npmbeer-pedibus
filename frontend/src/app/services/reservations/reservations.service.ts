@@ -73,6 +73,9 @@ export class ReservationsService {
 
     selected_stop_observer$: Subject<any> = new BehaviorSubject(undefined);
 
+    closePopup(){
+        this.selected_stop_observer$.next(undefined);
+    }
     selectStop(s) {
         this.selected_stop_observer$.next(s);
     }
