@@ -105,7 +105,6 @@ export class AuthService {
 
   // TODO: VERIFY correct functioning
   checkLoginState(){
-    return false;
     return moment().isBefore(this.getExpiration());
   }
 

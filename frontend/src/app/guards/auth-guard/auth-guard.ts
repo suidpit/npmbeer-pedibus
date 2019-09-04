@@ -17,12 +17,16 @@ export class AuthGuard implements CanActivate{
     const currentUser = this.auth.getCurrentUser();
 
     if(currentUser){
+      // NO AuthZ
       if( route.data.roles && route.data.roles.indexOf(currentUser.role) === -1){
-        this.router.navigate(["/login"]);
+        this.router.navigate(["/auth_error"]);
         return false;
       }
+
+      // OK
       return true;
     }
+    // NO AuthN
     else{
       // returnUrl allows to have the page be redirected to the url which was requested but required authN
       this.router.navigate(["/login"], {queryParams: { returnUrl: state.url}});

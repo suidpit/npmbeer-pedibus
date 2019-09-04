@@ -61,6 +61,8 @@ import {
   DialogEmailSendedNewReg
 } from './components/new-registration-email/new-registration-email.component';
 import { UserPasswordSetupComponent, PizzaPartyComponent } from './components/user-password-setup/user-password-setup.component';
+import { UnauthorizedComponent } from './components/unauthorized/unauthorized.component';
+import {NoAuthnGuard} from "./guards/no-authn-guard/no-authn-guard.service";
 
 
 @NgModule({
@@ -92,18 +94,20 @@ import { UserPasswordSetupComponent, PizzaPartyComponent } from './components/us
     StopListComponent,
     StopElementComponent,
     SpinnerComponent,
+    UnauthorizedComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     RouterModule.forRoot([
-      { path: "login", component: LoginComponent},
+      { path: "login", component: LoginComponent, canActivate: [NoAuthnGuard]},
       { path: "presenze", component: AttendanceComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
       { path: "registrazione", component: RegistrationComponent },
       { path: "admin/turni", component: ShiftPageComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
       { path: "registrazioneEmail", component: NewRegistrationEmailComponent},
       { path: "impostaPassword/:token", component: UserPasswordSetupComponent},
       { path: "prenotazione", component: ReservationsComponent},
+      { path: "auth_error" , component: UnauthorizedComponent},
       { path: "**", redirectTo: "login", pathMatch: "full"}
     ]),
     HttpClientModule,
