@@ -29,8 +29,6 @@ export class LoginComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    // TODO: remove this
-    this.auth.logout();
     let self = this;
     this.route.queryParams.subscribe((params) =>{
       self.return = params["returnUrl"] || "/presenze";

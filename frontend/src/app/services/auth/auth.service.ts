@@ -27,14 +27,17 @@ export class AuthService {
   public isLoggedIn$: Observable<boolean>;
 
   constructor(private http: HttpClient) {
-    // TODO check jwt validity before loading user, if not call logout
+    // TODO set role as well
     if(this.checkLoginState()){
-      this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem("user")));
+      let u = JSON.parse(localStorage.getItem("user"));
+      let user = new User(u._id, u._email);
+      this.currentUserSubject = new BehaviorSubject<User>(user);
       this.isLoggedInSubject = new BehaviorSubject<boolean>(true);
     }
     else{
       this.currentUserSubject = new BehaviorSubject<User>(null);
       this.isLoggedInSubject = new BehaviorSubject<boolean>(false);
+      this.resetSession();
     }
 
     this.currentUser$ = this.currentUserSubject.asObservable();
@@ -88,16 +91,21 @@ export class AuthService {
   };
 
   logout() {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token_id");
-    localStorage.removeItem("expires_at");
-    localStorage.removeItem("not_before");
+    this.resetSession();
     this.currentUserSubject.next(null);
     this.isLoggedInSubject.next(false);
   }
 
+  private resetSession(){
+    localStorage.removeItem("user");
+    localStorage.removeItem("token_id");
+    localStorage.removeItem("expires_at");
+    localStorage.removeItem("not_before");
+  }
+
   // TODO: VERIFY correct functioning
   checkLoginState(){
+    return false;
     return moment().isBefore(this.getExpiration());
   }
 
