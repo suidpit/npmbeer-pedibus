@@ -2,6 +2,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AngularResizedEventModule} from 'angular-resize-event';
+import { MatBadgeModule } from "@angular/material";
 import {MatButtonModule} from '@angular/material/button';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatCardModule} from '@angular/material/card';
@@ -106,6 +107,7 @@ import { UserPasswordSetupComponent, PizzaPartyComponent } from './components/us
       { path: "**", redirectTo: "login", pathMatch: "full"}
     ]),
     HttpClientModule,
+    MatBadgeModule,
     MatButtonModule,
     MatIconModule,
     MatCheckboxModule,
