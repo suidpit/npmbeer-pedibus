@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatDialog} from "@angular/material";
 import {ShiftService} from "../../../services/shift/shift.service";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import {DialogEventInfo} from "../shift-calendar/shift-calendar.component";
+import {FullCalendarComponent} from "@fullcalendar/angular";
 
 @Component({
   selector: 'app-shift-availabilities',
@@ -11,12 +12,19 @@ import {DialogEventInfo} from "../shift-calendar/shift-calendar.component";
 })
 export class ShiftAvailabilitiesComponent implements OnInit {
 
+  @ViewChild("availabilities", {static: true}) calendar: FullCalendarComponent;
   plugins = [dayGridPlugin];
   events = [];
 
   constructor(public shiftService: ShiftService, public dialog: MatDialog) { }
 
   ngOnInit() {
+    let self = this;
+    this.calendar.datesRender.subscribe((state)=>{
+      let start = new Date(state.view.activeStart);
+      let end = new Date(state.view.activeEnd);
+      self.shiftService.updateAvailabilties(start, end);
+    })
   }
 
   eventShowPopup(info){

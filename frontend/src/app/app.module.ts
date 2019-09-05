@@ -102,7 +102,7 @@ import {NoAuthnGuard} from "./guards/no-authn-guard/no-authn-guard.service";
     RouterModule.forRoot([
       { path: "login", component: LoginComponent, canActivate: [NoAuthnGuard]},
       { path: "presenze", component: AttendanceComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
-      { path: "registrazione", component: RegistrationComponent },
+      { path: "registrazione", component: RegistrationComponent, canActivate: [NoAuthnGuard] },
       { path: "admin/turni", component: ShiftPageComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
       { path: "registrazioneEmail", component: NewRegistrationEmailComponent},
       { path: "impostaPassword/:token", component: UserPasswordSetupComponent},

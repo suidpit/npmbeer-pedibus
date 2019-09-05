@@ -1,21 +1,23 @@
 <mat-tab-group>
 
   <mat-tab label="Turni">
-    <div class="shift-tab-container">
-      <div class="upcoming">
-        <app-upcoming-shifts></app-upcoming-shifts>
+    <ng-template matTabContent>
+      <div class="shift-tab-container">
+        <div class="upcoming">
+          <app-upcoming-shifts></app-upcoming-shifts>
+        </div>
+        <div class="calendar">
+          <app-shift-calendar></app-shift-calendar>
+        </div>
       </div>
-      <div class="calendar">
-        <app-shift-calendar></app-shift-calendar>
-      </div>
-    </div>
+    </ng-template>
   </mat-tab>
 
   <mat-tab label="Disponibilità">
-    <div class="shift-tab-container">
-      <div>
+    <ng-template matTabContent>
+      <div class="shift-tab-container">
         <app-shift-availabilities></app-shift-availabilities>
       </div>
-    </div>
+    </ng-template>
   </mat-tab>
 </mat-tab-group>

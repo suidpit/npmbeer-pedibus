@@ -23,6 +23,9 @@ export class ShiftService {
   private calendar_shifts_subject: Subject<any[]> = new BehaviorSubject([]);
   calendar_shifts$ : Observable<any[]> = this.calendar_shifts_subject.asObservable();
 
+  private availabilities_subject: Subject<any[]> = new BehaviorSubject([]);
+  availabilities$: Observable<any[]> = this.availabilities_subject.asObservable();
+
   constructor(private lineService: ReservationsService) {
     for(let j = 0; j < 10; j++){
       let shift = new Shift();
@@ -60,6 +63,11 @@ export class ShiftService {
     this.calendar_shifts_subject.next(this.events);
   }
 
+  updateAvailabilties(startDate: Date, endDate: Date){
+    // TODO Actually do this.
+    console.log(startDate, endDate);
+  }
+
   randomIntFromInterval(min, max) { // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
@@ -70,5 +78,9 @@ export class ShiftService {
 
   getShifts(): Observable<Shift[]>{
     return this.shifts$;
+  }
+
+  getAvailabilities(): Observable<any[]>{
+    return this.availabilities$;
   }
 }

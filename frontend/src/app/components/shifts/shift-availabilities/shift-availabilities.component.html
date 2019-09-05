@@ -8,10 +8,10 @@
     </mat-card-subtitle>
   </mat-card-header>
   <mat-card-content fxLayoutAlign="center center">
-    <div class="calendar-container" >
+    <div class="availabilities-container" >
       <full-calendar defaultView="dayGridWeek" (eventClick)="eventShowPopup($event)"
                      [plugins]="plugins" [hiddenDays]="[0]"
-                     [events]="shiftService.getCalendarShifts() | async"></full-calendar>
+                     [events]="shiftService.getAvailabilities() | async" #availabilities></full-calendar>
     </div>
   </mat-card-content>
 </mat-card>
