@@ -8,6 +8,7 @@ import it.polito.ai.pedibus.api.models.RecoveryToken;
 import it.polito.ai.pedibus.api.models.User;
 
 import java.util.HashMap;
+import java.util.List;
 
 public interface IUserService {
 
@@ -48,4 +49,6 @@ public interface IUserService {
     boolean checkPwd(User user, String pwdTocheck);
 
     void enableUserAndAddPassword(User user, String pass);
+
+    List<HashMap<String, String>> getChildren(String email);
 }

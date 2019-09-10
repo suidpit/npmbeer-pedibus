@@ -26,6 +26,7 @@ import org.springframework.web.context.request.WebRequest;
 import javax.validation.Valid;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 @RestController
@@ -180,4 +181,9 @@ public class UserAuthController {
         return user != null;
     }
 
+  /*  @RequestMapping(value = "/profile/{email}",method = RequestMethod.GET)
+    public List<HashMap<String, String>> getChildrenByEmail(@PathVariable("email")String email){
+        return service.getChildren(email);
+    }
+*/
 }

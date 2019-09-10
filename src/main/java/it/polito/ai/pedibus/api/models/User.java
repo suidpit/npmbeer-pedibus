@@ -28,9 +28,9 @@ import java.util.List;
 
     private List<String> roles;
 
-    private List<HashMap<String, String>> children;
-
     private List<SystemAuthority> authorities;
+
+    private List<HashMap<String, String>> children;
 
     private boolean enabled;
 
