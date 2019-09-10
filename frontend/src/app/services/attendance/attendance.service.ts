@@ -68,7 +68,7 @@ export class AttendanceService {
   }
 
   reservations(line: string, date): Observable<Reservations> {
-    let api_url = "http://127.0.0.1:8080/reservations/" + line + "/" + date;
+    let api_url = "http://127.0.0.1:8080/reservations/admin/" + line + "/" + date;
     return this.http.get<Reservations>(api_url).pipe(map(data => {
       let outwards: Array<Reservation[]> = [];
       let backs: Array<Reservation[]> = [];

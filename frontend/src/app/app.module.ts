@@ -102,7 +102,7 @@ import { UserPasswordSetupComponent, PizzaPartyComponent } from './components/us
       { path: "admin/turni", component: ShiftPageComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
       { path: "registrazioneEmail", component: NewRegistrationEmailComponent},
       { path: "impostaPassword/:token", component: UserPasswordSetupComponent},
-      { path: "prenotazione", component: ReservationsComponent},
+      { path: "prenotazione", component: ReservationsComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
       { path: "**", redirectTo: "login", pathMatch: "full"}
     ]),
     HttpClientModule,

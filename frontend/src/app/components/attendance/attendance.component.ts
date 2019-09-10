@@ -92,7 +92,7 @@ export class AttendanceComponent implements OnInit {
 
     let year = this.selectedDate.value.getFullYear();
     let date = day.toString() + month + year.toString();
-    this.attendanceService.reservations(this.selectedLine.lineName, date)
+    this.attendanceService.reservations(this.selectedLine.name, date)
         .subscribe(data => {
           this.reservations = data;
         }, () => null, () => {
