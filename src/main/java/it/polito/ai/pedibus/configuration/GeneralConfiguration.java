@@ -2,10 +2,15 @@ package it.polito.ai.pedibus.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.mongodb.DBCollection;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoDatabase;
 import it.polito.ai.pedibus.api.models.Line;
+import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.models.Shift;
 import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.LineRepository;
+import it.polito.ai.pedibus.api.repositories.ReservationRepository;
 import it.polito.ai.pedibus.api.repositories.ShiftRepository;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
 @Configuration
 public class GeneralConfiguration {
 
@@ -29,7 +35,7 @@ public class GeneralConfiguration {
     private static String shiftsInitDataFileName = "shifts.json";
 
     @Bean
-    public DateTimeFormatter fmt(){
+    public DateTimeFormatter fmt() {
         return DateTimeFormatter.ofPattern("ddMMyyyy");
     }
 
@@ -53,20 +59,33 @@ public class GeneralConfiguration {
         }
 
         List<User> users = mapper.readValue(new File(userInitDataFileName),
-                            mapper.getTypeFactory().constructCollectionType(List.class, User.class));
+                mapper.getTypeFactory().constructCollectionType(List.class, User.class));
 
-        for(User user: users){
+        for (User user : users) {
             user.setPassword(encoder.encode(user.getPassword()));
         }
-        if(userRepository.findAll().size() == 0){
+        if (userRepository.findAll().size() == 0) {
             userRepository.insert(users);
         }
 
         List<Shift> shifts = mapper.readValue(new File(shiftsInitDataFileName),
                 mapper.getTypeFactory().constructCollectionType(List.class, Shift.class));
 
-        if(shiftRepository.findAll().size() == 0){
+        if (shiftRepository.findAll().size() == 0) {
             shiftRepository.insert(shifts);
+        }
+
+        MongoClient mc = new MongoClient("127.0.0.1", 27019);
+        MongoDatabase collections = mc.getDatabase("test");
+        boolean check = true;
+        for (String name : collections.listCollectionNames()) {
+            if (name.equals("reservations")) {
+                check = false;
+                break;
+            }
+        }
+        if (check) {
+            collections.createCollection("reservations");
         }
 
         return mapper;

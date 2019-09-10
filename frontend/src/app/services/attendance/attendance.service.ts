@@ -59,8 +59,8 @@ export class AttendanceService {
       // finally build the Line
       return Builder(Line)
           .id(line.id)
-          .lineName(line.name)
-          .adminEmail(line.admin_email)
+          .name(line.name)
+          .admin_email(line.admin_email)
           .outward(outwards)
           .back(backs)
           .build();

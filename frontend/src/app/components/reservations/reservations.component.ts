@@ -1,9 +1,8 @@
 import {
-    AfterViewChecked, ChangeDetectionStrategy,
+    ChangeDetectionStrategy, ChangeDetectorRef,
     Component,
-    ElementRef, EventEmitter, Inject, OnDestroy,
+    EventEmitter, Inject, OnDestroy,
     OnInit, Output,
-    ViewChild
 } from '@angular/core';
 import {LocalTime} from "js-joda";
 import {ReservationsService} from "../../services/reservations/reservations.service";
@@ -13,7 +12,8 @@ import {ResizedEvent} from "angular-resize-event";
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material";
 import {DialogAddKidData, Kid} from "../stop-row/stop-row.component";
 import {Subject} from "rxjs";
-import {takeUntil} from "rxjs/operators";
+import {take, takeUntil} from "rxjs/operators";
+import {Stop} from "../../models/stop";
 
 @Component({
     selector: 'app-reservations',
@@ -47,13 +47,18 @@ export class ReservationsComponent implements OnInit, OnDestroy {
 
 
     ngOnInit() {
-        this.reservationsService.lines().subscribe(
-            (lines) => {
-                this.lines = lines;
-                this.selectedLine = this.lines[0];
-                this.updateData()
-            }
-        );
+        this.reservationsService.getLines()
+            .pipe(
+                take(1),
+                takeUntil(this.unsubscribe$)
+            )
+            .subscribe(
+                (lines) => {
+                    this.lines = lines;
+                    this.selectedLine = this.lines[0];
+                    this.updateData()
+                }
+            );
 
         this.stopService.stopsObserver$
             .pipe(takeUntil(this.unsubscribe$))
@@ -66,11 +71,35 @@ export class ReservationsComponent implements OnInit, OnDestroy {
             .subscribe(
                 (stop) => {
                     if (stop != undefined) {
+                        let index;
+
+                        if (this.selectedDirection == 'OUTWARD') {
+                            index = this.selectedRun
+                        } else {
+                            index = this.selectedRun - this.selectedLine.outward.length + 1
+                        }
+
+                        //get date
+                        let date = this.selectedDate.value;
+                        let darray = date.toLocaleDateString().split("/");
+                        date = "";
+
+                        darray.forEach((value) => {
+                                if (value < 10) {
+                                    date += "0" + value;
+                                } else {
+                                    date += value;
+                                }
+                            }
+                        );
+
                         let dialogRef = this.dialog.open(BookingDialog, {
                             data: {
-                                line: this.selectedLine,
+                                line: this.selectedLine.name,
                                 stop: stop,
-                                date: this.selectedDate
+                                date: date,
+                                direction: this.selectedDirection,
+                                index: index
                             }
                         });
 
@@ -103,7 +132,7 @@ export class ReservationsComponent implements OnInit, OnDestroy {
             if (this.oldSelectedLine != this.selectedLine) {
                 this.stopRows = undefined;
                 this.oldSelectedLine = this.selectedLine;
-                if (this.previousWidth > 0) {
+                if (!isNaN(this.previousWidth)) {
                     this.setStops(this.previousWidth);
                 }
             }
@@ -111,10 +140,12 @@ export class ReservationsComponent implements OnInit, OnDestroy {
     }
 
     onResize(event: ResizedEvent) {
-        this.stopRows = undefined;
-        if (this.selectedLine != null) {
-            this.previousWidth = event.newWidth;
-            this.setStops(event.newWidth);
+        if (event instanceof ResizedEvent) {
+            this.stopRows = undefined;
+            if (this.selectedLine != null) {
+                this.previousWidth = event.newWidth;
+                this.setStops(event.newWidth);
+            }
         }
     }
 
@@ -140,8 +171,10 @@ export class ReservationsComponent implements OnInit, OnDestroy {
 
 export interface BookingData {
     line: string;
-    stop: string;
+    stop: Stop;
     date: string;
+    direction: string;
+    index: number;
 }
 
 @Component({
@@ -154,6 +187,7 @@ export interface BookingData {
 export class BookingDialog implements OnInit, OnDestroy {
     private unsubscribe$ = new Subject<void>();
     children = new Map();
+    status = "dialog";
 
     errorMsg = null;
 
@@ -180,6 +214,7 @@ export class BookingDialog implements OnInit, OnDestroy {
     constructor(
         private reservationsService: ReservationsService,
         @Inject(MAT_DIALOG_DATA) public data: BookingData,
+        private cd: ChangeDetectorRef,
         public dialogRef: MatDialogRef<BookingDialog>) {
     }
 
@@ -205,8 +240,26 @@ export class BookingDialog implements OnInit, OnDestroy {
             return;
         } else {
             this.errorMsg = null;
-            //SEND REQUEST
-            this.closeDialog();
+            let children = [];
+            this.children.forEach((value, child) => {
+                if (value)
+                    children.push(child);
+            });
+            this.status = "request";
+            this.reservationsService.reserve(this.data.line, this.data.date, children, this.data.stop.name, this.data.direction, this.data.index)
+                .subscribe((resp) => {
+                    //success
+                    this.status = "completed";
+                    this.errorMsg = "Operazione completata con successo.";
+                    this.cd.markForCheck();
+                    setTimeout(() => this.closeDialog(), 3000);
+                }, (resp) => {
+                    console.log(resp);
+                    this.status = "completed";
+                    this.errorMsg = "Qualcosa è andato storto. Per favore riprovare più tardi.";
+                    this.cd.markForCheck();
+                    setTimeout(() => this.closeDialog(), 3000);
+                })
         }
     }
 }
