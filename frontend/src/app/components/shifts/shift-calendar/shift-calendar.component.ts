@@ -8,9 +8,11 @@ import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material";
 export  interface DialogEventData {
   date: Date;
   time: string;
+  from: string;
+  to: string;
   line: string;
   direction: string;
-
+  extendedProps: { obj: null}
 }
 
 @Component({

@@ -19,6 +19,7 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.sql.Timestamp;
@@ -74,6 +75,7 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
     public User registerNewUserEmail(EmailDTO emailDTO)
             throws EmailExistsException {
         if (emailExist(emailDTO.getEmail())) {
@@ -98,6 +100,7 @@ public class UserService implements IUserService {
 
     //TODO : We don't need it anymore
     @Override
+    @Transactional
     public User registerNewUserAccount(UserDTO accountDto)
             throws EmailExistsException {
 
@@ -142,7 +145,9 @@ public class UserService implements IUserService {
         user.setPassword(pass);
         userRepository.save(user);
     }
+
     @Override
+    @Transactional
     public void saveRegisteredUser(User user) {
         userRepository.save(user);
     }
@@ -170,6 +175,7 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
     public void createVerificationToken(User user, String token) {
 
         EmailVerificationToken myToken = EmailVerificationToken
@@ -182,6 +188,7 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
     public void createRecoveryToken(User user, String token) {
         RecoveryToken recoveryToken = RecoveryToken
                 .builder()

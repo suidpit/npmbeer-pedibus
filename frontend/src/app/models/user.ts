@@ -1,5 +1,6 @@
 export class User {
 
+
   private readonly _id;
   private readonly _email;
   private _role : Role = Role.USER;
@@ -8,6 +9,10 @@ export class User {
   constructor(id: string, email:string){
     this._id = id;
     this._email = email;
+  }
+
+  get id() {
+    return this._id;
   }
 
   get email(){

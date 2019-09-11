@@ -1,10 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+<h1 mat-dialog-title style="color: #fc463d">Info Turno</h1>
+<mat-divider style="background-color: #FFFFFF;"></mat-divider>
+<mat-divider style="background-color: #FFFFFF;"></mat-divider>
+<div mat-dialog-content>
+  <div style="font-family: Garamond;">
+    <h2 style="color: #FFFFFF;">
+      {{data.date.toLocaleDateString("it-IT",{ weekday: 'long'}) | titlecase}}, <br>
+      {{data.date.toLocaleDateString("it-IT",{ year: 'numeric', month: 'long', day: 'numeric' }) | titlecase}}
+    </h2>
+    <h3>
+      <table style="overflow-wrap: break-word;">
+        <tr>
+          <td>Partenza: </td>
+          <td>{{data.from}}</td>
+        </tr>
+        <tr>
+          <td>
+            Arrivo: </td>
+          <td>{{data.to}}</td>
+        </tr>
+      </table>
+    </h3>
+  </div>
+  <div>
+    <h3 style="font-family: 'Bookman Old Style';font-weight: bold; color: #f29d27;">{{data.line}}</h3>
+    <h4 style="font-family: 'Bookman Old Style';font-style: italic;">{{data.direction}}</h4>
+  </div>
+
+</div>
+<mat-divider style="background-color: #FFFFFF;"></mat-divider>
+<mat-divider style="background-color: #FFFFFF;"></mat-divider>
+<div mat-dialog-actions fxLayoutAlign="end center">
+  <button mat-raised-button (click)="onNoClick()">Chiudi</button>
+  <button mat-raised-button color="primary" (click)="onOkClick()">Candidati</button>
+</div>

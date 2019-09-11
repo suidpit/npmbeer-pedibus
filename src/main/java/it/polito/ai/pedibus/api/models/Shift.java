@@ -3,6 +3,7 @@ package it.polito.ai.pedibus.api.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import it.polito.ai.pedibus.api.serializers.ObjectIdListSerializer;
 import it.polito.ai.pedibus.api.serializers.ObjectIdSerializer;
 import lombok.Builder;
 import lombok.Data;
@@ -30,9 +31,13 @@ public class Shift {
     // This just represents an index in the array of trips for that line, in that direction.
     private Integer tripIndex;
 
+    private Stop from;
+    private Stop to;
+
     @JsonSerialize(using = ObjectIdSerializer.class)
     private ObjectId companionId;
 
+    @JsonSerialize(using = ObjectIdListSerializer.class)
     private List<ObjectId> availabilities;
 
     private boolean open;
