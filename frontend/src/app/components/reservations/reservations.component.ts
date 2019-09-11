@@ -254,9 +254,13 @@ export class BookingDialog implements OnInit, OnDestroy {
                     this.cd.markForCheck();
                     setTimeout(() => this.closeDialog(), 3000);
                 }, (resp) => {
-                    console.log(resp);
-                    this.status = "completed";
-                    this.errorMsg = "Qualcosa è andato storto. Per favore riprovare più tardi.";
+                    if(resp.status == 409){
+                        this.status = "completed";
+                        this.errorMsg = "Uno dei bambini è già prenotato per questa tratta.";
+                    }else{
+                        this.status = "completed";
+                        this.errorMsg = "Qualcosa è andato storto. Per favore riprovare più tardi.";
+                    }
                     this.cd.markForCheck();
                     setTimeout(() => this.closeDialog(), 3000);
                 })

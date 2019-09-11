@@ -4,6 +4,7 @@ import it.polito.ai.pedibus.api.dtos.ReservationDTO;
 import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.repositories.ReservationRepository;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
+import it.polito.ai.pedibus.security.CustomUserDetails;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -79,7 +80,7 @@ public class ReservationService {
     public Reservation insertReservationUser(String lineName, String dateString, ReservationDTO resd) {
         ObjectId user;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
+        if (principal instanceof CustomUserDetails) {
             user = getUserId();
         } else {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
@@ -90,6 +91,7 @@ public class ReservationService {
 
         for (String child : resd.getChild()) {
             boolean check = false;
+
             for (HashMap<String, String> map : userRepository.getById(user).getChildren()) {
                 if (map.get("name").equals(child)) {
                     check = true;
@@ -98,6 +100,12 @@ public class ReservationService {
             }
             if (!check)
                 throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+
+            for(Reservation res : reservationRepository.findByLineNameAndDateAndUser(lineName, date, user)){
+                if(res.getDirection()==resd.getDirection()){
+                    throw new HttpClientErrorException(HttpStatus.CONFLICT);
+                }
+            }
         }
 
         Reservation res = Reservation.builder()
@@ -115,7 +123,7 @@ public class ReservationService {
 
     private ObjectId getUserId() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = ((UserDetails) principal).getUsername();
+        String username = ((CustomUserDetails) principal).getUsername();
         return userRepository.findByEmail(username).getId();
     }
 
@@ -150,7 +158,7 @@ public class ReservationService {
 
     public List<Reservation> getAllUserReservations() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
+        if (principal instanceof CustomUserDetails) {
             ObjectId user = getUserId();
             return reservationRepository.findByUser(user);
         } else {
@@ -160,10 +168,9 @@ public class ReservationService {
 
     public List<Reservation> getUserReservationsByDateAndLine(String lineName, String dateString) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
-            String user = ((UserDetails) principal).getUsername();
+        if (principal instanceof CustomUserDetails) {
             LocalDate date = LocalDate.parse(dateString, fmt);
-            return reservationRepository.findByLineNameAndDateAndUser(lineName, date, user);
+            return reservationRepository.findByLineNameAndDateAndUser(lineName, date, getUserId());
         } else {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
         }
