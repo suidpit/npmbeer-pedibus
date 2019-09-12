@@ -9,8 +9,10 @@ import lombok.Builder;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -31,7 +33,10 @@ public class Shift {
     // This just represents an index in the array of trips for that line, in that direction.
     private Integer tripIndex;
 
+    @Valid
+    @Indexed()
     private Stop from;
+    @Valid
     private Stop to;
 
     @JsonSerialize(using = ObjectIdSerializer.class)

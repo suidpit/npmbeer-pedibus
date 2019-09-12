@@ -137,7 +137,6 @@ public class ShiftController {
     private List<Shift> purgeShifts(List<Shift> shifts){
         CustomUserDetails usr = ((CustomUserDetails)SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal());
-
         /*
          * For each shift retrieved, hide the availabilities of other companions (privacy)
          * but, if present, keep the user's availability (can be used in front end).
