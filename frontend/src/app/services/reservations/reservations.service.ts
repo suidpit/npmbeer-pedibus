@@ -23,7 +23,7 @@ export class ReservationsService {
     private lines: Line[] = [];
     private baseUrl: String = 'http://localhost:8080'
 
-    constructor(private http: HttpClient, private autService: AuthService) {
+    constructor(private http: HttpClient) {
     } // using Angular Dependency Injection
 
     getLines(): Observable<Line[]> {
@@ -63,12 +63,9 @@ export class ReservationsService {
         }));
     }
 
-
     children(): Observable<Child[]> {
         let children = [];
-        children.push("Alessandra");
         children.push("Francesca");
-        children.push("Michele");
         return of(children);
     }
 

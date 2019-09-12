@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormControl} from "@angular/forms";
 import {LocalDate, LocalDateTime, LocalTime} from 'js-joda';
 
@@ -8,13 +8,17 @@ import {Builder} from "builder-pattern";
 import {StopList} from "../../models/stop-list";
 import {AttendanceService} from 'src/app/services/attendance/attendance.service';
 import {Line} from "../../models/line";
+import {Subject} from "rxjs";
+import {take, takeUntil} from "rxjs/operators";
 
 @Component({
   selector: 'app-attendance',
   templateUrl: './attendance.component.html',
   styleUrls: ['./attendance.component.scss']
 })
-export class AttendanceComponent implements OnInit {
+export class AttendanceComponent implements OnInit, OnDestroy {
+
+  private unsubscribe$ = new Subject<void>();
 
   selectedLine = null;
   selectedRun = 0;
@@ -45,7 +49,12 @@ export class AttendanceComponent implements OnInit {
     let userAgent = navigator.userAgent;
     this.isMobile =
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(userAgent);
-    this.attendanceService.lines().subscribe(data => {
+    this.attendanceService.lines()
+        .pipe(
+            take(1),
+            takeUntil(this.unsubscribe$)
+        )
+        .subscribe(data => {
       this.lines = data
     }, () => null, () => {
       this.selectedLine = this.lines[0];
@@ -93,6 +102,9 @@ export class AttendanceComponent implements OnInit {
     let year = this.selectedDate.value.getFullYear();
     let date = day.toString() + month + year.toString();
     this.attendanceService.reservations(this.selectedLine.name, date)
+        .pipe(
+            takeUntil(this.unsubscribe$)
+        )
         .subscribe(data => {
           this.reservations = data;
         }, () => null, () => {
@@ -158,12 +170,17 @@ export class AttendanceComponent implements OnInit {
 
     if(reservations!=undefined && reservations.childs!=undefined)
       return reservations.childs.sort(function (a, b) {
-        if (a.name < b.name) return -1;
+          if (a.name < b.name) return -1;
         if (a.name > b.name) return 1;
         else return 0;
       });
     else
       return undefined;
 
+  }
+
+  ngOnDestroy(){
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 }
