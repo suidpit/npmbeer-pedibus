@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {LocalDate, LocalDateTime, LocalTime, ZoneOffset} from "js-joda";
+import {DateTimeFormatter, LocalDate, LocalDateTime, LocalTime, ZoneOffset} from "js-joda";
 import * as joda from "js-joda";
 import {Shift} from "../../models/shift";
 import {Subject} from "rxjs/internal/Subject";
@@ -12,6 +12,7 @@ import {map, toArray} from "rxjs/operators";
 import {range} from "rxjs/internal/observable/range";
 import {Line} from "../../models/line";
 import {HttpClient} from "@angular/common/http";
+import {Stop} from "../../models/stop";
 
 @Injectable({
   providedIn: 'root'
@@ -83,12 +84,115 @@ export class ShiftService {
     this.calendar_shifts_subject.next(this.events);
   }
 
+  // TODO implement end date.
   buildShifts(startDate: Date, endDate: Date){
     let start = LocalDateTime.ofEpochSecond(startDate.valueOf()/1000, ZoneOffset.UTC);
+
+    // backend compliant string
     let dateString =("0" + start.dayOfMonth()).slice(-2) +
       ("0" + start.monthValue()).slice(-2) +
       start.year();
-    this.http.get(this.shift_url+"/"+dateString).subscribe((result) => console.log(result));
+
+    this.http.get(this.shift_url+"/"+dateString).subscribe((retrieved_shifts) => {
+      let shifts = [];
+      for(let s of retrieved_shifts){
+        let from = new Stop();
+        from.position = s.from.position;
+        from.time = s.from.time;
+        from.name = s.from.name;
+
+        let to = new Stop();
+        to.position = s.to.position;
+        to.time = s.to.time;
+        to.name = s.to.name;
+
+        let shift = new Shift();
+        let date = LocalDateTime.of(LocalDate.parse(s.date, DateTimeFormatter.ofPattern("d-M-yyyy")), LocalTime.of(0, 0, 0));
+        shift.dateAndTime = date;
+        shift.lineName = s.lineName;
+        shift.direction = s.direction;
+        shift.tripIndex = s.tripIndex;
+        shift.open = s.open;
+        shift.from = from;
+        shift.to = to;
+        shift.startsAt = from.time;
+        shift.endsAt = to.time;
+
+        let dateString = date.year() +
+          "-" + ("0" + date.monthValue()).slice(-2) +
+          "-" + ("0" + date.dayOfMonth()).slice(-2);
+
+        let event = {
+          date: dateString,
+          title: shift.startsAt.toString() + " - " + shift.endsAt.toString() + " " + shift.lineName + " " + shift.direction,
+          shift: shift
+        };
+
+        shifts.push(event);
+      }
+
+      this.lineService.lines().pipe(
+        map(line_list => {
+          for (let i of Array(7).keys()) {
+            let date = start.plusDays(i);
+            let dateString = date.year() +
+              "-" + ("0" + date.monthValue()).slice(-2) +
+              "-" + ("0" + date.dayOfMonth()).slice(-2);
+            for (let line of line_list) {
+              let event = {};
+              let s;
+
+              // create a shift for each ride
+              for(let tripIndex in line.outward){
+                s = new Shift();
+                s.dateAndTime = date;
+                s.lineName = line.lineName;
+                s.direction = "OUTWARD";
+                s.tripIndex = tripIndex;
+                s.startsAt = line.outward[tripIndex].startsAt;
+                s.endsAt = line.outward[tripIndex].endsAt;
+                s.from = line.outward[tripIndex].stops[0];
+                s.to = line.outward[tripIndex].stops[line.outward[tripIndex].stops.length - 1];
+
+                // finds the index of the first element satisfying the passed callback criterion, otherwise -1
+                // in this case we don't want to add a shift if there was one with the same specifications already
+                if (shifts.findIndex(s.compareTo) === -1) {
+                  event = {
+                    date: dateString,
+                    title: s.startsAt.toString() + " - " + s.endsAt.toString() + " " + s.lineName + " " + s.direction,
+                    shift: s
+                  };
+
+                  shifts.push(event);
+                }
+              }
+
+              for(let tripIndex in line.back){
+                s = new Shift();
+                s.dateAndTime = date;
+                s.lineName = line.lineName;
+                s.direction = "BACK";
+                s.tripIndex = tripIndex;
+                s.startsAt = line.back[tripIndex].startsAt;
+                s.endsAt = line.back[tripIndex].endsAt;
+                s.from = line.back[tripIndex].stops[0];
+                s.to = line.back[tripIndex].stops[line.back[tripIndex].stops.length - 1];
+
+                if (shifts.findIndex(s.compareTo) === -1) {
+                  event = {
+                    date: dateString,
+                    title: s.startsAt.toString() + " - " + s.endsAt.toString() + " " + s.lineName + " " + s.direction,
+                    shift: s
+                  };
+
+                  shifts.push(event);
+                }
+              }
+            }
+          }
+        })
+      );
+    });
 
     this.lineService.lines().pipe(
       map(line_list =>{
@@ -107,8 +211,8 @@ export class ShiftService {
             s.direction = "OUTWARD";
             s.startsAt = line.back[0].startsAt;
             s.endsAt = line.back[0].endsAt;
-            s.from = line.back[0].stops[0].name;
-            s.to = line.back[0].stops[line.back[0].stops.length-1].name;
+            s.from = line.back[0].stops[0];
+            s.to = line.back[0].stops[line.back[0].stops.length-1];
 
             event = {
               date: dateString,
@@ -124,8 +228,8 @@ export class ShiftService {
             s.direction = "BACK";
             s.startsAt = line.back[0].startsAt;
             s.endsAt = line.back[0].endsAt;
-            s.from = line.back[0].stops[0].name;
-            s.to = line.back[0].stops[line.back[0].stops.length-1].name;
+            s.from = line.back[0].stops[0];
+            s.to = line.back[0].stops[line.back[0].stops.length-1];
 
             event = {
               date: dateString,

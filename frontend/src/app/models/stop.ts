@@ -1,11 +1,12 @@
 import {LocalTime} from "js-joda";
+import * as deepEqual from "deep-equal";
 import { Child } from "../models/child"
 
 export class Stop{
   private _name: string;
   private _time: LocalTime;
   private _position: {};
-  private _childs: Child[]
+  private _childs: Child[];
 
   get position(): {} {
     return this._position;
@@ -35,5 +36,12 @@ export class Stop{
 
   get childs() {
     return this._childs;
+  }
+
+  public compareTo(stop: Stop){
+    if(!(this._name === stop.name)) return false;
+    if(!(this._time === stop.time)) return false;
+    if(!deepEqual(this._position, stop.position)) return false;
+    return true;
   }
 }

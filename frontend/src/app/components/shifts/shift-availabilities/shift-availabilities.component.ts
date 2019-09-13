@@ -27,7 +27,7 @@ export class ShiftAvailabilitiesComponent implements OnInit {
       self.shiftService.buildShifts(start, end);
     });
 
-    this.shiftService.availabilities$.subscribe((aaa) => console.log(aaa));
+    this.shiftService.availabilities$.subscribe((aaa) => {});
   }
 
   eventShowPopup(info){
