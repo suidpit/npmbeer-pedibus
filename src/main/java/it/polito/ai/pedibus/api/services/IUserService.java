@@ -1,6 +1,8 @@
 package it.polito.ai.pedibus.api.services;
 
+import it.polito.ai.pedibus.api.dtos.ChildDTO;
 import it.polito.ai.pedibus.api.dtos.EmailDTO;
+import it.polito.ai.pedibus.api.dtos.ProfileInfoDTO;
 import it.polito.ai.pedibus.api.dtos.UserDTO;
 import it.polito.ai.pedibus.api.exceptions.EmailExistsException;
 import it.polito.ai.pedibus.api.models.EmailVerificationToken;
@@ -51,4 +53,8 @@ public interface IUserService {
     void enableUserAndAddPassword(User user, String pass);
 
     List<HashMap<String, String>> getChildren(String email);
+
+    void putChildInDB(ChildDTO childDTO);
+
+    void editProfileInfo(ProfileInfoDTO profileInfoDTO);
 }

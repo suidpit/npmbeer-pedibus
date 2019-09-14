@@ -34,4 +34,13 @@ import java.util.List;
 
     private boolean enabled;
 
+    @Nullable
+    private String name;
+    @Nullable
+    private String surname;
+    @Nullable
+    private String address;
+    @Nullable
+    private String telNumber;
+
 }

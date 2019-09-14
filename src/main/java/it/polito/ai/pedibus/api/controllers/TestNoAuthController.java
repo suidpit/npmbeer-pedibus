@@ -18,12 +18,7 @@ public class TestNoAuthController {
     @Autowired
     IUserService service;
 
-    @RequestMapping(value = "/profile",method = RequestMethod.GET)
-    public List<HashMap<String, String>> getChildrenByEmail(@RequestBody EmailDTO emailDTO) throws EmailNotExistsException {
 
-        String email = emailDTO.getEmail();
-        return service.getChildren(email);
-    }
 
     @RequestMapping(value = "/ciao",method = RequestMethod.GET)
     public String getCiao(){

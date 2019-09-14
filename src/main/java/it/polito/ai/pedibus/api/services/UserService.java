@@ -1,9 +1,12 @@
 package it.polito.ai.pedibus.api.services;
 
+import it.polito.ai.pedibus.api.dtos.ChildDTO;
 import it.polito.ai.pedibus.api.dtos.EmailDTO;
+import it.polito.ai.pedibus.api.dtos.ProfileInfoDTO;
 import it.polito.ai.pedibus.api.dtos.UserDTO;
 import it.polito.ai.pedibus.api.exceptions.EmailExistsException;
 import it.polito.ai.pedibus.api.exceptions.EmailNotExistsException;
+import it.polito.ai.pedibus.api.exceptions.TooManyChildrenException;
 import it.polito.ai.pedibus.api.models.EmailVerificationToken;
 import it.polito.ai.pedibus.api.models.RecoveryToken;
 import it.polito.ai.pedibus.api.models.SystemAuthority;
@@ -239,6 +242,40 @@ public class UserService implements IUserService {
             throw new EmailNotExistsException();
         User user = userRepository.getByEmail(email);
         return user.getChildren();
+    }
+
+    @Override
+    public void putChildInDB(ChildDTO childDTO) throws EmailNotExistsException, TooManyChildrenException {
+        if(!emailExist(childDTO.getEmail()))
+            throw new EmailNotExistsException();
+
+        User user = userRepository.getByEmail(childDTO.getEmail());
+        if(user.getChildren().size()>=3)
+            throw new TooManyChildrenException();
+        HashMap<String,String> child = new HashMap<>();
+
+        child.put("name",childDTO.getName());
+        child.put("surname",childDTO.getSurname());
+        child.put("birthday",childDTO.getBirthday());
+        child.put("gender",childDTO.getGender());
+
+        user.getChildren().add(child);
+        userRepository.save(user);
+
+    }
+
+    @Override
+    public void editProfileInfo(ProfileInfoDTO profileInfoDTO) throws EmailNotExistsException {
+        if(!emailExist(profileInfoDTO.getEmail()))
+            throw new EmailNotExistsException();
+        User user = userRepository.getByEmail(profileInfoDTO.getEmail());
+        user.setName(profileInfoDTO.getName());
+        user.setSurname(profileInfoDTO.getSurname());
+        user.setAddress(profileInfoDTO.getAddress());
+        user.setTelNumber(profileInfoDTO.getTelephone());
+
+        userRepository.save(user);
+
     }
 
 
