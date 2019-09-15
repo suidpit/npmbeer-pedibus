@@ -14,12 +14,16 @@ import { throwError } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
+ 
 
   login_url = "http://localhost:8080/login";  // http://localhost:4200/backend/login";
   register_url = "http://localhost:8080/register";
   email_check_url = "http://localhost:8080/exists";
   register_email_url = "http://localhost:8080/users/addNewUser";
   send_pwd_url = "http://localhost:8080/confirm/";
+  profile_information_url = "http://localhost:8080/profile/information/";
+  add_child_url =  "http://localhost:8080/profile/addChild";
+  change_profile_information_url =  "http://localhost:8080/profile"
 
   private currentUserSubject: BehaviorSubject<User>;
   public currentUser$: Observable<User>;
@@ -134,5 +138,31 @@ export class AuthService {
 
   checkExists(email: string){
     return this.http.post<boolean>(this.email_check_url, {"email": email});
+  }
+
+  getProfileinformation(current:User) {
+    let em = current['_email'];
+    console.log("request to : " + this.profile_information_url+ em);
+
+    return this.http.get<any>(this.profile_information_url + em).pipe(catchError(err=>this.handleError(err)));;
+  }
+
+  addChild(email:string,name:string,surname:string,birthday:string, gender:string){
+    return this.http.post<any>(this.add_child_url,{
+      "email":email,
+      "name" : name,
+      "surname" : surname,
+      "birthday" : birthday,
+      "gender" : gender
+    })
+  }
+  editProfileInformation(email:string,name:string,surname:string,address:string, telephone:string){
+    return this.http.post<any>(this.change_profile_information_url,{
+      "email":email,
+      "name" : name,
+      "surname" : surname,
+      "address" : address,
+      "telephone" : telephone
+    })
   }
 }

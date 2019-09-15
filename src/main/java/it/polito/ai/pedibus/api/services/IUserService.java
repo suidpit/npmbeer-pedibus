@@ -57,4 +57,6 @@ public interface IUserService {
     void putChildInDB(ChildDTO childDTO);
 
     void editProfileInfo(ProfileInfoDTO profileInfoDTO);
+
+    HashMap<String, String> getProfileInformation(String email);
 }

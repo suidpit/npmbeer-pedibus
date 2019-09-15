@@ -200,5 +200,10 @@ public class UserAuthController {
         return "success:editInfo";
     }
 
+    @RequestMapping(value = "/profile/information/{email:.+}",method = RequestMethod.GET)
+    public HashMap<String, String> getUserProfileInformation(@PathVariable("email")String email){
+        return service.getProfileInformation(email);
+    }
+
 
 }

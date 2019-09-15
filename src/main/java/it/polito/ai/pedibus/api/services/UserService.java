@@ -278,5 +278,21 @@ public class UserService implements IUserService {
 
     }
 
+    @Override
+    public HashMap<String, String> getProfileInformation(String email) throws EmailNotExistsException {
+        if(!emailExist(email))
+            throw new EmailNotExistsException();
+
+        HashMap<String, String> userInfo = new HashMap<>();
+        User user = userRepository.getByEmail(email);
+        userInfo.put("name",user.getName());
+        userInfo.put("surname",user.getSurname());
+        userInfo.put("address",user.getAddress());
+        userInfo.put("telephone",user.getTelNumber());
+
+        return userInfo;
+
+    }
+
 
 }

@@ -1,7 +1,7 @@
 export class User {
 
   private readonly _id;
-  private readonly _email;
+  private _email;
   private _role : Role = Role.USER;
   // authorities: Array<string>;
 
@@ -10,7 +10,10 @@ export class User {
     this._email = email;
   }
 
-  get email(){
+  get id(){
+    return this._id;
+  }
+  get email() {
     return this._email;
   }
 
