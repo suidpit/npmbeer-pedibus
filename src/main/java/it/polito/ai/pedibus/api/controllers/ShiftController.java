@@ -112,8 +112,8 @@ public class ShiftController {
                     s.setTo(l.getBack().get(s.getTripIndex()).get(l.getBack().get(s.getTripIndex()).size()-1));
                 }
                 else{
-                    s.setFrom(l.getOutward().get(s.getTripIndex()).get(l.getOutward().get(s.getTripIndex()).size()-1));
-                    s.setTo(l.getOutward().get(s.getTripIndex()).get(0));
+                    s.setFrom(l.getOutward().get(s.getTripIndex()).get(0));
+                    s.setTo(l.getOutward().get(s.getTripIndex()).get(l.getOutward().get(s.getTripIndex()).size()-1));
                 }
 
                 ArrayList<ObjectId> availabilities = new ArrayList<>();
@@ -138,9 +138,9 @@ public class ShiftController {
         CustomUserDetails usr = ((CustomUserDetails)SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal());
         /*
-         * For each shift retrieved, hide the availabilities of other companions (privacy)
+         * For each shift retrieved, hide the availabilities$ of utils companions (privacy)
          * but, if present, keep the user's availability (can be used in front end).
-         * Only the system admin / admin for that line can view the availabilities.
+         * Only the system admin / admin for that line can view the availabilities$.
          * */
         for(Shift s: shifts){
             if(!canView(s.getLineName())){

@@ -10,7 +10,9 @@ import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.EmailVerificationTokenRepository;
 import it.polito.ai.pedibus.api.repositories.RecoveryTokenRepository;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
+import it.polito.ai.pedibus.api.utils.Convertion;
 import it.polito.ai.pedibus.security.JwtTokenProvider;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +66,7 @@ public class UserService implements IUserService {
 //            }
 
             User user = userRepository.findByEmail(email);
-            String jwt = jwtTokenProvider.createToken(email, null, user.getId().toString());
+            String jwt = jwtTokenProvider.createToken(email, Convertion.authoritiesToMap(user.getAuthorities()), user.getId().toString());
             HashMap<String, String> userInfo = new HashMap<>();
             userInfo.put("jwt", jwt);
             return userInfo;
@@ -136,6 +138,12 @@ public class UserService implements IUserService {
     @Override
     public User getUserByEmail(String email) {
         return userRepository.getByEmail(email);
+
+    }
+
+    @Override
+    public User getUserById(ObjectId id) {
+        return userRepository.findUserById(id);
 
     }
 

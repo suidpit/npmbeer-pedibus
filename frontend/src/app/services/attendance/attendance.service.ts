@@ -21,8 +21,8 @@ export class AttendanceService {
 
   lines(): Observable<Line[]> {
     //TODO:  This will go in a config file
-    let api_url = "http://127.0.0.1:8080/lines"
-    console.log("Requesting from service...")
+    let api_url = "http://127.0.0.1:8080/lines";
+    console.log("Requesting from service...");
     return this.http.get<any[]>(api_url).pipe(map((data) => data.map((line) => {
       let outwards: Array<StopList> = [];
       let backs: Array<StopList> = [];

@@ -18,9 +18,12 @@ export class AuthGuard implements CanActivate{
 
     if(currentUser){
       // NO AuthZ
-      if( route.data.roles && route.data.roles.indexOf(currentUser.role) === -1){
-        this.router.navigate(["/auth_error"]);
-        return false;
+      if( route.data.roles ){
+        let authz = route.data.roles.filter((role) => currentUser.hasMinAuthority(role)).length > 0;
+        if(!authz) {
+          this.router.navigate(["/auth_error"]);
+          return false;
+        }
       }
 
       // OK

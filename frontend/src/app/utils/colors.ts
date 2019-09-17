@@ -5,4 +5,5 @@ export class Colors {
   static GREEN = "#1bc249";
   static BLUE = "#3788d8";
   static DARK_BLUE = "#2c3e50";
+  static GRAY = "#acacac"
 }

@@ -49,8 +49,6 @@ public class UserAuthController {
     public HashMap<String, String> login(
         @RequestBody LoginDTO loginDTO
     ){
-        logger.info(loginDTO.getEmail());
-        logger.info(loginDTO.getPassword());
         return service.signin(loginDTO.getEmail(), loginDTO.getPassword());
     }
 

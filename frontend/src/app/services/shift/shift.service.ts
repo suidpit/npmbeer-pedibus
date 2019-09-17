@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {DateTimeFormatter, LocalDate, LocalDateTime, LocalTime, ZoneOffset} from "js-joda";
+import {DateTimeFormatter, LocalDate, LocalDateTime, LocalTime, ZoneId, ZoneOffset} from "js-joda";
 import * as joda from "js-joda";
 import {Shift} from "../../models/shift";
 import {Subject} from "rxjs/internal/Subject";
@@ -13,6 +13,9 @@ import {range} from "rxjs/internal/observable/range";
 import {Line} from "../../models/line";
 import {HttpClient} from "@angular/common/http";
 import {Stop} from "../../models/stop";
+import {collectExternalReferences} from "@angular/compiler";
+import {AttendanceService} from "../attendance/attendance.service";
+import {Role} from "../../models/authority";
 
 @Injectable({
   providedIn: 'root'
@@ -43,8 +46,10 @@ export class ShiftService {
 
   private availabilities_subject: Subject<any[]> = new BehaviorSubject([]);
   availabilities$: Observable<any[]> = this.availabilities_subject.asObservable();
+  private currentStartDate: Date;
+  private currentEndDate: Date;
 
-  constructor(private lineService: ReservationsService, private auth: AuthService, private http: HttpClient) {
+  constructor(private lineService: AttendanceService, private auth: AuthService, private http: HttpClient) {
     for(let j = 0; j < 10; j++){
       let shift = new Shift();
 
@@ -53,9 +58,9 @@ export class ShiftService {
 
       dt = dt.plusDays(i);
 
-      shift.dateAndTime = dt;
+      shift.date = dt;
       shift.companionId = this.auth.getCurrentUser().id;
-      shift.availabilities =[this.auth.getCurrentUser().id];
+      shift.availabilities = [this.auth.getCurrentUser().id];
       shift.open = false;
 
       i = this.randomIntFromInterval(0,2);
@@ -66,14 +71,14 @@ export class ShiftService {
       this.shifts.push(shift);
     }
 
-    this.shifts.sort((a, b) => a.dateAndTime.isBefore(b.dateAndTime)? -1:+1);
+    this.shifts.sort((a, b) => a.date.isBefore(b.date)? -1:+1);
     for(let s of this.shifts) {
       let title = "";
-      title += ("0" + s.dateAndTime.hour()).slice(-2) + ":" + ("0" + s.dateAndTime.minute()).slice(-2);
+      title += ("0" + s.date.hour()).slice(-2) + ":" + ("0" + s.date.minute()).slice(-2);
       title += " " + s.lineName + " " + s.direction;
-      let date = s.dateAndTime.year() +
-        "-" + ("0" + s.dateAndTime.monthValue()).slice(-2) +
-        "-" + ("0" + s.dateAndTime.dayOfMonth()).slice(-2);
+      let date = s.date.year() +
+        "-" + ("0" + s.date.monthValue()).slice(-2) +
+        "-" + ("0" + s.date.dayOfMonth()).slice(-2);
       this.events.push({
         title: title,
         date: date
@@ -86,29 +91,32 @@ export class ShiftService {
 
   // TODO implement end date.
   buildShifts(startDate: Date, endDate: Date){
-    let start = LocalDateTime.ofEpochSecond(startDate.valueOf()/1000, ZoneOffset.UTC);
-
+    this.currentStartDate = startDate;
+    this.currentEndDate = endDate;
+    let start = LocalDate.of(startDate.getFullYear(), startDate.getMonth()+1, startDate.getDate());
+    // let start = LocalDateTime.ofEpochSecond(startDate.valueOf()/1000+1, ZoneOffset.of());
     // backend compliant string
     let dateString =("0" + start.dayOfMonth()).slice(-2) +
       ("0" + start.monthValue()).slice(-2) +
       start.year();
 
-    this.http.get(this.shift_url+"/"+dateString).subscribe((retrieved_shifts) => {
+    this.http.get<any[]>(this.shift_url+"/"+dateString).subscribe((retrieved_shifts) => {
       let shifts = [];
       for(let s of retrieved_shifts){
         let from = new Stop();
         from.position = s.from.position;
-        from.time = s.from.time;
+        from.time = LocalTime.parse(s.from.time);
         from.name = s.from.name;
 
         let to = new Stop();
         to.position = s.to.position;
-        to.time = s.to.time;
+        to.time = LocalTime.parse(s.to.time);
         to.name = s.to.name;
 
         let shift = new Shift();
-        let date = LocalDateTime.of(LocalDate.parse(s.date, DateTimeFormatter.ofPattern("d-M-yyyy")), LocalTime.of(0, 0, 0));
-        shift.dateAndTime = date;
+        let date = LocalDate.parse(s.date, DateTimeFormatter.ofPattern("d-M-yyyy"));
+        shift.id = s.id;
+        shift.date = date;
         shift.lineName = s.lineName;
         shift.direction = s.direction;
         shift.tripIndex = s.tripIndex;
@@ -117,6 +125,19 @@ export class ShiftService {
         shift.to = to;
         shift.startsAt = from.time;
         shift.endsAt = to.time;
+        shift.availabilities = this.auth.getUsersDetails(s.availabilities);
+        shift.companionId = s.companionId;
+
+        let color = this.getBackgroundColor(shift, s.lineName, s.availabilities);
+
+        // black border if user had expressed availability for this shift.
+        if(s.availabilities && s.availabilities.indexOf(this.auth.getCurrentUser().id) !== -1){
+          shift.classNames = ["black-border"];
+        }
+        else shift.classNames = ["white-border"];
+
+        shift.color = color;
+        shift.disabled = color === Colors.GRAY;
 
         let dateString = date.year() +
           "-" + ("0" + date.monthValue()).slice(-2) +
@@ -125,9 +146,10 @@ export class ShiftService {
         let event = {
           date: dateString,
           title: shift.startsAt.toString() + " - " + shift.endsAt.toString() + " " + shift.lineName + " " + shift.direction,
-          shift: shift
+          shift: shift,
+          color: shift.color,
+          classNames: shift.classNames,
         };
-
         shifts.push(event);
       }
 
@@ -135,32 +157,39 @@ export class ShiftService {
         map(line_list => {
           for (let i of Array(7).keys()) {
             let date = start.plusDays(i);
+
             let dateString = date.year() +
               "-" + ("0" + date.monthValue()).slice(-2) +
               "-" + ("0" + date.dayOfMonth()).slice(-2);
             for (let line of line_list) {
               let event = {};
-              let s;
-
+              let new_shift;
               // create a shift for each ride
               for(let tripIndex in line.outward){
-                s = new Shift();
-                s.dateAndTime = date;
-                s.lineName = line.lineName;
-                s.direction = "OUTWARD";
-                s.tripIndex = tripIndex;
-                s.startsAt = line.outward[tripIndex].startsAt;
-                s.endsAt = line.outward[tripIndex].endsAt;
-                s.from = line.outward[tripIndex].stops[0];
-                s.to = line.outward[tripIndex].stops[line.outward[tripIndex].stops.length - 1];
+                new_shift = new Shift();
+                new_shift.date = date;
+                new_shift.lineName = line.lineName;
+                new_shift.direction = "OUTWARD";
+                new_shift.tripIndex = tripIndex;
+                new_shift.startsAt = line.outward[tripIndex].startsAt;
+                new_shift.endsAt = line.outward[tripIndex].endsAt;
+                new_shift.from = line.outward[tripIndex].stops[0];
+                new_shift.to = line.outward[tripIndex].stops[line.outward[tripIndex].stops.length - 1];
 
                 // finds the index of the first element satisfying the passed callback criterion, otherwise -1
                 // in this case we don't want to add a shift if there was one with the same specifications already
-                if (shifts.findIndex(s.compareTo) === -1) {
+                if (shifts.filter(elem => new_shift.compareTo(elem.shift)).length <= 0) {
+
+                  new_shift.color = this.getBackgroundColor(new_shift, line.lineName);
+                  new_shift.classNames = ["white-border"];
+                  new_shift.disabled = new_shift.color === Colors.GRAY;
+
                   event = {
                     date: dateString,
-                    title: s.startsAt.toString() + " - " + s.endsAt.toString() + " " + s.lineName + " " + s.direction,
-                    shift: s
+                    title: new_shift.startsAt.toString() + " - " + new_shift.endsAt.toString() + " " + new_shift.lineName + " " + new_shift.direction,
+                    shift: new_shift,
+                    color: new_shift.color,
+                    classNames: new_shift.classNames
                   };
 
                   shifts.push(event);
@@ -168,21 +197,28 @@ export class ShiftService {
               }
 
               for(let tripIndex in line.back){
-                s = new Shift();
-                s.dateAndTime = date;
-                s.lineName = line.lineName;
-                s.direction = "BACK";
-                s.tripIndex = tripIndex;
-                s.startsAt = line.back[tripIndex].startsAt;
-                s.endsAt = line.back[tripIndex].endsAt;
-                s.from = line.back[tripIndex].stops[0];
-                s.to = line.back[tripIndex].stops[line.back[tripIndex].stops.length - 1];
+                new_shift = new Shift();
+                new_shift.date = date;
+                new_shift.lineName = line.lineName;
+                new_shift.direction = "BACK";
+                new_shift.tripIndex = tripIndex;
+                new_shift.startsAt = line.back[tripIndex].startsAt;
+                new_shift.endsAt = line.back[tripIndex].endsAt;
+                new_shift.from = line.back[tripIndex].stops[0];
+                new_shift.to = line.back[tripIndex].stops[line.back[tripIndex].stops.length - 1];
 
-                if (shifts.findIndex(s.compareTo) === -1) {
+                if (shifts.filter(elem => new_shift.compareTo(elem.shift)).length <= 0) {
+
+                  new_shift.color = this.getBackgroundColor(new_shift, line.lineName);
+                  new_shift.classNames = ["white-border"];
+                  new_shift.disabled = new_shift.color === Colors.GRAY;
+
                   event = {
                     date: dateString,
-                    title: s.startsAt.toString() + " - " + s.endsAt.toString() + " " + s.lineName + " " + s.direction,
-                    shift: s
+                    title: new_shift.startsAt.toString() + " - " + new_shift.endsAt.toString() + " " + new_shift.lineName + " " + new_shift.direction,
+                    shift: new_shift,
+                    color: new_shift.color,
+                    classNames: new_shift.classNames
                   };
 
                   shifts.push(event);
@@ -190,61 +226,38 @@ export class ShiftService {
               }
             }
           }
+          return shifts;
         })
-      );
+      ).subscribe((shifts) => this.availabilities_subject.next(shifts));
     });
-
-    this.lineService.lines().pipe(
-      map(line_list =>{
-        let shifts = [];
-        for(let i of Array(7).keys()){
-          let date = start.plusDays(i);
-          let dateString = date.year() +
-            "-" + ("0" + date.monthValue()).slice(-2) +
-            "-" + ("0" + date.dayOfMonth()).slice(-2);
-          for(let line of line_list){
-            let event = {};
-
-            let s = new Shift();
-            s.dateAndTime = date;
-            s.lineName = line.lineName;
-            s.direction = "OUTWARD";
-            s.startsAt = line.back[0].startsAt;
-            s.endsAt = line.back[0].endsAt;
-            s.from = line.back[0].stops[0];
-            s.to = line.back[0].stops[line.back[0].stops.length-1];
-
-            event = {
-              date: dateString,
-              title: s.startsAt.toString() + " - " + s.endsAt.toString() + " " + s.lineName + " OUTWARD",
-              shift: s
-            };
-
-            shifts.push(event);
-
-            s = new Shift();
-            s.dateAndTime = date;
-            s.lineName = line.lineName;
-            s.direction = "BACK";
-            s.startsAt = line.back[0].startsAt;
-            s.endsAt = line.back[0].endsAt;
-            s.from = line.back[0].stops[0];
-            s.to = line.back[0].stops[line.back[0].stops.length-1];
-
-            event = {
-              date: dateString,
-              title: s.startsAt.toString() + " - " + s.endsAt.toString() + " " + s.lineName + " BACK",
-              shift: s
-            };
-
-            shifts.push(event);
-          }
-        }
-        return shifts;
-      })
-    ).subscribe((shifts) => this.availabilities_subject.next(shifts));
   }
 
+  private getBackgroundColor(shift: Shift, lineName: string, availabilities = []){
+    let color = "";
+    if(shift.date.isBefore(LocalDate.now(ZoneId.of("+01:00")))){
+      // Old shifts are not to be expresses availabilities for.
+      color = Colors.GRAY;
+    }
+    else if(!shift.open){
+      // Closed shift, no need to express availability, but still can if anyone wants.
+      color = Colors.GREEN;
+    }
+    else if(this.auth.getCurrentUser().hasAuthorityOnLine(shift.lineName)){
+      if (shift.companionId !== "" && shift.companionId !== null && shift.companionId !== undefined) {
+        color = Colors.DARK_BLUE;
+      }
+      else {
+        if (availabilities.length > 0) {
+          color = Colors.YELLOW;
+        }
+        else {
+          color = Colors.RED;
+        }
+      }
+    }
+    return color;
+  }
+/*
   updateAvailabilties(startDate: Date, endDate: Date){
     this.lineService.lines().subscribe((lines) => console.log(lines));
     let start = LocalDateTime.ofEpochSecond(startDate.valueOf()/1000, ZoneOffset.UTC);
@@ -259,7 +272,7 @@ export class ShiftService {
       let dt = start;
       dt = dt.plusDays(i);
 
-      shift.dateAndTime = dt;
+      shift.date = dt;
 
       i = this.randomIntFromInterval(0,1);
       let flag = i===0;
@@ -316,14 +329,14 @@ export class ShiftService {
       avail.push(shift);
     }
 
-    avail.sort((a, b) => a.dateAndTime.isBefore(b.dateAndTime)? -1:+1);
+    avail.sort((a, b) => a.date.isBefore(b.date)? -1:+1);
     for(let s of avail) {
       let title = "";
-      title += ("0" + s.dateAndTime.hour()).slice(-2) + ":" + ("0" + s.dateAndTime.minute()).slice(-2);
+      title += ("0" + s.date.hour()).slice(-2) + ":" + ("0" + s.date.minute()).slice(-2);
       title += " " + s.lineName + " " + s.direction;
-      let date = s.dateAndTime.year() +
-        "-" + ("0" + s.dateAndTime.monthValue()).slice(-2) +
-        "-" + ("0" + s.dateAndTime.dayOfMonth()).slice(-2);
+      let date = s.date.year() +
+        "-" + ("0" + s.date.monthValue()).slice(-2) +
+        "-" + ("0" + s.date.dayOfMonth()).slice(-2);
       avail_events.push({
         title: title,
         date: date,
@@ -334,7 +347,7 @@ export class ShiftService {
     }
     this.availabilities_subject.next(avail_events);
   }
-
+*/
   randomIntFromInterval(min, max) { // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
@@ -352,8 +365,12 @@ export class ShiftService {
   }
 
   sendShiftAvailability(s: Shift){
+    let body = {shiftId: s.id, date:s.date, lineName: s.lineName, direction:s.direction, tripIndex: s.tripIndex};
     this.http.post(this.availabilty_url,
-      [{shiftId: s.id, date:s.dateAndTime.toLocalDate(), lineName: s.lineName, direction:s.direction, tripIndex: 0}])
-      .subscribe((result) => console.log(result));
+      [body])
+      .subscribe(() => {
+        this.buildShifts(this.currentStartDate, this.currentEndDate);
+        // TODO successful insertion feedback
+      });
   }
 }

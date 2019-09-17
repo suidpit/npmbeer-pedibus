@@ -48,6 +48,7 @@ import { ShiftChipComponent } from './components/shifts/shift-chip/shift-chip.co
 import { DialogEventInfo, ShiftCalendarComponent} from './components/shifts/shift-calendar/shift-calendar.component';
 import { ShiftPageComponent } from './components/shifts/shift-page/shift-page.component';
 import {
+  DialogEventAdmin,
   DialogEventNormal,
   ShiftAvailabilitiesComponent
 } from './components/shifts/shift-availabilities/shift-availabilities.component';
@@ -57,7 +58,7 @@ import {StopListComponent} from './components/stop-list/stop-list.component';
 import {StopElementComponent} from './components/stop-list/stop-element/stop-element.component';
 import {SpinnerComponent} from './components/spinner/spinner.component';
 import {AuthGuard} from "./guards/auth-guard/auth-guard";
-import {Role} from "./models/user";
+import {Role} from "./models/authority";
 import {
   NewRegistrationEmailComponent,
   DialogEmailExistsNewReg,
@@ -82,6 +83,7 @@ import {NoAuthnGuard} from "./guards/no-authn-guard/no-authn-guard.service";
     DialogEmailExists,
     DialogEventInfo,
     DialogEventNormal,
+    DialogEventAdmin,
     UpcomingShiftsComponent,
     ShiftChipComponent,
     ShiftCalendarComponent,
@@ -150,7 +152,7 @@ import {NoAuthnGuard} from "./guards/no-authn-guard/no-authn-guard.service";
     multi: true
   }],
   entryComponents: [DialogAddKid,DialogAddKidReg,DialogEmailSended, DialogEmailExists, DialogEmailExistsNewReg,
-                    DialogEventInfo, DialogEventNormal, DialogEmailSendedNewReg, PizzaPartyComponent, BookingDialog],
+                    DialogEventInfo, DialogEventNormal, DialogEventAdmin, DialogEmailSendedNewReg, PizzaPartyComponent, BookingDialog],
   bootstrap: [AppComponent]
 
 })

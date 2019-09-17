@@ -1,15 +1,16 @@
-import {LocalDateTime, LocalTime} from "js-joda";
+import {LocalDate, LocalDateTime, LocalTime} from "js-joda";
 import {User} from "./user";
 import {Stop} from "./stop";
+import {Observable} from "rxjs/internal/Observable";
 
 export class Shift {
 
   id: string;
-  dateAndTime: LocalDateTime;
+  date: LocalDate;
   lineName: string;
   direction: string;
   tripIndex: number;
-  availabilities: User[];
+  availabilities: Observable<User[]>;
   open: boolean = true;
   companionId: string;
   startsAt: LocalTime;
@@ -18,15 +19,16 @@ export class Shift {
   to: Stop;
   color: string;  // color to use in calendar
   classNames: string[];  // css classes to use in calendar
+  disabled: boolean = false;
 
-  public compareTo(shift: Shift){
-    if(this.id === shift.id) return true;
-    if(!this.dateAndTime.isEqual(shift.dateAndTime)) return false;
-    if(!(this.lineName === shift.lineName)) return false;
-    if(!(this.direction === shift.direction)) return false;
-    if(!(this.tripIndex === shift.tripIndex)) return false;
-    if(!this.from.compareTo(shift.from)) return false;
-    if(!this.to.compareTo(shift.to)) return false;
+  public compareTo(__shift: Shift){
+    if(this.id !== undefined && __shift.id !== undefined && this.id === __shift.id) return true;
+    if(!this.date.isEqual(__shift.date)) return false;
+    if(!(this.lineName === __shift.lineName)) return false;
+    if(!(this.direction === __shift.direction)) return false;
+    if(!(this.tripIndex == __shift.tripIndex)) return false;
+    if(!this.from.compareTo(__shift.from)) return false;
+    if(!this.to.compareTo(__shift.to)) return false;
     return true;
   }
 }

@@ -6,8 +6,11 @@ import {User} from "../../models/user";
 import {BehaviorSubject} from "rxjs/internal/BehaviorSubject";
 import {Observable} from "rxjs/internal/Observable";
 import {mapEntry} from "@angular/compiler/src/output/map_util";
-import {map, catchError} from "rxjs/operators";
+import { map, catchError, toArray, mergeMap, concatMap} from "rxjs/operators";
 import { throwError } from 'rxjs';
+import {from} from "rxjs/internal/observable/from";
+import {of} from "rxjs/internal/observable/of";
+import {Authority, Role} from "../../models/authority";
 
 
 @Injectable({
@@ -20,6 +23,7 @@ export class AuthService {
   email_check_url = "http://localhost:8080/exists";
   register_email_url = "http://localhost:8080/users/addNewUser";
   send_pwd_url = "http://localhost:8080/confirm/";
+  retrieve_user_url = "http://localhost:8080/users/retrieve/";
 
   private currentUserSubject: BehaviorSubject<User>;
   public currentUser$: Observable<User>;
@@ -27,10 +31,14 @@ export class AuthService {
   public isLoggedIn$: Observable<boolean>;
 
   constructor(private http: HttpClient) {
+    this.getUsersDetails([]);
     // TODO set role as well
     if(this.checkLoginState()){
       let u = JSON.parse(localStorage.getItem("user"));
       let user = new User(u._id, u._email);
+      for(let a of u._authorities){
+        user.addAuthority(new Authority(a._role, a._lineName));
+      }
       this.currentUserSubject = new BehaviorSubject<User>(user);
       this.isLoggedInSubject = new BehaviorSubject<boolean>(true);
     }
@@ -74,7 +82,6 @@ export class AuthService {
 
 
   private handleError(error: HttpErrorResponse) {
-   // debugger
     if (error.error instanceof ErrorEvent) {
       // A client-side or network error occurred. Handle it accordingly.
       console.error('An error occurred:', error.error.message);
@@ -126,7 +133,15 @@ export class AuthService {
 
     let user = new User(userInfo["user_id"], userInfo["email"]);
 
-    // add seconds to moment 0 ( 1 Jan 1970 00:00:00)
+    const authorityObject = JSON.parse(userInfo["authorities"]);
+    for(let k of Object.keys(authorityObject)){
+      for(let line of authorityObject[k]){
+        let authority = new Authority(Role.fromString(k), line);
+        user.addAuthority(authority);
+      }
+    }
+
+    // add seconds to moment 0 (1 Jan 1970 00:00:00)
     const expiresAt = moment(0).add(exp, "second");
     const notBefore = moment(0).add(nbf, "second");
     localStorage.setItem("user", JSON.stringify(user));
@@ -141,5 +156,25 @@ export class AuthService {
 
   checkExists(email: string){
     return this.http.post<boolean>(this.email_check_url, {"email": email});
+  }
+
+  getUsersDetails(ids: string[]): Observable<User[]>{
+    /**
+     * given an array of ids, retrieve user info and merge them to obtain a Observable<Array<User>>
+     */
+    if(ids === null || ids === undefined) ids = [];
+    return from(ids).pipe(
+      mergeMap((id) => this.http.get(this.retrieve_user_url+id)),
+      mergeMap((user) =>{
+        let u = new User(user.id, user.email);
+        u.children = user.children;
+        return of(u);
+      }),
+      toArray()
+    );
+  }
+
+  hasAuthorityOnLine(line: string){
+    return this.getCurrentUser().hasAuthorityOnLine(line);
   }
 }

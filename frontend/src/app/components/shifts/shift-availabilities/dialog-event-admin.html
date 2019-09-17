@@ -1,22 +1,64 @@
-<h1 mat-dialog-title style="color: #fc463d">Info Turno</h1>
-<mat-divider style="background-color: #FFFFFF;"></mat-divider>
-<mat-divider style="background-color: #FFFFFF;"></mat-divider>
-<div mat-dialog-content>
-  <div style="font-family: Garamond;">
-    <h2 style="color: #FFFFFF;">
-      {{data.date.toLocaleDateString("it-IT",{ weekday: 'long'}) | titlecase}}, <br>
-      {{data.date.toLocaleDateString("it-IT",{ year: 'numeric', month: 'long', day: 'numeric' }) | titlecase}}
-    </h2>
-    <h3>Ore {{data.time}}</h3>
-  </div>
-  <div>
-    <h3 style="font-family: 'Bookman Old Style';font-weight: bold; color: #f29d27;">{{data.line}}</h3>
-    <h4 style="font-family: 'Bookman Old Style';font-style: italic;">{{data.direction}}</h4>
-  </div>
+<div style="margin: auto; padding:10px; width: 100%; word-break: break-word; background-color: transparent" fxLayout="row">
+  <mat-card class="blue-background dialog-border dialog-shadow" style="width: 40%;margin-right: 10px;">
+    <mat-card-title style="color: #fc463d">
+      Disponibilit&agrave;
+    </mat-card-title>
+    <mat-card-subtitle style="color: #fefefe;">
+      Assegna un accompagnatore.
+    </mat-card-subtitle>
+    <mat-card-content fxLayout="column" fxLayoutGap="16px">
+      <mat-form-field class="companion_select">
+        <mat-label style="color: #FFFFFF;">Accompagnatore</mat-label>
+        <mat-select>
+          <mat-option *ngFor="let acc of data.extendedProps.obj.availabilities | async" [value]="acc.email">
+            {{acc.email}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </mat-card-content>
+  </mat-card>
+  <mat-card fxFlex class="blue-background dialog-border dialog-shadow">
 
+    <mat-card-title style="color: #fc463d">
+      Info Turno
+    </mat-card-title>
+    <mat-card-content>
+
+      <mat-divider [inset]="true" style="background-color: #FFFFFF;"></mat-divider>
+      <mat-divider [inset]="true" style="background-color: #FFFFFF;"></mat-divider>
+      <div style="font-family: Garamond;">
+        <h2 style="color: #FFFFFF;">
+          {{data.date.toLocaleDateString("it-IT",{ weekday: 'long'}) | titlecase}}, <br>
+          {{data.date.toLocaleDateString("it-IT",{ year: 'numeric', month: 'long', day: 'numeric' }) | titlecase}}
+        </h2>
+        <h3>
+          <table style="overflow-wrap: break-word;">
+            <tr>
+              <td>Partenza: </td>
+              <td>{{data.from}}</td>
+            </tr>
+            <tr>
+              <td>
+                Arrivo: </td>
+              <td>{{data.to}}</td>
+            </tr>
+          </table>
+        </h3>
+      </div>
+      <div>
+        <h3 style="font-family: 'Bookman Old Style';font-weight: bold; color: #f29d27;">{{data.line}}</h3>
+        <h4 style="font-family: 'Bookman Old Style';font-style: italic;">{{data.direction}}</h4>
+      </div>
+
+      <mat-divider [inset]="true" style="background-color: #FFFFFF;"></mat-divider>
+      <mat-divider [inset]="true" style="background-color: #FFFFFF;"></mat-divider>
+      <div mat-dialog-actions fxLayoutAlign="end center">
+        <button mat-raised-button (click)="onNoClick()">Chiudi</button>
+        <button mat-raised-button color="primary" (click)="onOkClick()" *ngIf="!data.extendedProps.obj.disabled">Candidati</button>
+        <button mat-raised-button [disabled]="true" style="color:#acacac;" *ngIf="data.extendedProps.obj.disabled">Candidati</button>
+      </div>
+    </mat-card-content>
+  </mat-card>
 </div>
-<mat-divider style="background-color: #FFFFFF;"></mat-divider>
-<mat-divider style="background-color: #FFFFFF;"></mat-divider>
-<div mat-dialog-actions fxLayoutAlign="end center">
-  <button mat-raised-button (click)="onNoClick()">Chiudi</button>
-</div>
+
+

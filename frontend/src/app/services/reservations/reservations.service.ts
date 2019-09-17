@@ -27,7 +27,9 @@ export class ReservationsService {
             for (let out of line.outward) {
                 let stopList = Builder(StopList)
                     .stops(out.map(function (stop) {
+                      console.log(stop.time);
                         let time = LocalTime.parse(stop.time);
+                        console.log(time);
                         return Builder(Stop)
                             .name(stop.name)
                             .time(time)

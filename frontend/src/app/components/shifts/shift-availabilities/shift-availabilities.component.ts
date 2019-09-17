@@ -4,6 +4,7 @@ import {ShiftService} from "../../../services/shift/shift.service";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import {DialogEventData, DialogEventInfo} from "../shift-calendar/shift-calendar.component";
 import {FullCalendarComponent} from "@fullcalendar/angular";
+import {AuthService} from "../../../services/auth/auth.service";
 
 @Component({
   selector: 'app-shift-availabilities',
@@ -16,7 +17,7 @@ export class ShiftAvailabilitiesComponent implements OnInit {
   plugins = [dayGridPlugin];
   events = [];
 
-  constructor(public shiftService: ShiftService, public dialog: MatDialog) { }
+  constructor(public shiftService: ShiftService, private auth: AuthService, public dialog: MatDialog) { }
 
   ngOnInit() {
     let self = this;
@@ -35,14 +36,23 @@ export class ShiftAvailabilitiesComponent implements OnInit {
 
     let shift = info.event.extendedProps.shift;
     let direction = shift.direction;
-    let from = "[" + shift.startsAt.toString() + "] " + shift.from;
-    let to = "[" + shift.endsAt.toString() + "] " + shift.to;
+    let from = "[" + shift.startsAt.toString() + "] " + shift.from.name;
+    let to = "[" + shift.endsAt.toString() + "] " + shift.to.name;
     let lineName = shift.lineName;
-    const dialogRef = this.dialog.open(DialogEventNormal, {
-      panelClass: 'event-dialog',
-      width: "300px",
-      data: { date: date, from: from, to: to, line: lineName, direction: direction, extendedProps: {obj:shift}}
-    })
+    if(this.auth.hasAuthorityOnLine(lineName)){
+      const dialogRef = this.dialog.open(DialogEventAdmin, {
+        panelClass: 'admin-availability-dialog',
+        width: "550px",
+        data: { date: date, from: from, to: to, line: lineName, direction: direction, extendedProps: {obj:shift}}
+      })
+    }
+    else{
+      const dialogRef = this.dialog.open(DialogEventNormal, {
+        panelClass: 'event-dialog',
+        width: "300px",
+        data: { date: date, from: from, to: to, line: lineName, direction: direction, extendedProps: {obj:shift}}
+      })
+    }
   }
 }
 
@@ -52,6 +62,28 @@ export class ShiftAvailabilitiesComponent implements OnInit {
   templateUrl: 'dialog-event-normal.html',
 })
 export class DialogEventNormal {
+
+  constructor(
+    private shiftService: ShiftService,
+    public dialogRef: MatDialogRef<DialogEventInfo>,
+    @Inject(MAT_DIALOG_DATA) public data: DialogEventData) {}
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+
+  onOkClick(): void{
+    this.shiftService.sendShiftAvailability(this.data.extendedProps.obj);
+    this.dialogRef.close();
+  }
+
+}
+
+@Component({
+  selector: 'dialog-event-admin',
+  templateUrl: 'dialog-event-admin.html',
+})
+export class DialogEventAdmin {
 
   constructor(
     private shiftService: ShiftService,

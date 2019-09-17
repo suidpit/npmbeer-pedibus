@@ -49,7 +49,7 @@ public class ShiftService {
         if(s.getId() != null){
             return shiftRepository.save(s);
         }
-        // if you don't have a shift id, check not to have an other shift in db already with same info.
+        // if you don't have a shift id, check not to have an utils shift in db already with same info.
         // if so, get the id and save
         List<Shift> found = this.shiftRepository
                 .findByLineNameAndDirectionAndTripIndexAndDate(

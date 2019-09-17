@@ -40,7 +40,7 @@ export class Stop{
 
   public compareTo(stop: Stop){
     if(!(this._name === stop.name)) return false;
-    if(!(this._time === stop.time)) return false;
+    if(this._time.compareTo(stop.time) !== 0) return false;
     if(!deepEqual(this._position, stop.position)) return false;
     return true;
   }

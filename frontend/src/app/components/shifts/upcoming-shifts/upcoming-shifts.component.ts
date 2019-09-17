@@ -15,7 +15,7 @@ export class UpcomingShiftsComponent implements OnInit {
     for(let i = 0; i < 5; i++){
       let dt = LocalDateTime.now();
       let shift = new Shift();
-      shift.dateAndTime = dt;
+      shift.date = dt.toLocalDate();
       shift.direction = "BACK";
       shift.lineName = "Linea 2";
       this.upcoming_shifts.push(shift);

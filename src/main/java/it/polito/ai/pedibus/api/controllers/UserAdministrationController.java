@@ -2,6 +2,7 @@ package it.polito.ai.pedibus.api.controllers;
 
 
 import it.polito.ai.pedibus.api.dtos.EmailDTO;
+import it.polito.ai.pedibus.api.dtos.UserDetailDTO;
 import it.polito.ai.pedibus.api.dtos.UserPrivilegesDTO;
 import it.polito.ai.pedibus.api.events.OnRegistrationCompleteEvent;
 import it.polito.ai.pedibus.api.exceptions.EmailExistsException;
@@ -10,6 +11,7 @@ import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
 import it.polito.ai.pedibus.security.LineGrantedAuthority;
 import it.polito.ai.pedibus.api.services.IUserService;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -126,15 +128,6 @@ public class UserAdministrationController {
         return "success";
     }
 
-    private boolean hasAuthority(Collection<? extends GrantedAuthority> authorities, String authority){
-        boolean hasAuthority = false;
-        for (GrantedAuthority grantedAuthority : authorities) {
-            hasAuthority = grantedAuthority.getAuthority().equals(authority);
-            if (hasAuthority) break;
-        }
-        return hasAuthority;
-    }
-
     /*Admin adds an e-mail for the new user*/
     @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN')")
     @RequestMapping(value = "/addNewUser", method = RequestMethod.POST)
@@ -169,6 +162,22 @@ public class UserAdministrationController {
         }
         return "";
 
+    }
+
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN')")
+    @RequestMapping(value = "/retrieve/{userId}", method = RequestMethod.GET)
+    public UserDetailDTO retrieveUserInfo(@PathVariable("userId") String userId){
+        return UserDetailDTO.of(this.userService.getUserById(new ObjectId(userId)));
+    }
+
+
+    private boolean hasAuthority(Collection<? extends GrantedAuthority> authorities, String authority){
+        boolean hasAuthority = false;
+        for (GrantedAuthority grantedAuthority : authorities) {
+            hasAuthority = grantedAuthority.getAuthority().equals(authority);
+            if (hasAuthority) break;
+        }
+        return hasAuthority;
     }
 
 }

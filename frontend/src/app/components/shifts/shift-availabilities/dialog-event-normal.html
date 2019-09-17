@@ -31,5 +31,6 @@
 <mat-divider style="background-color: #FFFFFF;"></mat-divider>
 <div mat-dialog-actions fxLayoutAlign="end center">
   <button mat-raised-button (click)="onNoClick()">Chiudi</button>
-  <button mat-raised-button color="primary" (click)="onOkClick()">Candidati</button>
+  <button mat-raised-button color="primary" (click)="onOkClick()" *ngIf="!data.extendedProps.obj.disabled">Candidati</button>
+  <button mat-raised-button [disabled]="true" style="color:#acacac;" *ngIf="data.extendedProps.obj.disabled">Candidati</button>
 </div>
