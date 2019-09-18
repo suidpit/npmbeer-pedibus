@@ -73,7 +73,7 @@ public class GeneralConfiguration {
 
 
         // Remove automatically created indexes on shifts collection, which were causing problems with later insertions
-        mongoTemplate.indexOps("shifts").dropAllIndexes();
+        // mongoTemplate.indexOps("shifts").dropAllIndexes();
         return mapper;
     }
 

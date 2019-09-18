@@ -17,7 +17,7 @@ public class Stop {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private LocalTime time;
 
-    @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2D)
+    @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
     @ValidCoordinate
     private GeoJsonPoint position;
 }
