@@ -1,9 +1,11 @@
 package it.polito.ai.pedibus.api.repositories;
 
+import it.polito.ai.pedibus.api.models.Child;
 import it.polito.ai.pedibus.api.models.User;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.HashMap;
 import java.util.List;
 
 public interface UserRepository extends MongoRepository<User,String> {
@@ -16,5 +18,6 @@ public interface UserRepository extends MongoRepository<User,String> {
     boolean existsByEmail(String email);
 
     User getByEmail(String email);
+
     User getById(ObjectId id);
 }

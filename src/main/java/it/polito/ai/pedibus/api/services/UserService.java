@@ -1,8 +1,12 @@
 package it.polito.ai.pedibus.api.services;
 
+import it.polito.ai.pedibus.api.dtos.ChildDTO;
 import it.polito.ai.pedibus.api.dtos.EmailDTO;
+import it.polito.ai.pedibus.api.dtos.ProfileInfoDTO;
 import it.polito.ai.pedibus.api.dtos.UserDTO;
 import it.polito.ai.pedibus.api.exceptions.EmailExistsException;
+import it.polito.ai.pedibus.api.exceptions.EmailNotExistsException;
+import it.polito.ai.pedibus.api.exceptions.TooManyChildrenException;
 import it.polito.ai.pedibus.api.models.EmailVerificationToken;
 import it.polito.ai.pedibus.api.models.RecoveryToken;
 import it.polito.ai.pedibus.api.models.SystemAuthority;
@@ -22,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 
 @Service
 public class UserService implements IUserService {
@@ -233,6 +234,64 @@ public class UserService implements IUserService {
         user.setEnabled(true);
         user.setPassword(encoder.encode(pass));
         userRepository.save(user);
+    }
+
+    @Override
+    public List<HashMap<String, String>> getChildren(String email) throws EmailNotExistsException {
+        if (!emailExist(email))
+            throw new EmailNotExistsException();
+        User user = userRepository.getByEmail(email);
+        return user.getChildren();
+    }
+
+    @Override
+    public void putChildInDB(ChildDTO childDTO) throws EmailNotExistsException, TooManyChildrenException {
+        if(!emailExist(childDTO.getEmail()))
+            throw new EmailNotExistsException();
+
+        User user = userRepository.getByEmail(childDTO.getEmail());
+        if(user.getChildren().size()>=3)
+            throw new TooManyChildrenException();
+        HashMap<String,String> child = new HashMap<>();
+
+        child.put("name",childDTO.getName());
+        child.put("surname",childDTO.getSurname());
+        child.put("birthday",childDTO.getBirthday());
+        child.put("gender",childDTO.getGender());
+
+        user.getChildren().add(child);
+        userRepository.save(user);
+
+    }
+
+    @Override
+    public void editProfileInfo(ProfileInfoDTO profileInfoDTO) throws EmailNotExistsException {
+        if(!emailExist(profileInfoDTO.getEmail()))
+            throw new EmailNotExistsException();
+        User user = userRepository.getByEmail(profileInfoDTO.getEmail());
+        user.setName(profileInfoDTO.getName());
+        user.setSurname(profileInfoDTO.getSurname());
+        user.setAddress(profileInfoDTO.getAddress());
+        user.setTelNumber(profileInfoDTO.getTelephone());
+
+        userRepository.save(user);
+
+    }
+
+    @Override
+    public HashMap<String, String> getProfileInformation(String email) throws EmailNotExistsException {
+        if(!emailExist(email))
+            throw new EmailNotExistsException();
+
+        HashMap<String, String> userInfo = new HashMap<>();
+        User user = userRepository.getByEmail(email);
+        userInfo.put("name",user.getName());
+        userInfo.put("surname",user.getSurname());
+        userInfo.put("address",user.getAddress());
+        userInfo.put("telephone",user.getTelNumber());
+
+        return userInfo;
+
     }
 
 

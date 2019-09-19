@@ -1,8 +1,5 @@
 package it.polito.ai.pedibus.api.controllers;
-import it.polito.ai.pedibus.api.dtos.EmailDTO;
-import it.polito.ai.pedibus.api.dtos.LoginDTO;
-import it.polito.ai.pedibus.api.dtos.NewPasswordDTO;
-import it.polito.ai.pedibus.api.dtos.UserDTO;
+import it.polito.ai.pedibus.api.dtos.*;
 import it.polito.ai.pedibus.api.events.OnRegistrationCompleteEvent;
 import it.polito.ai.pedibus.api.exceptions.EmailExistsException;
 import it.polito.ai.pedibus.api.exceptions.EmailTokenNotFoundException;
@@ -26,6 +23,7 @@ import org.springframework.web.context.request.WebRequest;
 import javax.validation.Valid;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 @RestController
@@ -179,5 +177,33 @@ public class UserAuthController {
         User user = service.getUserByEmail(emailDTO.getEmail());
         return user != null;
     }
+
+    @RequestMapping(value = "/profile/children",method = RequestMethod.GET)
+    public List<HashMap<String, String>> getChildrenByEmail(@RequestBody EmailDTO emailDTO){
+
+        String email = emailDTO.getEmail();
+        return service.getChildren(email);
+    }
+
+
+    @RequestMapping(value = "/profile/addChild",method = RequestMethod.POST)
+    public String putChild(@RequestBody ChildDTO childDTO){
+
+        service.putChildInDB(childDTO);
+
+        return "success:insertChildren";
+    }
+
+    @RequestMapping(value = "/profile",method = RequestMethod.POST)
+    public String editInfo(@RequestBody ProfileInfoDTO profileInfoDTO){
+        service.editProfileInfo(profileInfoDTO);
+        return "success:editInfo";
+    }
+
+    @RequestMapping(value = "/profile/information/{email:.+}",method = RequestMethod.GET)
+    public HashMap<String, String> getUserProfileInformation(@PathVariable("email")String email){
+        return service.getProfileInformation(email);
+    }
+
 
 }

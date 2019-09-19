@@ -60,6 +60,9 @@ import {
   DialogEmailSendedNewReg
 } from './components/new-registration-email/new-registration-email.component';
 import { UserPasswordSetupComponent, PizzaPartyComponent } from './components/user-password-setup/user-password-setup.component';
+import { LateralmenuComponent } from './components/lateralmenu/lateralmenu.component';
+import { LayoutModule } from '@angular/cdk/layout';
+import { ProfileComponent } from './components/profileInfo/profile/profile.component';
 
 
 @NgModule({
@@ -91,6 +94,8 @@ import { UserPasswordSetupComponent, PizzaPartyComponent } from './components/us
     StopListComponent,
     StopElementComponent,
     SpinnerComponent,
+    LateralmenuComponent,
+    ProfileComponent,
   ],
   imports: [
     BrowserModule,
@@ -103,6 +108,7 @@ import { UserPasswordSetupComponent, PizzaPartyComponent } from './components/us
       { path: "registrazioneEmail", component: NewRegistrationEmailComponent},
       { path: "impostaPassword/:token", component: UserPasswordSetupComponent},
       { path: "prenotazione", component: ReservationsComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
+      { path: "profilo", component: LateralmenuComponent},
       { path: "**", redirectTo: "login", pathMatch: "full"}
     ]),
     HttpClientModule,
@@ -133,6 +139,7 @@ import { UserPasswordSetupComponent, PizzaPartyComponent } from './components/us
     FullCalendarModule,
     MatSnackBarModule,
     AngularResizedEventModule,
+    LayoutModule,
   ],
   providers: [MatDatepickerModule, {
     provide: HTTP_INTERCEPTORS,
