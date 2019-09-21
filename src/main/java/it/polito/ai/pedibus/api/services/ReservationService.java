@@ -7,16 +7,11 @@ import it.polito.ai.pedibus.api.repositories.ReservationRepository;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
 import it.polito.ai.pedibus.security.CustomUserDetails;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
-import sun.plugin.liveconnect.SecurityContextHelper;
 
-import javax.xml.ws.Response;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
