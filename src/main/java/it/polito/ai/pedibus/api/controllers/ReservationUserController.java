@@ -38,8 +38,6 @@ public class ReservationUserController {
      * @param dateString
      * @return
      */
-
-
     @RequestMapping(value = "/{lineName}/{date}", method = RequestMethod.GET)
     public List<Reservation> getOwnChildsForStop(@PathVariable("lineName") String lineName,
                                                  @PathVariable("date") String dateString) {

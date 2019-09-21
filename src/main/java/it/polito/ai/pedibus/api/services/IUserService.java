@@ -51,12 +51,4 @@ public interface IUserService {
     boolean checkPwd(User user, String pwdTocheck);
 
     void enableUserAndAddPassword(User user, String pass);
-
-    List<HashMap<String, String>> getChildren(String email);
-
-    void putChildInDB(ChildDTO childDTO);
-
-    void editProfileInfo(ProfileInfoDTO profileInfoDTO);
-
-    HashMap<String, String> getProfileInformation(String email);
 }

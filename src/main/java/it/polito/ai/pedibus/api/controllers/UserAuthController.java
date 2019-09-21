@@ -177,33 +177,4 @@ public class UserAuthController {
         User user = service.getUserByEmail(emailDTO.getEmail());
         return user != null;
     }
-
-    @RequestMapping(value = "/profile/children",method = RequestMethod.GET)
-    public List<HashMap<String, String>> getChildrenByEmail(@RequestBody EmailDTO emailDTO){
-
-        String email = emailDTO.getEmail();
-        return service.getChildren(email);
-    }
-
-
-    @RequestMapping(value = "/profile/addChild",method = RequestMethod.POST)
-    public String putChild(@RequestBody ChildDTO childDTO){
-
-        service.putChildInDB(childDTO);
-
-        return "success:insertChildren";
-    }
-
-    @RequestMapping(value = "/profile",method = RequestMethod.POST)
-    public String editInfo(@RequestBody ProfileInfoDTO profileInfoDTO){
-        service.editProfileInfo(profileInfoDTO);
-        return "success:editInfo";
-    }
-
-    @RequestMapping(value = "/profile/information/{email:.+}",method = RequestMethod.GET)
-    public HashMap<String, String> getUserProfileInformation(@PathVariable("email")String email){
-        return service.getProfileInformation(email);
-    }
-
-
 }

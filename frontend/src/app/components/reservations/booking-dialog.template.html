@@ -10,7 +10,7 @@
                 </div>
                 <mat-chip-list class="mat-chip-list-stacked" *ngIf="children && children.length !== 0">
                     <mat-chip *ngFor="let child of children | keyvalue" [selected]="child.value"
-                              (click)="selectChild(child.key)">{{child.key}}</mat-chip>
+                              (click)="selectChild(child.key)">{{child.key.name}}</mat-chip>
                 </mat-chip-list>
             </mat-card-content>
         </mat-card>

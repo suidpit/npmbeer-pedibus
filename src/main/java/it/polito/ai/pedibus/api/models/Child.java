@@ -1,6 +1,7 @@
 package it.polito.ai.pedibus.api.models;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import it.polito.ai.pedibus.api.serializers.ObjectIdSerializer;
 import lombok.Data;
@@ -23,12 +24,13 @@ public class Child {
 
     private String surname;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="dd-MM-yyyy")
     private LocalDate birthday;
 
     private Sex gender;
 
 
-    enum Sex{
+    public enum Sex{
         F,
         M
     }

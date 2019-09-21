@@ -1,5 +1,6 @@
 package it.polito.ai.pedibus.api.dtos;
 
+import it.polito.ai.pedibus.api.models.Child;
 import it.polito.ai.pedibus.api.models.Reservation;
 import lombok.Data;
 

@@ -10,9 +10,6 @@ import java.time.LocalDate;
 @Data
 public class ChildDTO {
 
-    @Email
-    private String email;
-
     @NotNull
     private String name;
 
@@ -20,11 +17,8 @@ public class ChildDTO {
     private String surname;
 
     @NotNull
-    private String birthday;
+    private LocalDate birthday;
 
     @NotNull
-    private String gender;
-
-
-
+    private Child.Sex gender;
 }

@@ -1,26 +1,20 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
+import {BehaviorSubject, Observable, Subject} from 'rxjs';
 import {Line} from '../../models/line';
-import {HttpClient, HttpResponse} from '@angular/common/http';
-import {catchError, last, map, tap} from 'rxjs/operators'
-import {Reservations} from "../../models/reservations";
+import {HttpClient} from '@angular/common/http';
+import {map} from 'rxjs/operators'
 import {Child} from "../../models/child";
 import {Builder} from "builder-pattern";
 import {StopList} from "../../models/stop-list";
 import {LocalTime} from "js-joda";
 import {Stop} from "../../models/stop";
-import {Reservation} from "../../models/reservation";
-import {ILine} from "../../models/iline";
-import {AuthService} from "../auth/auth.service";
 import {ReservationReq} from "../../models/reservation-req";
-import {stringify} from "querystring";
 
 @Injectable({
     providedIn: 'root'
 })
 export class ReservationsService {
 
-    private lines: Line[] = [];
     private baseUrl: String = 'http://localhost:8080'
 
     constructor(private http: HttpClient) {
@@ -64,9 +58,7 @@ export class ReservationsService {
     }
 
     children(): Observable<Child[]> {
-        let children = [];
-        children.push("Francesca");
-        return of(children);
+        return this.http.get<Child[]>(this.baseUrl + "/profile/children");
     }
 
     reserve(line: String, date: String, children: String[], stop: String, direction: String, tripIndex: number): Observable<any> {

@@ -1,6 +1,7 @@
 package it.polito.ai.pedibus.api.services;
 
 import it.polito.ai.pedibus.api.dtos.ReservationDTO;
+import it.polito.ai.pedibus.api.models.Child;
 import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.repositories.ReservationRepository;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
@@ -92,8 +93,8 @@ public class ReservationService {
         for (String child : resd.getChild()) {
             boolean check = false;
 
-            for (HashMap<String, String> map : userRepository.getById(user).getChildren()) {
-                if (map.get("name").equals(child)) {
+            for (Child c: userRepository.getById(user).getChildren()) {
+                if (c.getName().equals(child)) {
                     check = true;
                     break;
                 }
@@ -103,7 +104,10 @@ public class ReservationService {
 
             for(Reservation res : reservationRepository.findByLineNameAndDateAndUser(lineName, date, user)){
                 if(res.getDirection()==resd.getDirection()){
-                    throw new HttpClientErrorException(HttpStatus.CONFLICT);
+                    for(String c : res.getChildName()){
+                        if(c.equals(child))
+                            throw new HttpClientErrorException(HttpStatus.CONFLICT);
+                    }
                 }
             }
         }

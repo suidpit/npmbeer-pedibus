@@ -14,6 +14,7 @@ import {DialogAddKidData, Kid} from "../stop-row/stop-row.component";
 import {Subject} from "rxjs";
 import {take, takeUntil} from "rxjs/operators";
 import {Stop} from "../../models/stop";
+import {Child} from "../../models/child";
 
 @Component({
     selector: 'app-reservations',
@@ -186,8 +187,8 @@ export interface BookingData {
 
 export class BookingDialog implements OnInit, OnDestroy {
     private unsubscribe$ = new Subject<void>();
-    children = new Map();
-    status = "dialog";
+    children = new Map<Child, boolean>();
+    status = "request";
 
     errorMsg = null;
 
@@ -203,10 +204,13 @@ export class BookingDialog implements OnInit, OnDestroy {
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe(
                 (children) => {
-                    this.children = new Map();
+                    console.log(children);
+                    this.children = new Map<Child, boolean>();
                     for (let c of children) {
                         this.children.set(c, false);
                     }
+                    this.status = "dialog";
+                    this.cd.detectChanges();
                 }
             );
     }
@@ -243,7 +247,7 @@ export class BookingDialog implements OnInit, OnDestroy {
             let children = [];
             this.children.forEach((value, child) => {
                 if (value)
-                    children.push(child);
+                    children.push(child.name);
             });
             this.status = "request";
             this.reservationsService.reserve(this.data.line, this.data.date, children, this.data.stop.name, this.data.direction, this.data.index)
@@ -254,10 +258,10 @@ export class BookingDialog implements OnInit, OnDestroy {
                     this.cd.markForCheck();
                     setTimeout(() => this.closeDialog(), 3000);
                 }, (resp) => {
-                    if(resp.status == 409){
+                    if (resp.status == 409) {
                         this.status = "completed";
                         this.errorMsg = "Uno dei bambini è già prenotato per questa tratta.";
-                    }else{
+                    } else {
                         this.status = "completed";
                         this.errorMsg = "Qualcosa è andato storto. Per favore riprovare più tardi.";
                     }

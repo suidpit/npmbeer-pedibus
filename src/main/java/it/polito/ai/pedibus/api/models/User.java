@@ -30,7 +30,7 @@ import java.util.List;
 
     private List<SystemAuthority> authorities;
 
-    private List<HashMap<String, String>> children;
+    private List<Child> children;
 
     private boolean enabled;
 
