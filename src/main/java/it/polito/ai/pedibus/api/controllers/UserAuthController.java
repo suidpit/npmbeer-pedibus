@@ -1,8 +1,5 @@
 package it.polito.ai.pedibus.api.controllers;
-import it.polito.ai.pedibus.api.dtos.EmailDTO;
-import it.polito.ai.pedibus.api.dtos.LoginDTO;
-import it.polito.ai.pedibus.api.dtos.NewPasswordDTO;
-import it.polito.ai.pedibus.api.dtos.UserDTO;
+import it.polito.ai.pedibus.api.dtos.*;
 import it.polito.ai.pedibus.api.events.OnRegistrationCompleteEvent;
 import it.polito.ai.pedibus.api.exceptions.EmailExistsException;
 import it.polito.ai.pedibus.api.exceptions.EmailTokenNotFoundException;
@@ -26,6 +23,7 @@ import org.springframework.web.context.request.WebRequest;
 import javax.validation.Valid;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 @RestController
@@ -179,5 +177,4 @@ public class UserAuthController {
         User user = service.getUserByEmail(emailDTO.getEmail());
         return user != null;
     }
-
 }

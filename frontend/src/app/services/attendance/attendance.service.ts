@@ -10,65 +10,59 @@ import {StopList} from "../../models/stop-list";
 import {LocalTime} from "js-joda";
 import {Stop} from "../../models/stop";
 import {Reservation} from "../../models/reservation";
+import {AuthService} from "../auth/auth.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AttendanceService {
 
+  private base_url = "http://localhost:8080";
   constructor(private http: HttpClient) {
   }
 
   lines(): Observable<Line[]> {
+
     //TODO:  This will go in a config file
-    let api_url = "http://127.0.0.1:8080/lines"
-    console.log("Requesting from service...")
-    return this.http.get<any[]>(api_url).pipe(map((data) => data.map((line) => {
-      let outwards: Array<StopList> = [];
-      let backs: Array<StopList> = [];
-      // map outwards
-      for (let out of line.outward ) {
-        let stopList = Builder(StopList)
-            .stops(out.map(function (stop) {
-              let time = LocalTime.parse(stop.time);
-              return Builder(Stop)
-                  .name(stop.name)
-                  .time(time)
-                  .position(stop.position)
-                  .build();
-            }))
-            .build();
-        outwards.push(stopList);
-      }
-
-      // map inwards
-      for (let b of line.back) {
-        let stopList = Builder(StopList)
-            .stops(b.map(function (stop) {
-              let time = LocalTime.parse(stop.time);
-              return Builder(Stop)
-                  .name(stop.name)
-                  .time(time)
-                  .position(stop.position)
-                  .build();
-            }))
-            .build();
-        backs.push(stopList);
-      }
-
-      // finally build the Line
-      return Builder(Line)
-          .id(line.id)
-          .lineName(line.name)
-          .adminEmail(line.admin_email)
-          .outward(outwards)
-          .back(backs)
-          .build();
-    })));
+    let api_url = this.base_url + "/lines";
+    return this.http.get<Line[]>(api_url).pipe(map((data) => {
+      return data.map((line) => {
+        let l = new Line(line);
+        for (let i = 0; i < l.outward.length; i++) {
+          let sl: any = l.outward[i];
+          let stops: Stop[] = [];
+          sl.forEach((s) => {
+            stops.push(
+                Builder(Stop)
+                    .name(s.name)
+                    .position(s.position)
+                    .time(LocalTime.parse(s.time))
+                    .build());
+          });
+          l.outward[i] = new StopList();
+          l.outward[i].stops = stops;
+        }
+        for (let i = 0; i < l.back.length; i++) {
+          let sl: any = l.back[i];
+          let stops: Stop[] = [];
+          sl.forEach((s) => {
+            stops.push(
+                Builder(Stop)
+                    .name(s.name)
+                    .position(s.position)
+                    .time(LocalTime.parse(s.time))
+                    .build());
+          });
+          l.back[i] = new StopList();
+          l.back[i].stops = stops;
+        }
+        return l;
+      });
+    }));
   }
 
   reservations(line: string, date): Observable<Reservations> {
-    let api_url = "http://127.0.0.1:8080/reservations/" + line + "/" + date;
+    let api_url = this.base_url+"/reservations/admin/" + line + "/" + date;
     return this.http.get<Reservations>(api_url).pipe(map(data => {
       let outwards: Array<Reservation[]> = [];
       let backs: Array<Reservation[]> = [];

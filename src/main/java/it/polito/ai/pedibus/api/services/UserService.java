@@ -1,8 +1,12 @@
 package it.polito.ai.pedibus.api.services;
 
+import it.polito.ai.pedibus.api.dtos.ChildDTO;
 import it.polito.ai.pedibus.api.dtos.EmailDTO;
+import it.polito.ai.pedibus.api.dtos.ProfileInfoDTO;
 import it.polito.ai.pedibus.api.dtos.UserDTO;
 import it.polito.ai.pedibus.api.exceptions.EmailExistsException;
+import it.polito.ai.pedibus.api.exceptions.EmailNotExistsException;
+import it.polito.ai.pedibus.api.exceptions.TooManyChildrenException;
 import it.polito.ai.pedibus.api.models.EmailVerificationToken;
 import it.polito.ai.pedibus.api.models.RecoveryToken;
 import it.polito.ai.pedibus.api.models.SystemAuthority;
@@ -22,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 
 @Service
 public class UserService implements IUserService {

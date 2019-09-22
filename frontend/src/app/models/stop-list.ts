@@ -5,6 +5,7 @@ import {LocalTime} from "js-joda";
  * Comfort class which holds the starting time for a certain series of Stops
  * **/
 export class StopList {
+
   private _stops: Stop[];
   private _startsAt: LocalTime;
   private _endsAt: LocalTime;
@@ -35,5 +36,4 @@ export class StopList {
     this._endsAt = maxTime;
     this._stops = value;
   }
-
 }

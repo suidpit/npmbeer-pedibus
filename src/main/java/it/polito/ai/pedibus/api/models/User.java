@@ -28,10 +28,19 @@ import java.util.List;
 
     private List<String> roles;
 
-    private List<HashMap<String, String>> children;
-
     private List<SystemAuthority> authorities;
 
+    private List<Child> children;
+
     private boolean enabled;
+
+    @Nullable
+    private String name;
+    @Nullable
+    private String surname;
+    @Nullable
+    private String address;
+    @Nullable
+    private String telNumber;
 
 }

@@ -11,6 +11,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.util.List;
 
 
 @Data
@@ -22,11 +23,17 @@ public class Reservation {
     @Id
     @JsonSerialize(using = ObjectIdSerializer.class)
     private ObjectId id;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="dd-MM-yyyy")
     private LocalDate date;
     private String lineName;
     // We're not sure an ID is needed here, since every stop name, in the context of a direction and tripIndex number, is unique.
-    private String childName;
+    private List<String> childName;
+
+    //TODO:
+    //Change to USER ID
+    @JsonSerialize(using = ObjectIdSerializer.class)
+    private ObjectId user;
     private Direction direction;
     private String stopName;
     // This just represents an index in the array of trips for that line, in that direction.
