@@ -75,6 +75,9 @@ import { UserPasswordSetupComponent, PizzaPartyComponent } from './components/us
 import { UnauthorizedComponent } from './components/unauthorized/unauthorized.component';
 import {NoAuthnGuard} from "./guards/no-authn-guard/no-authn-guard.service";
 import { ShiftConfirmationComponent } from './components/shifts/shift-confirmation/shift-confirmation.component';
+import { LateralmenuComponent } from './components/lateralmenu/lateralmenu.component';
+import { LayoutModule } from '@angular/cdk/layout';
+import { ProfileComponent } from './components/profileInfo/profile/profile.component';
 
 
 @NgModule({
@@ -110,6 +113,8 @@ import { ShiftConfirmationComponent } from './components/shifts/shift-confirmati
     SpinnerComponent,
     UnauthorizedComponent,
     ShiftConfirmationComponent,
+    LateralmenuComponent,
+    ProfileComponent,
   ],
   imports: [
     BrowserModule,
@@ -121,8 +126,9 @@ import { ShiftConfirmationComponent } from './components/shifts/shift-confirmati
       { path: "admin/turni", component: ShiftPageComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
       { path: "registrazioneEmail", component: NewRegistrationEmailComponent},
       { path: "impostaPassword/:token", component: UserPasswordSetupComponent},
-      { path: "prenotazione", component: ReservationsComponent},
       { path: "auth_error" , component: UnauthorizedComponent},
+      { path: "prenotazione", component: ReservationsComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
+      { path: "profilo", component: LateralmenuComponent},
       { path: "**", redirectTo: "login", pathMatch: "full"}
     ]),
     HttpClientModule,
@@ -159,6 +165,7 @@ import { ShiftConfirmationComponent } from './components/shifts/shift-confirmati
     FullCalendarModule,
     MatSnackBarModule,
     AngularResizedEventModule,
+    LayoutModule,
   ],
   providers: [MatDatepickerModule, {
     provide: HTTP_INTERCEPTORS,

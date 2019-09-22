@@ -1,48 +1,61 @@
+
 <div style="margin: auto; padding:10px; width: 100%; word-break: break-word; background-color: transparent" fxLayout="row">
-    <mat-card class="children blue-background dialog-border dialog-shadow" style="width: 30%;margin-right: 10px;">
+  <div *ngIf="status=='dialog' || status=='request'" style="background: transparent;">
+      <mat-card class="children blue-background dialog-border dialog-shadow" style="width: 30%;margin-right: 10px;">
         <mat-card-title style="color: #fc463d">
-            Bambini
+          Bambini
         </mat-card-title>
         <mat-card-content fxLayout="column" fxLayoutGap="16px">
-            <div>
-                Seleziona il bambino che vuoi prenotare
-            </div>
-            <mat-chip-list class="mat-chip-list-stacked" *ngIf="children && children.length !== 0">
-                <mat-chip *ngFor="let child of children | keyvalue" [selected]="child.value"
-                          (click)="selectChild(child.key)">{{child.key}}</mat-chip>
-            </mat-chip-list>
+          <div>
+            Seleziona il bambino che vuoi prenotare
+          </div>
+          <mat-chip-list class="mat-chip-list-stacked" *ngIf="children && children.length !== 0">
+            <mat-chip *ngFor="let child of children | keyvalue" [selected]="child.value"
+                      (click)="selectChild(child.key)">{{child.key.name}}</mat-chip>
+          </mat-chip-list>
         </mat-card-content>
-    </mat-card>
-    <mat-card fxFlex class="blue-background dialog-border dialog-shadow">
+      </mat-card>
+
+      <mat-card fxFlex class="blue-background dialog-border dialog-shadow">
 
         <mat-card-title style="color: #fc463d">
-            Dettagli Fermata
+          Dettagli Fermata
         </mat-card-title>
         <mat-card-content>
 
-            <h2>
-                Nome Fermata:
-            </h2>
-            <p>
-                {{data.stop.name}}
-            </p>
-            <h3>
-                Orario:
-            </h3>
-            <p>
-                {{data.stop.time}}
-            </p>
-            <div style="color: red; " *ngIf="errorMsg">
-                {{errorMsg}}
-            </div>
-            <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="space-between">
-                <button mat-raised-button (click)="closeDialog()">
-                    Indietro
-                </button>
-                <button mat-raised-button (click)="book()">
-                    Prenota
-                </button>
-            </div>
+          <h2>
+            Nome Fermata:
+          </h2>
+          <p>
+            {{data.stop.name}}
+          </p>
+          <h3>
+            Orario:
+          </h3>
+          <p>
+            {{data.stop.time}}
+          </p>
+          <div style="color: red; " *ngIf="errorMsg">
+            {{errorMsg}}
+          </div>
+          <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="space-between">
+            <button mat-raised-button (click)="closeDialog()">
+              Indietro
+            </button>
+            <button mat-raised-button (click)="book()">
+              Prenota
+            </button>
+          </div>
         </mat-card-content>
-    </mat-card>
+      </mat-card>
+
+      <app-spinner *ngIf="status=='request'"></app-spinner>
+    </div>
+    <div *ngIf="status=='completed'">
+        <mat-card>
+            <p>
+                {{errorMsg}}
+            </p>
+        </mat-card>
+    </div>
 </div>

@@ -37,7 +37,7 @@
 
           <ng-container matColumnDef="companion">
             <th mat-header-cell *matHeaderCellDef> Accompagnatore </th>
-            <td mat-cell *matCellDef="let elem"> {{elem.shift.companionId}} </td>
+            <td mat-cell *matCellDef="let elem"><span *ngFor="let companion of(elem.usersInfo$ | async); let isFirst = first">{{isFirst?'':','}}{{companion.email}}</span> </td>
           </ng-container>
 
           <ng-container matColumnDef="open">

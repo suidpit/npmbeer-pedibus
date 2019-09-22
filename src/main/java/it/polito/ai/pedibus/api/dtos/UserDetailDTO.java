@@ -1,6 +1,7 @@
 package it.polito.ai.pedibus.api.dtos;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import it.polito.ai.pedibus.api.models.Child;
 import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.serializers.ObjectIdSerializer;
 import lombok.Builder;
@@ -19,7 +20,7 @@ public class UserDetailDTO {
 
     private String email;
 
-    private List<HashMap<String, String>> children;
+    private List<Child> children;
 
     private boolean enabled;
 

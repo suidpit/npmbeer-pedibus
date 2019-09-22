@@ -15,18 +15,26 @@
     "children": [
       {
         "name": "Francesca",
+        "surname":"Pizzi",
+        "birthday":"11-11-1993",
         "gender": "F"
       },
       {
         "name": "Liberata",
+        "surname":"Pizzi",
+        "birthday":"11-11-1993",
         "gender": "F"
       },
       {
         "name": "Berta",
+        "surname":"Pizzi",
+        "birthday":"11-11-1993",
         "gender": "F"
       },
       {
         "name": "Simone",
+        "surname":"Pizzi",
+        "birthday":"11-11-1993",
         "gender": "M"
       }
     ],

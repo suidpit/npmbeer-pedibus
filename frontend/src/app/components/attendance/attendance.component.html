@@ -10,7 +10,7 @@
             <mat-form-field>
               <mat-label>Seleziona una linea</mat-label>
               <mat-select [(value)]="selectedLine" (valueChange)="updateData()">
-                <mat-option *ngFor="let line of lines" [value]="line">{{line.lineName}}</mat-option>
+                <mat-option *ngFor="let line of lines" [value]="line">{{line.name}}</mat-option>
               </mat-select>
             </mat-form-field>
             <span class="fill-row"></span>
@@ -68,9 +68,7 @@
                                   [type]="'intermediate'"
                                   [children]="reservedStops['outward'][i][j]"
                                   [stop-name]="stop.name"
-                                  [stop-time]="stop.time"
-                                  (child-presence)="logEvent($event)"
-                                  (add-child)="logEvent($event)"></app-stop-row>
+                                  [stop-time]="stop.time"></app-stop-row>
                   </mat-list-item>
                   <mat-list-item>
                     <app-stop-row [type]="'dots'"></app-stop-row>
@@ -95,9 +93,7 @@
                                   [type]="'intermediate'"
                                   [children]="reservedStops['back'][i][j]"
                                   [stop-name]="stop.name"
-                                  [stop-time]="stop.time"
-                                  (child-presence)="logEvent($event)"
-                                  (add-child)="logEvent($event)"></app-stop-row>
+                                  [stop-time]="stop.time"></app-stop-row>
                   </mat-list-item>
                   <mat-list-item>
                     <app-stop-row [type]="'dots'"></app-stop-row>

@@ -57,7 +57,8 @@ export class ShiftService {
   }
 
   updateCalendarShifts(startDate: Date){
-    let start = LocalDate.of(startDate.getFullYear(), startDate.getMonth()+1, startDate.getDate());
+    // take always the whole month.
+    let start = LocalDate.of(startDate.getFullYear(), startDate.getMonth()+1, 1);
     // let start = LocalDateTime.ofEpochSecond(startDate.valueOf()/1000+1, ZoneOffset.of());
     // backend compliant string
     let dateString =("0" + start.dayOfMonth()).slice(-2) +
@@ -246,7 +247,7 @@ export class ShiftService {
               for(let tripIndex in line.outward){
                 new_shift = new Shift();
                 new_shift.date = date;
-                new_shift.lineName = line.lineName;
+                new_shift.lineName = line.name;
                 new_shift.direction = "OUTWARD";
                 new_shift.tripIndex = tripIndex;
                 new_shift.startsAt = line.outward[tripIndex].startsAt;
@@ -258,7 +259,7 @@ export class ShiftService {
                 // filter shifts finding all elements which are equal to new_shift. If any exists, don't add event.
                 if (shifts.filter(elem => new_shift.compareTo(elem.shift)).length <= 0) {
 
-                  new_shift.color = this.getBackgroundColor(new_shift, line.lineName);
+                  new_shift.color = this.getBackgroundColor(new_shift, line.name);
                   new_shift.classNames = ["white-border"];
                   new_shift.disabled = new_shift.color === Colors.GRAY;
 
@@ -277,7 +278,7 @@ export class ShiftService {
               for(let tripIndex in line.back){
                 new_shift = new Shift();
                 new_shift.date = date;
-                new_shift.lineName = line.lineName;
+                new_shift.lineName = line.name;
                 new_shift.direction = "BACK";
                 new_shift.tripIndex = tripIndex;
                 new_shift.startsAt = line.back[tripIndex].startsAt;
@@ -288,7 +289,7 @@ export class ShiftService {
 
                 if (shifts.filter(elem => new_shift.compareTo(elem.shift)).length <= 0) {
 
-                  new_shift.color = this.getBackgroundColor(new_shift, line.lineName);
+                  new_shift.color = this.getBackgroundColor(new_shift, line.name);
                   new_shift.classNames = ["white-border"];
                   new_shift.disabled = new_shift.color === Colors.GRAY;
 

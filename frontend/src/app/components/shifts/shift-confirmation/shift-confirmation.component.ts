@@ -8,6 +8,8 @@ import {promise} from "selenium-webdriver";
 import checkedNodeCall = promise.checkedNodeCall;
 import {MatPaginator, MatSnackBar, MatSort, MatTableDataSource} from "@angular/material";
 import {Data} from "@angular/router";
+import {User} from "../../../models/user";
+import {AuthService} from "../../../services/auth/auth.service";
 
 @Component({
   selector: 'app-shift-confirmation',
@@ -34,7 +36,7 @@ export class ShiftConfirmationComponent implements OnInit {
 
   n = 0;
 
-  constructor(public shiftService: ShiftService, private _snackBar: MatSnackBar) {
+  constructor(public shiftService: ShiftService, private auth: AuthService, private _snackBar: MatSnackBar) {
   }
 
   ngOnInit() {
@@ -46,7 +48,7 @@ export class ShiftConfirmationComponent implements OnInit {
     this.shiftService.getShifts().subscribe((shifts)=>{
       let arr = [];
       for(let s of shifts){
-        arr.push(new DataHolder(s, false));
+        arr.push(new DataHolder(s, false, this.auth.getUsersDetails([s.companionId])));
       }
       this.dataSource = new MatTableDataSource<DataHolder>(arr);
       this.dataSource.sort = this.sort;
@@ -132,8 +134,10 @@ export class ShiftConfirmationComponent implements OnInit {
 export class DataHolder{
   public shift: Shift;
   public checked: boolean;
-  constructor(s: Shift, c: boolean){
+  public usersInfo$: Observable<User[]>;
+  constructor(s: Shift, c: boolean, userInfo$: Observable<User[]>){
     this.shift = s;
     this.checked = c;
+    this.usersInfo$ = userInfo$;
   }
 }
