@@ -1,6 +1,6 @@
 <div class="shift-container">
   <div class="datetime-container p-4">{{shift.date.dayOfWeek()}} {{shift.date.dayOfMonth()}} {{shift.date.month()}}
-    ore {{("0"+shift.date.hour()).slice(-2)}}:{{("0"+shift.date.minute()).slice(-2)}}</div>
+    ore {{("0"+shift.startsAt.hour()).slice(-2)}}:{{("0"+shift.startsAt.minute()).slice(-2)}}</div>
   <mat-divider [inset]="true"></mat-divider>
 
   <div class="line-container p-4">{{shift.lineName}}</div>

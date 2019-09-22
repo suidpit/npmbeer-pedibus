@@ -1,12 +1,14 @@
 package it.polito.ai.pedibus.api.controllers;
 
 import it.polito.ai.pedibus.api.dtos.ShiftRequestDTO;
-import it.polito.ai.pedibus.api.exceptions.LineNotExistingException;
+import it.polito.ai.pedibus.api.exceptions.*;
 import it.polito.ai.pedibus.api.models.Line;
 import it.polito.ai.pedibus.api.models.Shift;
+import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.ShiftRepository;
 import it.polito.ai.pedibus.api.services.LineService;
 import it.polito.ai.pedibus.api.services.ShiftService;
+import it.polito.ai.pedibus.api.services.UserService;
 import it.polito.ai.pedibus.security.CustomUserDetails;
 import it.polito.ai.pedibus.security.LineGrantedAuthority;
 import org.bson.types.ObjectId;
@@ -14,11 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -30,6 +34,7 @@ public class ShiftController {
     private final ShiftRepository shiftRepository;
     private final LineService lineService;
     private final ShiftService shiftService;
+    private final UserService userService;
 
     @Qualifier("fmt")
     private final DateTimeFormatter fmt;
@@ -37,10 +42,13 @@ public class ShiftController {
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    public ShiftController(ShiftRepository shiftRepository, LineService lineService, ShiftService shiftService, DateTimeFormatter fmt) {
+    public ShiftController(ShiftRepository shiftRepository, LineService lineService,
+                           ShiftService shiftService, UserService userService,
+                           DateTimeFormatter fmt) {
         this.shiftRepository = shiftRepository;
         this.lineService = lineService;
         this.shiftService = shiftService;
+        this.userService = userService;
         this.fmt = fmt;
     }
 
@@ -56,6 +64,27 @@ public class ShiftController {
         return purgeShifts(shifts);
     }
 
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN') or hasAuthority('COMPANION')")
+    @RequestMapping(value = "/assigned/{date}/{id}", method = RequestMethod.GET)
+    public List<Shift> getShiftsByIdAndAfterDate(@PathVariable("date") String dateString,
+                                                 @PathVariable("id") String idString){
+
+        CustomUserDetails usr = ((CustomUserDetails)SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal());
+
+        ObjectId userId = usr.getId();
+        ObjectId id = new ObjectId(idString);
+
+        if(!userId.equals(id)){
+            throw new DeniedOperationException();
+        }
+
+        LocalDate date = LocalDate.parse(dateString, this.fmt);
+        List<Shift> shifts = this.shiftService.getAllShiftsAfterDateByCompanionId(date, userId);
+
+        return purgeShifts(shifts);
+    }
+
 
     @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN') or hasAuthority('COMPANION')")
     @RequestMapping(value = "/{lineName}/{date}", method = RequestMethod.GET)
@@ -63,7 +92,7 @@ public class ShiftController {
                                  @PathVariable("date") String dateString){
 
         LocalDate date = LocalDate.parse(dateString, this.fmt);
-        List<Shift> shifts = shiftRepository.findByDateAfterAndLineName(lineName, date);
+        List<Shift> shifts = shiftRepository.findByDateGreaterThanEqualAndLineName(lineName, date);
 
         return purgeShifts(shifts);
     }
@@ -100,6 +129,7 @@ public class ShiftController {
 
                 s.setLineName(sDTO.getLineName());
                 s.setDate(sDTO.getDate());
+                s.setDefaultCompanion(l.getAdmin_email());
                 s.setCompanionId(null);
                 s.setOpen(true);
                 s.setDirection(sDTO.getDirection());
@@ -128,10 +158,104 @@ public class ShiftController {
         return ids;
     }
 
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN') or hasAuthority('COMPANION')")
+    @RequestMapping(value = "/cancel_availability", method = RequestMethod.POST)
+    public void cancelAvailability(@RequestBody ShiftRequestDTO shiftRequestDTO){
+        CustomUserDetails usr = ((CustomUserDetails)SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal());
+
+        ObjectId userId = usr.getId();
+        Shift s;
+        // Shift was in db already
+        if(shiftRequestDTO.getShiftId() != null){
+            s = this.shiftService.getShiftById(shiftRequestDTO.getShiftId());
+            if(s != null){
+                if(s.getCompanionId() != null && s.getCompanionId().equals(userId)){
+                    // cannot cancel availability if you were assigned to shift
+                    throw new DeniedOperationException();
+                }
+                List<ObjectId> availabilities = s.getAvailabilities();
+                availabilities.remove(userId);
+                s.setAvailabilities(availabilities);
+                this.shiftService.insertOrUpdateShift(s);
+            }
+        }
+        else{
+            throw new WrongFormatException();
+        }
+    }
+
+
     @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN')")
-    @RequestMapping(value = "/confirm", method = RequestMethod.POST)
-    public void postShiftConfirmation(){
-        // TODO remember to check if it is admin for that line.
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping(value = "/confirm", headers = "Accept=application/json", method = RequestMethod.POST)
+    public void postShiftConfirmation(@RequestBody @Valid ShiftRequestDTO shiftRequestDTO){
+        // TODO send notification to user.
+        if(canView(shiftRequestDTO.getLineName())){
+            if(shiftRequestDTO.getShiftId() != null){
+                Shift s = this.shiftService.getShiftById(shiftRequestDTO.getShiftId());
+                User u = this.userService.getUserByEmail(shiftRequestDTO.getAssignedCompanionEmail());
+                if(u != null){
+                    s.setCompanionId(u.getId());
+                    s.setOpen(true);
+                    if(shiftRequestDTO.getTo() == null || shiftRequestDTO.getTo().hasNullFields() || s.getTo().equals(shiftRequestDTO.getTo())){
+                        this.shiftService.insertOrUpdateShift(s);
+                    }
+                    else{
+                        // create complementary shift.
+                        try{
+                            Shift complementary_shift = (Shift) s.clone();
+                            complementary_shift.setId(null);
+                            complementary_shift.setCompanionId(null);
+                            complementary_shift.setFrom(shiftRequestDTO.getTo());
+                            s.setTo(shiftRequestDTO.getTo());
+                            this.shiftService.insertOrUpdateShift(s);
+                            this.shiftService.insertOrUpdateShift(complementary_shift);
+                        }
+                        catch(Exception e){
+                            // TODO create complementary shift anew (no clone).
+                        }
+                    }
+                }
+                else{
+                    throw new NoSuchUserException();
+                }
+            }
+            else{
+                throw new WrongFormatException();
+            }
+        }
+        else{
+            throw new UnauthorizedLineActionException();
+        }
+    }
+
+
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN')")
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping(value = "/toggle-open", headers = "Accept=application/json", method = RequestMethod.POST)
+    public void postOpenCloseShift(@RequestBody ShiftRequestDTO[] shiftRequestDTOs){
+        for(ShiftRequestDTO sDTO: shiftRequestDTOs){
+            try {
+                Shift s = this.shiftService.getShiftById(sDTO.getShiftId());
+                if(this.canView(s.getLineName())){
+                    if(s.getCompanionId()!=null){
+                        s.setOpen(sDTO.isOpen());
+                        // TODO improve by using saveAll => one db query only.
+                        this.shiftService.insertOrUpdateShift(s);
+                    }
+                    else{
+                        throw new DeniedOperationException();
+                    }
+                }
+                else {
+                    throw new UnauthorizedLineActionException();
+                }
+            }
+            catch(NullPointerException e){
+                throw new WrongFormatException();
+            }
+        }
     }
 
     private List<Shift> purgeShifts(List<Shift> shifts){

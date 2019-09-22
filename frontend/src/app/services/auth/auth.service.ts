@@ -166,8 +166,8 @@ export class AuthService {
     return from(ids).pipe(
       mergeMap((id) => this.http.get(this.retrieve_user_url+id)),
       mergeMap((user) =>{
-        let u = new User(user.id, user.email);
-        u.children = user.children;
+        let u = new User(user['id'], user['email']);
+        u.children = user['children'];
         return of(u);
       }),
       toArray()

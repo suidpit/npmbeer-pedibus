@@ -1,4 +1,4 @@
-<mat-tab-group>
+<mat-tab-group (selectedTabChange)="onTabChanged($event)">
 
   <mat-tab label="I Miei Turni">
     <ng-template matTabContent>
@@ -23,7 +23,9 @@
 
   <mat-tab label="Convalida Turni">
     <ng-template matTabContent>
-      solo admin di almeno una linea mi vedrà.
+      <div class="shift-tab-container center" style="margin: 0 auto;">
+        <app-shift-confirmation #confirm></app-shift-confirmation>
+      </div>
     </ng-template>
   </mat-tab>
 </mat-tab-group>

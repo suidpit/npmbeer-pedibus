@@ -2,7 +2,14 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AngularResizedEventModule} from 'angular-resize-event';
-import { MatBadgeModule } from "@angular/material";
+import {
+  MatBadgeModule,
+  MatExpansionModule,
+  MatFormFieldModule,
+  MatPaginatorModule,
+  MatSortModule,
+  MatTableModule
+} from "@angular/material";
 import {MatButtonModule} from '@angular/material/button';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatCardModule} from '@angular/material/card';
@@ -67,6 +74,7 @@ import {
 import { UserPasswordSetupComponent, PizzaPartyComponent } from './components/user-password-setup/user-password-setup.component';
 import { UnauthorizedComponent } from './components/unauthorized/unauthorized.component';
 import {NoAuthnGuard} from "./guards/no-authn-guard/no-authn-guard.service";
+import { ShiftConfirmationComponent } from './components/shifts/shift-confirmation/shift-confirmation.component';
 
 
 @NgModule({
@@ -101,6 +109,7 @@ import {NoAuthnGuard} from "./guards/no-authn-guard/no-authn-guard.service";
     StopElementComponent,
     SpinnerComponent,
     UnauthorizedComponent,
+    ShiftConfirmationComponent,
   ],
   imports: [
     BrowserModule,
@@ -139,6 +148,11 @@ import {NoAuthnGuard} from "./guards/no-authn-guard/no-authn-guard.service";
     MatToolbarModule,
     MatSidenavModule,
     MatDialogModule,
+    MatSortModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatFormFieldModule,
+    MatExpansionModule,
     FlexLayoutModule,
     CdkStepperModule,
     MatStepperModule,

@@ -14,6 +14,7 @@ export class Stop{
 
   set position(value: {}) {
     this._position = value;
+
   }
   set time(value: LocalTime) {
     this._time = value;
@@ -43,5 +44,13 @@ export class Stop{
     if(this._time.compareTo(stop.time) !== 0) return false;
     if(!deepEqual(this._position, stop.position)) return false;
     return true;
+  }
+
+  public compareByToString(s: string){
+    return this.toString() === s;
+  }
+
+  public toString(){
+    return "[" + (this._time?this._time.toString():"--:--") + "] " + (this.name?this.name:"no-name");
   }
 }

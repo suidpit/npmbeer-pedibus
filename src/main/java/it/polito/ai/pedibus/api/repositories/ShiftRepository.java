@@ -18,11 +18,11 @@ public interface ShiftRepository extends MongoRepository<Shift, String> {
     List<Shift> findByLineNameAndCompanionIdAndDateBetween(String lineName, LocalDate date1,
                                                            LocalDate date2, ObjectId companionId);
 
-    List<Shift> findByDateAfterAndLineName(String lineName, LocalDate date);
+    List<Shift> findByDateGreaterThanEqualAndLineName(String lineName, LocalDate date);
 
-    List<Shift> findByDateAfterAndCompanionId(LocalDate date, ObjectId companionId);
+    List<Shift> findByDateGreaterThanEqualAndCompanionId(LocalDate date, ObjectId companionId);
 
-    List<Shift> findByDateAfter(LocalDate date);
+    List<Shift> findByDateGreaterThanEqual(LocalDate date);
 
     Shift findById(ObjectId id);
 }

@@ -1,5 +1,5 @@
 export class Colors {
-  static RED = "#e3170a";
+  static RED = "#a00a00";//"#e3170a";
   static ORANGE = "#f75c03";
   static YELLOW = "#fca311";
   static GREEN = "#1bc249";

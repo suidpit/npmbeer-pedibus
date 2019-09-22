@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.models.Shift;
 import it.polito.ai.pedibus.api.models.Stop;
+import lombok.Builder;
 import lombok.Data;
 import org.bson.types.ObjectId;
 
@@ -18,20 +19,22 @@ public class ShiftRequestDTO {
     private ObjectId shiftId;
 
     @NotNull
-    @NotEmpty
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
     @NotNull
-    @NotEmpty
     private String lineName;
 
     @NotNull
-    @NotEmpty
     private Shift.Direction direction;
 
     @NotNull
-    @NotEmpty
     private Integer tripIndex;
+
+    private String assignedCompanionEmail;
+
+    private Stop to;
+
+    private boolean open;
 
 }

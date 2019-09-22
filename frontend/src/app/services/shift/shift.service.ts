@@ -16,6 +16,7 @@ import {Stop} from "../../models/stop";
 import {collectExternalReferences} from "@angular/compiler";
 import {AttendanceService} from "../attendance/attendance.service";
 import {Role} from "../../models/authority";
+import {of} from "rxjs/internal/observable/of";
 
 @Injectable({
   providedIn: 'root'
@@ -46,53 +47,128 @@ export class ShiftService {
 
   private availabilities_subject: Subject<any[]> = new BehaviorSubject([]);
   availabilities$: Observable<any[]> = this.availabilities_subject.asObservable();
+
   private currentStartDate: Date;
   private currentEndDate: Date;
 
   constructor(private lineService: AttendanceService, private auth: AuthService, private http: HttpClient) {
-    for(let j = 0; j < 10; j++){
-      let shift = new Shift();
+    this.updateCalendarShifts(new Date());
+    this.buildUpcomingEvents();
+  }
 
-      let i = this.randomIntFromInterval(0,7);
-      let dt = LocalDateTime.now();
+  updateCalendarShifts(startDate: Date){
+    let start = LocalDate.of(startDate.getFullYear(), startDate.getMonth()+1, startDate.getDate());
+    // let start = LocalDateTime.ofEpochSecond(startDate.valueOf()/1000+1, ZoneOffset.of());
+    // backend compliant string
+    let dateString =("0" + start.dayOfMonth()).slice(-2) +
+      ("0" + start.monthValue()).slice(-2) +
+      start.year();
 
-      dt = dt.plusDays(i);
+    let uid = this.auth.getCurrentUser().id;
+    this.http.get<any[]>(`${this.shift_url}/assigned/${dateString}/${uid}`).subscribe((retrieved_shifts)=>{
+      let events = [];
+      for(let s of retrieved_shifts){
+        let from = new Stop();
+        from.position = s.from.position;
+        from.time = LocalTime.parse(s.from.time);
+        from.name = s.from.name;
 
-      shift.date = dt;
-      shift.companionId = this.auth.getCurrentUser().id;
-      shift.availabilities = [this.auth.getCurrentUser().id];
-      shift.open = false;
+        let to = new Stop();
+        to.position = s.to.position;
+        to.time = LocalTime.parse(s.to.time);
+        to.name = s.to.name;
 
-      i = this.randomIntFromInterval(0,2);
-      shift.lineName = this.line_names[i];
+        let shift = new Shift();
+        let date = LocalDate.parse(s.date, DateTimeFormatter.ofPattern("d-M-yyyy"));
+        shift.id = s.id;
+        shift.date = date;
+        shift.lineName = s.lineName;
+        shift.direction = s.direction;
+        shift.tripIndex = s.tripIndex;
+        shift.open = s.open;
+        shift.from = from;
+        shift.to = to;
+        shift.startsAt = from.time;
+        shift.endsAt = to.time;
+        shift.availabilities = this.auth.getUsersDetails(s.availabilities);
+        shift.companionId = s.companionId;
+        shift.defaultCompanion = s.defaultCompanion;
 
-      i = this.randomIntFromInterval(0,1);
-      shift.direction = this.directions[i];
-      this.shifts.push(shift);
-    }
+        let color = this.getBackgroundColor(shift, s.lineName, s.availabilities);
+        shift.color = color === Colors.GREEN?Colors.GREEN : Colors.BLUE;
 
-    this.shifts.sort((a, b) => a.date.isBefore(b.date)? -1:+1);
-    for(let s of this.shifts) {
-      let title = "";
-      title += ("0" + s.date.hour()).slice(-2) + ":" + ("0" + s.date.minute()).slice(-2);
-      title += " " + s.lineName + " " + s.direction;
-      let date = s.date.year() +
-        "-" + ("0" + s.date.monthValue()).slice(-2) +
-        "-" + ("0" + s.date.dayOfMonth()).slice(-2);
-      this.events.push({
-        title: title,
-        date: date
-      });
-    }
+        let dateString = date.year() +
+          "-" + ("0" + date.monthValue()).slice(-2) +
+          "-" + ("0" + date.dayOfMonth()).slice(-2);
 
-    this.shifts_subject.next(this.shifts);
-    this.calendar_shifts_subject.next(this.events);
+        let event = {
+          date: dateString,
+          title: shift.startsAt.toString() + " - " + shift.endsAt.toString() + " " + shift.lineName + " " + shift.direction,
+          shift: shift,
+          color: shift.color
+        };
+        events.push(event);
+      }
+      this.calendar_shifts_subject.next(events);
+    });
+  }
+
+  buildUpcomingEvents(){
+    let startDate = new Date();
+    let start = LocalDate.of(startDate.getFullYear(), startDate.getMonth()+1, startDate.getDate());
+    // let start = LocalDateTime.ofEpochSecond(startDate.valueOf()/1000+1, ZoneOffset.of());
+    // backend compliant string
+    let dateString =("0" + start.dayOfMonth()).slice(-2) +
+      ("0" + start.monthValue()).slice(-2) +
+      start.year();
+
+    let uid = this.auth.getCurrentUser().id;
+    this.http.get<any[]>(`${this.shift_url}/assigned/${dateString}/${uid}`).subscribe((retrieved_shifts)=>{
+      let shifts = [];
+      for(let s of retrieved_shifts){
+        let from = new Stop();
+        from.position = s.from.position;
+        from.time = LocalTime.parse(s.from.time);
+        from.name = s.from.name;
+
+        let to = new Stop();
+        to.position = s.to.position;
+        to.time = LocalTime.parse(s.to.time);
+        to.name = s.to.name;
+
+        let shift = new Shift();
+        let date = LocalDate.parse(s.date, DateTimeFormatter.ofPattern("d-M-yyyy"));
+        shift.id = s.id;
+        shift.date = date;
+        shift.lineName = s.lineName;
+        shift.direction = s.direction;
+        shift.tripIndex = s.tripIndex;
+        shift.open = s.open;
+        shift.from = from;
+        shift.to = to;
+        shift.startsAt = from.time;
+        shift.endsAt = to.time;
+        shift.availabilities = this.auth.getUsersDetails(s.availabilities);
+        shift.companionId = s.companionId;
+        shift.defaultCompanion = s.defaultCompanion;
+
+        let color = this.getBackgroundColor(shift, s.lineName, s.availabilities);
+        shift.color = color === Colors.GREEN?Colors.GREEN : Colors.BLUE;
+
+        shifts.push(shift);
+      }
+      this.shifts_subject.next(shifts);
+    });
   }
 
   // TODO implement end date.
-  buildShifts(startDate: Date, endDate: Date){
-    this.currentStartDate = startDate;
-    this.currentEndDate = endDate;
+  buildShifts(startDate: Date=null, endDate: Date=null){
+
+    if(startDate === null) startDate = this.currentStartDate;
+    else this.currentStartDate = startDate;
+    if(endDate === null) endDate = this.currentEndDate;
+    else this.currentEndDate = endDate;
+
     let start = LocalDate.of(startDate.getFullYear(), startDate.getMonth()+1, startDate.getDate());
     // let start = LocalDateTime.ofEpochSecond(startDate.valueOf()/1000+1, ZoneOffset.of());
     // backend compliant string
@@ -127,17 +203,19 @@ export class ShiftService {
         shift.endsAt = to.time;
         shift.availabilities = this.auth.getUsersDetails(s.availabilities);
         shift.companionId = s.companionId;
+        shift.defaultCompanion = s.defaultCompanion;
 
         let color = this.getBackgroundColor(shift, s.lineName, s.availabilities);
+        shift.color = color;
+        shift.disabled = color === Colors.GRAY;
 
         // black border if user had expressed availability for this shift.
-        if(s.availabilities && s.availabilities.indexOf(this.auth.getCurrentUser().id) !== -1){
+        if(!shift.disabled && s.availabilities && s.availabilities.indexOf(this.auth.getCurrentUser().id) !== -1){
           shift.classNames = ["black-border"];
+          shift.subscribed = true;
         }
         else shift.classNames = ["white-border"];
 
-        shift.color = color;
-        shift.disabled = color === Colors.GRAY;
 
         let dateString = date.year() +
           "-" + ("0" + date.monthValue()).slice(-2) +
@@ -175,9 +253,9 @@ export class ShiftService {
                 new_shift.endsAt = line.outward[tripIndex].endsAt;
                 new_shift.from = line.outward[tripIndex].stops[0];
                 new_shift.to = line.outward[tripIndex].stops[line.outward[tripIndex].stops.length - 1];
+                new_shift.defaultCompanion = line.adminEmail;
 
-                // finds the index of the first element satisfying the passed callback criterion, otherwise -1
-                // in this case we don't want to add a shift if there was one with the same specifications already
+                // filter shifts finding all elements which are equal to new_shift. If any exists, don't add event.
                 if (shifts.filter(elem => new_shift.compareTo(elem.shift)).length <= 0) {
 
                   new_shift.color = this.getBackgroundColor(new_shift, line.lineName);
@@ -206,6 +284,7 @@ export class ShiftService {
                 new_shift.endsAt = line.back[tripIndex].endsAt;
                 new_shift.from = line.back[tripIndex].stops[0];
                 new_shift.to = line.back[tripIndex].stops[line.back[tripIndex].stops.length - 1];
+                new_shift.defaultCompanion = line.adminEmail;
 
                 if (shifts.filter(elem => new_shift.compareTo(elem.shift)).length <= 0) {
 
@@ -234,7 +313,7 @@ export class ShiftService {
 
   private getBackgroundColor(shift: Shift, lineName: string, availabilities = []){
     let color = "";
-    if(shift.date.isBefore(LocalDate.now(ZoneId.of("+01:00")))){
+    if(shift.date.isBefore(LocalDate.now(ZoneId.of("+01:00"))) || shift.date.isEqual(LocalDate.now(ZoneId.of("+01:00")))){
       // Old shifts are not to be expresses availabilities for.
       color = Colors.GRAY;
     }
@@ -257,97 +336,7 @@ export class ShiftService {
     }
     return color;
   }
-/*
-  updateAvailabilties(startDate: Date, endDate: Date){
-    this.lineService.lines().subscribe((lines) => console.log(lines));
-    let start = LocalDateTime.ofEpochSecond(startDate.valueOf()/1000, ZoneOffset.UTC);
-    let end = LocalDateTime.ofEpochSecond(endDate.valueOf()/1000, ZoneOffset.UTC);
-    let avail = [];
-    let avail_events = [];
-    for(let j = 0; j < 10; j++){
-      let shift = new Shift();
 
-      let i = this.randomIntFromInterval(0,7);
-
-      let dt = start;
-      dt = dt.plusDays(i);
-
-      shift.date = dt;
-
-      i = this.randomIntFromInterval(0,1);
-      let flag = i===0;
-      if(flag){
-        shift.availabilities = [this.auth.getCurrentUser().id];
-        i = this.randomIntFromInterval(0,1);
-        flag = i===0;
-        shift.companionId = flag?this.auth.getCurrentUser().id:"";
-        i = this.randomIntFromInterval(0,1);
-        flag = i===0;
-        shift.open = flag;
-      }
-      else{
-        shift.availabilities = [];
-        shift.companionId = "";
-        shift.open = true;
-      }
-
-      let color = "";
-      if(!shift.open){
-        color = Colors.GREEN;
-      }
-      else{
-        if(shift.companionId !== ""){
-          color = Colors.BLUE;
-        }
-        else{
-          if(shift.availabilities.length > 0){
-            color = Colors.YELLOW;
-          }
-          else{
-            color = Colors.RED;
-          }
-        }
-      }
-
-      if(shift.availabilities.indexOf(this.auth.getCurrentUser().id) !== -1){
-        shift.classNames = ["black-border"];
-      }
-      else shift.classNames = ["white-border"];
-
-      shift.color = color;
-
-      i = this.randomIntFromInterval(0,1);
-      flag = i===0;
-      shift.availabilities = [flag?this.auth.getCurrentUser():null];
-
-      if(shift.availabilities.length)
-      i = this.randomIntFromInterval(0,2);
-      shift.lineName = this.line_names[i];
-
-      i = this.randomIntFromInterval(0,1);
-      shift.direction = this.directions[i];
-      avail.push(shift);
-    }
-
-    avail.sort((a, b) => a.date.isBefore(b.date)? -1:+1);
-    for(let s of avail) {
-      let title = "";
-      title += ("0" + s.date.hour()).slice(-2) + ":" + ("0" + s.date.minute()).slice(-2);
-      title += " " + s.lineName + " " + s.direction;
-      let date = s.date.year() +
-        "-" + ("0" + s.date.monthValue()).slice(-2) +
-        "-" + ("0" + s.date.dayOfMonth()).slice(-2);
-      avail_events.push({
-        title: title,
-        date: date,
-        color: s.color,
-        classNames: s.classNames,
-        shift: s
-      });
-    }
-    this.availabilities_subject.next(avail_events);
-  }
-*/
   randomIntFromInterval(min, max) { // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
@@ -366,11 +355,42 @@ export class ShiftService {
 
   sendShiftAvailability(s: Shift){
     let body = {shiftId: s.id, date:s.date, lineName: s.lineName, direction:s.direction, tripIndex: s.tripIndex};
-    this.http.post(this.availabilty_url,
-      [body])
-      .subscribe(() => {
-        this.buildShifts(this.currentStartDate, this.currentEndDate);
-        // TODO successful insertion feedback
-      });
+    return this.http.post(this.availabilty_url, [body]);
+  }
+
+  cancelShiftAvailability(s: Shift){
+    if(s.id === null || s.id === undefined || s.id === ""){
+      console.error("Invalid Shift to cancel availability from.");
+      return;
+    }
+    let body = {shiftId: s.id, date:s.date, lineName: s.lineName, direction:s.direction, tripIndex: s.tripIndex};
+    return this.http.post(`${this.shift_url}/cancel_availability`, body);
+  }
+
+  sendShiftAssignment(s: Shift, assigned_user: string, arrival_stop: Stop){
+    let stop = {};
+    if(arrival_stop != null) {
+      let coords = {type: arrival_stop.position['type'], coordinates: arrival_stop.position['coordinates']};
+      stop = {name: arrival_stop.name, position: coords, time: arrival_stop.time};
+    }
+
+    let body = {
+      shiftId: s.id,
+      date:s.date,
+      lineName: s.lineName,
+      direction:s.direction,
+      tripIndex: s.tripIndex,
+      assignedCompanionEmail: assigned_user,
+      to: stop};
+    console.log(body);
+    return this.http.post(`${this.shift_url}/confirm`, body);
+  }
+
+  sendOpenCloseShifts(shifts: Shift[]){
+    let body = [];
+    for(let s of shifts){
+      body.push({shiftId: s.id, open: s.open});
+    }
+    return this.http.post(`${this.shift_url}/toggle-open`, body);
   }
 }

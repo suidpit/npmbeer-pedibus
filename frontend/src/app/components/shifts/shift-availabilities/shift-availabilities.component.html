@@ -7,7 +7,21 @@
       Seleziona destra o sinistra per scorrere le settimane
     </mat-card-subtitle>
   </mat-card-header>
-  <mat-card-content fxLayoutAlign="center center">
+  <mat-card-content fxLayout="column" fxLayoutAlign="center center">
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Legenda
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <p [hidden]="!isAdmin"><span class="legend red"></span> Nessuna disponibilità presente</p>
+      <p [hidden]="!isAdmin"><span class="legend yellow"></span> Disponibilità presenti, nessun assegnato</p>
+      <p [hidden]="!isAdmin"><span class="legend dark-blue"></span> Turno assegnato, ma aperto</p>
+      <p><span class="legend green"></span> Turno assegnato e chiuso</p>
+      <p><span class="legend blue"></span> Turno assegnato per cui non ho espresso disponibilità e non sono amministratore</p>
+      <p><span class="legend black-border"></span> Turno per cui ho espresso disponibilità</p>
+      <p><span class="legend gray"></span> Turno passato e non modificabile</p>
+    </mat-expansion-panel>
     <div class="availabilities-container" >
       <full-calendar defaultView="dayGridWeek" (eventClick)="eventShowPopup($event)"
                      [plugins]="plugins" [hiddenDays]="[0]"

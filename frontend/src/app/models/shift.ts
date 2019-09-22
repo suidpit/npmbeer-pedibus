@@ -10,6 +10,7 @@ export class Shift {
   lineName: string;
   direction: string;
   tripIndex: number;
+  defaultCompanion: string;
   availabilities: Observable<User[]>;
   open: boolean = true;
   companionId: string;
@@ -20,6 +21,7 @@ export class Shift {
   color: string;  // color to use in calendar
   classNames: string[];  // css classes to use in calendar
   disabled: boolean = false;
+  subscribed: boolean = false;
 
   public compareTo(__shift: Shift){
     if(this.id !== undefined && __shift.id !== undefined && this.id === __shift.id) return true;
@@ -27,8 +29,8 @@ export class Shift {
     if(!(this.lineName === __shift.lineName)) return false;
     if(!(this.direction === __shift.direction)) return false;
     if(!(this.tripIndex == __shift.tripIndex)) return false;
-    if(!this.from.compareTo(__shift.from)) return false;
-    if(!this.to.compareTo(__shift.to)) return false;
+    //if(!this.from.compareTo(__shift.from)) return false;
+    //if(!this.to.compareTo(__shift.to)) return false;
     return true;
   }
 }

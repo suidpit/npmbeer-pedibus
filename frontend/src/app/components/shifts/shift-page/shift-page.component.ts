@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {ShiftConfirmationComponent} from "../shift-confirmation/shift-confirmation.component";
+import {MatTabChangeEvent} from "@angular/material";
 
 @Component({
   selector: 'app-shift-page',
@@ -7,9 +9,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ShiftPageComponent implements OnInit {
 
+  @ViewChild("confirm", {static: true}) confirmTab: ShiftConfirmationComponent;
+
   constructor() { }
 
   ngOnInit() {
+  }
+
+  onTabChanged(event: MatTabChangeEvent){
   }
 
 }

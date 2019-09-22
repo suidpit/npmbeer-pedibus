@@ -13,13 +13,14 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
 import java.time.LocalDate;
 import java.util.List;
 
 
 @Data
 @Document(collection = "shifts")
-public class Shift {
+public class Shift implements Cloneable{
     public enum Direction {OUTWARD, BACK}
 
     @Id
@@ -45,5 +46,13 @@ public class Shift {
     @JsonSerialize(using = ObjectIdListSerializer.class)
     private List<ObjectId> availabilities;
 
+    @Email
+    private String defaultCompanion;
+
     private boolean open;
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }
