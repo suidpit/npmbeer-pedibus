@@ -78,6 +78,7 @@ import { ShiftConfirmationComponent } from './components/shifts/shift-confirmati
 import { LateralmenuComponent } from './components/lateralmenu/lateralmenu.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import { ProfileComponent } from './components/profileInfo/profile/profile.component';
+import { HomeComponent } from './components/home/home.component';
 
 
 @NgModule({
@@ -115,11 +116,13 @@ import { ProfileComponent } from './components/profileInfo/profile/profile.compo
     ShiftConfirmationComponent,
     LateralmenuComponent,
     ProfileComponent,
+    HomeComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     RouterModule.forRoot([
+      { path: "home", component: HomeComponent},
       { path: "login", component: LoginComponent, canActivate: [NoAuthnGuard]},
       { path: "presenze", component: AttendanceComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
       { path: "registrazione", component: RegistrationComponent, canActivate: [NoAuthnGuard] },
@@ -129,7 +132,7 @@ import { ProfileComponent } from './components/profileInfo/profile/profile.compo
       { path: "auth_error" , component: UnauthorizedComponent},
       { path: "prenotazione", component: ReservationsComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
       { path: "profilo", component: LateralmenuComponent},
-      { path: "**", redirectTo: "login", pathMatch: "full"}
+      { path: "**", redirectTo: "home", pathMatch: "full"}
     ]),
     HttpClientModule,
     MatBadgeModule,

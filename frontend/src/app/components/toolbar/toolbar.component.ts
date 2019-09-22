@@ -16,6 +16,11 @@ export class ToolbarComponent implements OnInit {
 
   entries = [
     {
+      displayName: "Home",
+      url: "/home",
+      roles: []
+    },
+    {
       displayName: "Presenze",
       url: "/presenze",
       roles: []
