@@ -1,0 +1,65 @@
+<div class="overall-container">
+  <mat-card role="group">
+    <mat-card-header fxLayout="column" fxFlexAlign="center center">
+      <mat-card-title style="text-align: center;">
+        Conferma Assegnazione Turno
+      </mat-card-title>
+      <mat-card-subtitle style="text-align: center;">
+        Da qui è possibile chiudere o riaprire i turni assegnati.
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="confirmation-container">
+        <div class="confirmation-button-container" fxLayoutAlign="end center">
+          <button mat-button (click)="submit()">Salva Modifiche ({{n}} selezionati)</button>
+        </div>
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 confirmation-table"
+               matSort matSortActive="lineName" matSortDirection="asc" (matSortChange)="sortBy($event)">
+          <ng-container matColumnDef="lineName">
+            <th mat-header-cell mat-sort-header *matHeaderCellDef> Linea </th>
+            <td mat-cell *matCellDef="let elem"> {{elem.shift.lineName}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="direction">
+            <th mat-header-cell mat-sort-header *matHeaderCellDef> Direzione </th>
+            <td mat-cell *matCellDef="let elem"> {{elem.shift.direction}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="date">
+            <th mat-header-cell mat-sort-header *matHeaderCellDef> Data </th>
+            <td mat-cell *matCellDef="let elem"> {{elem.shift.date.toString()}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="startsAt">
+            <th mat-header-cell mat-sort-header *matHeaderCellDef> Ora </th>
+            <td mat-cell *matCellDef="let elem"> {{elem.shift.startsAt.toString()}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="companion">
+            <th mat-header-cell *matHeaderCellDef> Accompagnatore </th>
+            <td mat-cell *matCellDef="let elem"> {{elem.shift.companionId}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="open">
+            <th mat-header-cell mat-sort-header *matHeaderCellDef> Stato </th>
+            <td mat-cell *matCellDef="let elem" [ngClass]="elem.shift.open?'bold':''"> {{elem.shift.open?'Aperto':'Chiuso'}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="visualized">
+            <th mat-header-cell mat-sort-header *matHeaderCellDef> Presa Visione </th>
+            <td mat-cell *matCellDef="let elem"> No </td>
+          </ng-container>
+
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef> Seleziona (Apri/Chiudi) </th>
+            <td mat-cell *matCellDef="let elem"> <mat-checkbox (change)="selectElement(elem)" aria-label="shift selection checkbox" [checked]="elem.checked"></mat-checkbox> </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+          <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></tr>
+        </table>
+        <mat-paginator [pageSizeOptions]="[10, 20, 30]" [showFirstLastButtons]="true" class="table-paginator" #paginator></mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
