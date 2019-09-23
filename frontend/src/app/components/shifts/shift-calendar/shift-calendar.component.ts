@@ -1,16 +1,19 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, Inject, OnInit, ViewChild} from '@angular/core';
   import dayGridPlugin from "@fullcalendar/daygrid";
 import Tooltip from "tooltip.js";
 import {ShiftService} from "../../../services/shift/shift.service";
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material";
+import {FullCalendarComponent} from "@fullcalendar/angular";
 
 
 export  interface DialogEventData {
   date: Date;
   time: string;
+  from: string;
+  to: string;
   line: string;
   direction: string;
-
+  extendedProps: { obj: null}
 }
 
 @Component({
@@ -20,15 +23,19 @@ export  interface DialogEventData {
 })
 export class ShiftCalendarComponent implements OnInit {
 
+  @ViewChild("calendar", {static: true}) calendar: FullCalendarComponent;
   calendarPlugins = [dayGridPlugin];
   events = [];
-
-
 
   constructor(public shiftService: ShiftService, public dialog: MatDialog) {
   }
 
   ngOnInit() {
+    let self = this;
+    this.calendar.datesRender.subscribe((state)=>{
+      let start = new Date(state.view.activeStart);
+      self.shiftService.updateCalendarShifts(start);
+    });
   }
 
   eventShowPopup(info){

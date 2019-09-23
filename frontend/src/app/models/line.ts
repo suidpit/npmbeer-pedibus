@@ -4,7 +4,7 @@ import {StopList} from "./stop-list";
 export class Line {
   name;
   id;
-  admin_email;
+  adminEmail;
   outward: Array<StopList>;
   back: Array<StopList>;
 

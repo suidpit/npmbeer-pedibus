@@ -14,7 +14,9 @@ import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.EmailVerificationTokenRepository;
 import it.polito.ai.pedibus.api.repositories.RecoveryTokenRepository;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
+import it.polito.ai.pedibus.api.utils.Convertion;
 import it.polito.ai.pedibus.security.JwtTokenProvider;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.sql.Timestamp;
@@ -64,7 +67,7 @@ public class UserService implements IUserService {
 //            }
 
             User user = userRepository.findByEmail(email);
-            String jwt = jwtTokenProvider.createToken(email, null, user.getId().toString());
+            String jwt = jwtTokenProvider.createToken(email, Convertion.authoritiesToMap(user.getAuthorities()), user.getId().toString());
             HashMap<String, String> userInfo = new HashMap<>();
             userInfo.put("jwt", jwt);
             return userInfo;
@@ -75,6 +78,7 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
     public User registerNewUserEmail(EmailDTO emailDTO)
             throws EmailExistsException {
         if (emailExist(emailDTO.getEmail())) {
@@ -99,6 +103,7 @@ public class UserService implements IUserService {
 
     //TODO : We don't need it anymore
     @Override
+    @Transactional
     public User registerNewUserAccount(UserDTO accountDto)
             throws EmailExistsException {
 
@@ -138,12 +143,20 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public User getUserById(ObjectId id) {
+        return userRepository.findUserById(id);
+
+    }
+
+    @Override
     public void userChangePassword(User user, String pass) {
 
         user.setPassword(pass);
         userRepository.save(user);
     }
+
     @Override
+    @Transactional
     public void saveRegisteredUser(User user) {
         userRepository.save(user);
     }
@@ -171,6 +184,7 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
     public void createVerificationToken(User user, String token) {
 
         EmailVerificationToken myToken = EmailVerificationToken
@@ -183,6 +197,7 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
     public void createRecoveryToken(User user, String token) {
         RecoveryToken recoveryToken = RecoveryToken
                 .builder()

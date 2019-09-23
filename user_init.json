@@ -4,12 +4,12 @@
     "password": "1234",
     "roles": [
       "USER",
-      "SYSTEM_ADMIN"
+      "ADMIN"
     ],
     "authorities": [
       {
         "line_names": ["linea1"],
-        "authority": 0
+        "authority": 1
       }
     ],
     "children": [
@@ -36,6 +36,27 @@
         "surname":"Pizzi",
         "birthday":"11-11-1993",
         "gender": "M"
+      }
+    ],
+    "enabled": true
+  },
+  {
+    "email": "dademanna@gmail.com",
+    "password": "12345678",
+    "roles": [
+      "USER",
+      "ADMIN"
+    ],
+    "authorities": [
+      {
+        "line_names": ["linea2"],
+        "authority": 1
+      }
+    ],
+    "children": [
+      {
+        "name": "Rosita",
+        "gender": "F"
       }
     ],
     "enabled": true

@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import {LocalDateTime} from "js-joda";
 import {Shift} from "../../../models/shift";
 import {ShiftService} from "../../../services/shift/shift.service";
+import {map} from "rxjs/operators";
+import {of} from "rxjs/internal/observable/of";
+import {Observable} from "rxjs/internal/Observable";
 @Component({
   selector: 'app-upcoming-shifts',
   templateUrl: './upcoming-shifts.component.html',
@@ -9,17 +12,16 @@ import {ShiftService} from "../../../services/shift/shift.service";
 })
 export class UpcomingShiftsComponent implements OnInit {
 
-  upcoming_shifts = [];
+  upcoming_shifts$ : Observable<Shift[]>;
 
   constructor(public shiftService: ShiftService) {
-    for(let i = 0; i < 5; i++){
-      let dt = LocalDateTime.now();
-      let shift = new Shift();
-      shift.dateAndTime = dt;
-      shift.direction = "BACK";
-      shift.lineName = "Linea 2";
-      this.upcoming_shifts.push(shift);
-    }
+    this.shiftService.buildUpcomingEvents();
+    this.upcoming_shifts$ = this.shiftService.getShifts().pipe(
+      map((shifts) =>{
+        shifts.sort((a, b) => a.date.isBefore(b.date)?-1:+1);
+        return shifts;
+      }
+      ));
   }
 
   ngOnInit() {

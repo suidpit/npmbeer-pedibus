@@ -95,6 +95,7 @@ export class ReservationsComponent implements OnInit, OnDestroy {
                         );
 
                         let dialogRef = this.dialog.open(BookingDialog, {
+                          panelClass: "reservation-dialog",
                             data: {
                                 line: this.selectedLine.name,
                                 stop: stop,

@@ -16,6 +16,7 @@ import it.polito.ai.pedibus.api.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.geo.GeoJsonModule;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -43,7 +44,8 @@ public class GeneralConfiguration {
     @Autowired
     public ObjectMapper objectMapper(LineRepository lineRepository,
                                      UserRepository userRepository,
-                                     ShiftRepository shiftRepository)
+                                     ShiftRepository shiftRepository,
+                                     MongoTemplate mongoTemplate)
             throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -67,15 +69,16 @@ public class GeneralConfiguration {
         if (userRepository.findAll().size() == 0) {
             userRepository.insert(users);
         }
+//
+//        List<Shift> shifts = mapper.readValue(new File(shiftsInitDataFileName),
+//                mapper.getTypeFactory().constructCollectionType(List.class, Shift.class));
+//
+//        if(shiftRepository.findAll().size() == 0){
+//            shiftRepository.insert(shifts);
+//        }
 
-        List<Shift> shifts = mapper.readValue(new File(shiftsInitDataFileName),
-                mapper.getTypeFactory().constructCollectionType(List.class, Shift.class));
 
-        if (shiftRepository.findAll().size() == 0) {
-            shiftRepository.insert(shifts);
-        }
-
-        MongoClient mc = new MongoClient("127.0.0.1", 27019);
+        MongoClient mc = new MongoClient("127.0.0.1", 27017);
         MongoDatabase collections = mc.getDatabase("test");
         boolean check = true;
         for (String name : collections.listCollectionNames()) {
@@ -87,7 +90,6 @@ public class GeneralConfiguration {
         if (check) {
             collections.createCollection("reservations");
         }
-
         return mapper;
     }
 

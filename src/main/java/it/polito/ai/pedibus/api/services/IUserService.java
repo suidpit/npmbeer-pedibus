@@ -8,6 +8,7 @@ import it.polito.ai.pedibus.api.exceptions.EmailExistsException;
 import it.polito.ai.pedibus.api.models.EmailVerificationToken;
 import it.polito.ai.pedibus.api.models.RecoveryToken;
 import it.polito.ai.pedibus.api.models.User;
+import org.bson.types.ObjectId;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +36,8 @@ public interface IUserService {
     EmailVerificationToken getVerificationTokenByUser(User user);
 
     User getUserByEmail(String email);
+
+    User getUserById(ObjectId id);
 
     void createRecoveryToken(User user, String token);
 

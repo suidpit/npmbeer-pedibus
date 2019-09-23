@@ -23,8 +23,7 @@ public class LineController {
      */
     @RequestMapping(value = "", method = RequestMethod.GET)
     public List<Line> getLines(){
-        return lineService.getAllLines();
-    }
+        return lineService.getAllLines();    }
 
     /**
      * GET /lines/{nome_linea} – restituisce un oggetto JSON contenente due liste, riportanti i

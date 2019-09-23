@@ -1,7 +1,7 @@
 package it.polito.ai.pedibus.api.models;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import it.polito.ai.pedibus.api.other.ValidList;
+import it.polito.ai.pedibus.api.utils.ValidList;
 import it.polito.ai.pedibus.api.serializers.ObjectIdSerializer;
 import lombok.Data;
 import org.bson.types.ObjectId;
