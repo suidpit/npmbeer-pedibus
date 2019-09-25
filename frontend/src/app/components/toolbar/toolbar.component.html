@@ -20,7 +20,7 @@
     <span fxShow="true" fxHide.lt-md="true" fxLayoutAlign="space-evenly center"
           *ngIf="auth.isLoggedIn$ | async" class="side-container">
 
-        <div mat-card-avatar class="avatar"></div>
+        <div class="avatar"></div>
         <div fxLayout="column" fxLayoutAlign="center center">
           <span class="logged-user-style" *ngIf="auth.currentUser$ | async as user">
             <span class="user-email" [matMenuTriggerFor]="userMenu">

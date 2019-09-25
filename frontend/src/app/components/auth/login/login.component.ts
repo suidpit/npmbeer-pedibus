@@ -31,7 +31,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     let self = this;
     this.route.queryParams.subscribe((params) =>{
-      self.return = params["returnUrl"] || "/presenze";
+      self.return = params["returnUrl"] || "/home";
     })
   }
 

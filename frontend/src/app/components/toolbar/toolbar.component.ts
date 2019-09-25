@@ -3,6 +3,7 @@ import {AuthService} from "../../services/auth/auth.service";
 import {User} from "../../models/user";
 import {of} from "rxjs/internal/observable/of";
 import {Observable} from "rxjs/internal/Observable";
+import {Role} from "../../models/authority";
 
 @Component({
   selector: 'app-toolbar',
@@ -14,34 +15,46 @@ export class ToolbarComponent implements OnInit {
   isAuthenticated: boolean;
   user: User;
 
-  entries = [
+  entries = [];
+
+  user_entries = [
     {
       displayName: "Home",
       url: "/home",
       roles: []
     },
     {
-      displayName: "Presenze",
-      url: "/presenze",
-      roles: []
+      displayName: "Kid Finder",
+      url: "/trovaBambino",
+      roles: [Role.USER]
     },
     {
       displayName: "Prenotazione",
       url: "/prenotazione",
-      roles: []
+      roles: [Role.USER]
+    }
+  ];
+
+  companion_entries = [
+    {
+      displayName: "Presenze",
+      url: "/presenze",
+      roles: [Role.COMPANION]
     },
     {
       displayName: "Turni",
       url: "/admin/turni",
-      roles: []
-    },
-    {
-      displayName: "Registrazione Utenti",
-      url: "/registrazioneEmail",
-      roles: []
+      roles: [Role.COMPANION]
     }
   ];
 
+  admin_entries = [
+    {
+      displayName: "Registrazione Utenti",
+      url: "/registrazioneEmail",
+      roles: [Role.ADMIN]
+    }
+    ];
   constructor(public auth: AuthService) {
   }
 
@@ -54,6 +67,16 @@ export class ToolbarComponent implements OnInit {
       {
         this.user = user;
         this.isAuthenticated = user !== null && user !== undefined;
+        this.entries = this.user_entries;
+
+        if(this.isAuthenticated){
+          if(this.auth.getCurrentUser().hasMinAuthority(Role.COMPANION)){
+            this.entries = this.entries.concat(this.companion_entries);
+          }
+          if(this.auth.getCurrentUser().hasMinAuthority(Role.ADMIN)){
+            this.entries = this.entries.concat(this.admin_entries);
+          }
+        }
       }
     )
   }
