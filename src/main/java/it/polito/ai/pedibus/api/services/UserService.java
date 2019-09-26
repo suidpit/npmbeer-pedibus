@@ -150,7 +150,6 @@ public class UserService implements IUserService {
 
     @Override
     public void userChangePassword(User user, String pass) {
-
         user.setPassword(pass);
         userRepository.save(user);
     }
@@ -250,6 +249,4 @@ public class UserService implements IUserService {
         user.setPassword(encoder.encode(pass));
         userRepository.save(user);
     }
-
-
 }

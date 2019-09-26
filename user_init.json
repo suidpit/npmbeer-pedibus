@@ -8,34 +8,40 @@
     ],
     "authorities": [
       {
-        "line_names": ["linea1"],
+        "line_names": [
+          "linea1"
+        ],
         "authority": 1
       }
     ],
     "children": [
       {
         "name": "Francesca",
-        "surname":"Pizzi",
-        "birthday":"11-11-1993",
-        "gender": "F"
+        "surname": "Pizzi",
+        "birthday": "11-11-1993",
+        "gender": "F",
+        "disability": false
       },
       {
         "name": "Liberata",
-        "surname":"Pizzi",
-        "birthday":"11-11-1993",
-        "gender": "F"
+        "surname": "Pizzi",
+        "birthday": "11-11-1993",
+        "gender": "F",
+        "disability": false
       },
       {
         "name": "Berta",
-        "surname":"Pizzi",
-        "birthday":"11-11-1993",
-        "gender": "F"
+        "surname": "Pizzi",
+        "birthday": "11-11-1993",
+        "gender": "F",
+        "disability": false
       },
       {
         "name": "Simone",
-        "surname":"Pizzi",
-        "birthday":"11-11-1993",
-        "gender": "M"
+        "surname": "Pizzi",
+        "birthday": "11-11-1993",
+        "gender": "M",
+        "disability": true
       }
     ],
     "enabled": true
@@ -49,7 +55,9 @@
     ],
     "authorities": [
       {
-        "line_names": ["linea2"],
+        "line_names": [
+          "linea2"
+        ],
         "authority": 1
       }
     ],

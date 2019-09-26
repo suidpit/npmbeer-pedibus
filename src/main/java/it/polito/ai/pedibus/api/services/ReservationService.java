@@ -1,8 +1,9 @@
 package it.polito.ai.pedibus.api.services;
 
 import it.polito.ai.pedibus.api.dtos.ReservationDTO;
-import it.polito.ai.pedibus.api.models.Child;
 import it.polito.ai.pedibus.api.models.Reservation;
+import it.polito.ai.pedibus.api.repositories.ChildRepository;
+import it.polito.ai.pedibus.api.repositories.LineRepository;
 import it.polito.ai.pedibus.api.repositories.ReservationRepository;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
 import it.polito.ai.pedibus.security.CustomUserDetails;
@@ -23,12 +24,15 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
+    private final ChildRepository childRepository;
 
     private final DateTimeFormatter fmt;
 
-    public ReservationService(ReservationRepository reservationRepository, DateTimeFormatter fmt, UserRepository userRepository) {
+    public ReservationService(ReservationRepository reservationRepository, DateTimeFormatter fmt,
+                              UserRepository userRepository, ChildRepository childRepository) {
         this.reservationRepository = reservationRepository;
         this.userRepository = userRepository;
+        this.childRepository = childRepository;
         this.fmt = fmt;
     }
 
@@ -55,14 +59,14 @@ public class ReservationService {
                     o.add(new HashMap<>());
                     System.err.println(o.size());
                 }
-                for (String child : res.getChildName())
-                    o.get(res.getTripIndex()).computeIfAbsent(res.getStopName(), k -> new ArrayList<>()).add(child);
+                for (ObjectId child : res.getChildId())
+                    o.get(res.getTripIndex()).computeIfAbsent(res.getStopName(), k -> new ArrayList<>()).add(child.toString());
             } else if (res.getDirection() == Reservation.Direction.BACK) {
                 while (res.getTripIndex() >= b.size()) {
                     b.add(new HashMap<>());
                 }
-                for (String child : res.getChildName())
-                    b.get(res.getTripIndex()).computeIfAbsent(res.getStopName(), k -> new ArrayList<>()).add(child);
+                for (ObjectId child : res.getChildId())
+                    b.get(res.getTripIndex()).computeIfAbsent(res.getStopName(), k -> new ArrayList<>()).add(child.toString());
             }
         }
 
@@ -85,11 +89,11 @@ public class ReservationService {
         LocalDate date = LocalDate.parse(dateString, fmt);
         // The stop is now identified by a line, a direction, and a trip index.
 
-        for (String child : resd.getChild()) {
+        for (ObjectId child : resd.getChild()) {
             boolean check = false;
 
-            for (Child c: userRepository.getById(user).getChildren()) {
-                if (c.getName().equals(child)) {
+            for (ObjectId c: userRepository.getById(user).getChildren()) {
+                if (childRepository.getById(c).getId().equals(child)) {
                     check = true;
                     break;
                 }
@@ -99,7 +103,7 @@ public class ReservationService {
 
             for(Reservation res : reservationRepository.findByLineNameAndDateAndUser(lineName, date, user)){
                 if(res.getDirection()==resd.getDirection()){
-                    for(String c : res.getChildName()){
+                    for(ObjectId c : res.getChildId()){
                         if(c.equals(child))
                             throw new HttpClientErrorException(HttpStatus.CONFLICT);
                     }
@@ -112,7 +116,7 @@ public class ReservationService {
                 .lineName(lineName)
                 .user(user)
                 .stopName(resd.getStopName())
-                .childName(resd.getChild())
+                .childId(resd.getChild())
                 .direction(resd.getDirection())
                 .tripIndex(resd.getTripIndex())
                 .build();
@@ -135,7 +139,7 @@ public class ReservationService {
                 .date(date)
                 .lineName(line)
                 .stopName(resd.getStopName())
-                .childName(resd.getChild())
+                .childId(resd.getChild())
                 .direction(resd.getDirection())
                 .tripIndex(resd.getTripIndex())
                 .build();
