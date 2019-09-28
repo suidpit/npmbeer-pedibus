@@ -32,9 +32,4 @@ public class NotificationController {
             listeners.put(name, sink::next);
         });
     }
-
-    @GetMapping(value="/lol")
-    public String getUser(Authentication authentication) {
-        return authentication.getName();
-    }
 }
