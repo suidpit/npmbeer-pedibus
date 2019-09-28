@@ -1,35 +1,26 @@
 package it.polito.ai.pedibus.api.controllers;
 
+import it.polito.ai.pedibus.api.models.Event;
+import it.polito.ai.pedibus.api.repositories.EventRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
-
 @CrossOrigin
 @RestController
 @RequestMapping("/events")
 public class EventController {
-    private Map<String, Consumer<String>> listeners = new ConcurrentHashMap<>();
+    private EventRepository eventRepository;
 
-
-    @RequestMapping(value = "/write", method = RequestMethod.POST)
-    public String writeThing(Authentication authentication, @RequestBody String message) {
-        String name = authentication.getName();
-        listeners.get(name).accept(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " ["+name+"] " + message);
-        return "Done";
+    @Autowired
+    public EventController(EventRepository eventRepository) {
+        this.eventRepository = eventRepository;
     }
 
     @GetMapping(value="/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> streamEvents(Authentication authentication) {
-        String name = authentication.getName();
-        return Flux.create(sink -> {
-            listeners.put(name, sink::next);
-        });
+    public Flux<Event> streamEvents(Authentication authentication) {
+        return eventRepository.findWithTailableCursorBy();
     }
 }
