@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 @CrossOrigin
 @RestController
 @RequestMapping("/events")
-public class NotificationController {
+public class EventController {
     private Map<String, Consumer<String>> listeners = new ConcurrentHashMap<>();
 
 
