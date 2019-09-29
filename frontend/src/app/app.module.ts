@@ -63,6 +63,7 @@ import { UserPasswordSetupComponent, PizzaPartyComponent } from './components/us
 import { LateralmenuComponent } from './components/lateralmenu/lateralmenu.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import { ProfileComponent } from './components/profileInfo/profile/profile.component';
+import { SimpleEventLoggerComponent } from './components/simple-event-logger/simple-event-logger.component';
 
 
 @NgModule({
@@ -96,6 +97,7 @@ import { ProfileComponent } from './components/profileInfo/profile/profile.compo
     SpinnerComponent,
     LateralmenuComponent,
     ProfileComponent,
+    SimpleEventLoggerComponent,
   ],
   imports: [
     BrowserModule,
@@ -109,6 +111,7 @@ import { ProfileComponent } from './components/profileInfo/profile/profile.compo
       { path: "impostaPassword/:token", component: UserPasswordSetupComponent},
       { path: "prenotazione", component: ReservationsComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
       { path: "profilo", component: LateralmenuComponent},
+      { path: "eventi", component: SimpleEventLoggerComponent},
       { path: "**", redirectTo: "login", pathMatch: "full"}
     ]),
     HttpClientModule,
