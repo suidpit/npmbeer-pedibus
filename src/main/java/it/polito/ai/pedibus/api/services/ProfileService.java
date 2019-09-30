@@ -133,6 +133,8 @@ public class ProfileService {
         user.setSurname(profileInfoDTO.getSurname());
         user.setAddress(profileInfoDTO.getAddress());
         user.setTelNumber(profileInfoDTO.getTelephone());
+        user.setDefaultLine(profileInfoDTO.getDefaultLine());
+        user.setDefaultStop(profileInfoDTO.getDefaultStop());
         userRepository.save(user);
     }
 
@@ -153,6 +155,8 @@ public class ProfileService {
         profileInfoDTO.setSurname(user.getSurname());
         profileInfoDTO.setTelephone(user.getTelNumber());
         profileInfoDTO.setPhotoFile(user.isPhoto());
+        profileInfoDTO.setDefaultLine(user.getDefaultLine());
+        profileInfoDTO.setDefaultStop(user.getDefaultStop());
         return profileInfoDTO;
     }
 

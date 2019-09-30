@@ -12,4 +12,6 @@ public class ProfileInfoDTO {
     private String email;
     private boolean photoFile;
     private String photo;
+    private String defaultLine;
+    private String defaultStop;
 }

@@ -9,4 +9,6 @@ export class UserProfile {
     public readonly email: String;
     public photo: String;
     public photoFile: boolean;
+    public defaultLine: String;
+    public defaultStop: String;
 }

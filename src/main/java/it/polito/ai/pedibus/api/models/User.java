@@ -50,4 +50,9 @@ public class User {
     
     private boolean photo;
 
+    @Nullable
+    private String defaultLine;
+
+    @Nullable
+    private String defaultStop;
 }
