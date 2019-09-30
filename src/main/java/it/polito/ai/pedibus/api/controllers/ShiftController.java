@@ -3,10 +3,12 @@ package it.polito.ai.pedibus.api.controllers;
 import it.polito.ai.pedibus.api.dtos.ShiftRequestDTO;
 import it.polito.ai.pedibus.api.exceptions.*;
 import it.polito.ai.pedibus.api.models.Line;
+import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.models.Shift;
 import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.ShiftRepository;
 import it.polito.ai.pedibus.api.services.LineService;
+import it.polito.ai.pedibus.api.services.ReservationService;
 import it.polito.ai.pedibus.api.services.ShiftService;
 import it.polito.ai.pedibus.api.services.UserService;
 import it.polito.ai.pedibus.security.CustomUserDetails;
@@ -36,6 +38,7 @@ public class ShiftController {
     private final ShiftService shiftService;
     private final UserService userService;
 
+    private ReservationService reservationService;
     @Qualifier("fmt")
     private final DateTimeFormatter fmt;
 
@@ -44,11 +47,13 @@ public class ShiftController {
     @Autowired
     public ShiftController(ShiftRepository shiftRepository, LineService lineService,
                            ShiftService shiftService, UserService userService,
+                           ReservationService reservationService,
                            DateTimeFormatter fmt) {
         this.shiftRepository = shiftRepository;
         this.lineService = lineService;
         this.shiftService = shiftService;
         this.userService = userService;
+        this.reservationService = reservationService;
         this.fmt = fmt;
     }
 
@@ -60,6 +65,17 @@ public class ShiftController {
 
         LocalDate date = LocalDate.parse(dateString, this.fmt);
         List<Shift> shifts = this.shiftService.getAllShiftAfterDate(date);
+
+        return purgeShifts(shifts);
+    }
+
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN') or hasAuthority('COMPANION')")
+    @RequestMapping(value = "/by-date/{date}", method = RequestMethod.GET)
+    public List<Shift> getShiftsOnDate(@PathVariable("date") String dateString){
+
+        LocalDate date = LocalDate.parse(dateString, this.fmt);
+        ObjectId userId = ((CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        List<Shift> shifts = this.shiftService.getShiftsByDateAndCompanionId(date, userId);
 
         return purgeShifts(shifts);
     }
@@ -136,7 +152,7 @@ public class ShiftController {
                 s.setTripIndex(sDTO.getTripIndex());
 
                 // setting starting and ending stops
-                if(s.getDirection() == Shift.Direction.BACK){
+                if(s.getDirection() == Reservation.Direction.BACK){
                     s.setFrom(l.getBack().get(s.getTripIndex()).get(0));
                     // Take last stop
                     s.setTo(l.getBack().get(s.getTripIndex()).get(l.getBack().get(s.getTripIndex()).size()-1));
@@ -256,6 +272,23 @@ public class ShiftController {
                 throw new WrongFormatException();
             }
         }
+    }
+
+    @RequestMapping(value = "by-resid/{resid}", method = RequestMethod.GET)
+    public List<String> getShiftIdByReservationId(@PathVariable("resid") String resid){
+        Reservation res = reservationService.getReservation(new ObjectId(resid));
+
+        List<Shift> shifts = shiftService.getShiftsByAllFields(res.getDate(), res.getLineName(),
+                res.getDirection(), res.getTripIndex()); // TODO may return null -> handle
+
+        if(shifts != null){
+            ArrayList<String> objectIds = new ArrayList<>();
+            for(Shift s: shifts){
+                objectIds.add(s.getId().toString());
+            }
+            return objectIds;
+        }
+        return null;
     }
 
     private List<Shift> purgeShifts(List<Shift> shifts){

@@ -79,6 +79,8 @@ import { LateralmenuComponent } from './components/lateralmenu/lateralmenu.compo
 import { LayoutModule } from '@angular/cdk/layout';
 import { ProfileComponent } from './components/profileInfo/profile/profile.component';
 import { HomeComponent } from './components/home/home.component';
+import { KidTrackerComponent } from './components/kid-tracker/kid-tracker.component';
+import {AgmCoreModule} from "@agm/core";
 
 
 @NgModule({
@@ -117,12 +119,14 @@ import { HomeComponent } from './components/home/home.component';
     LateralmenuComponent,
     ProfileComponent,
     HomeComponent,
+    KidTrackerComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     RouterModule.forRoot([
       { path: "home", component: HomeComponent},
+      { path: "trovaBambino", component: KidTrackerComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
       { path: "login", component: LoginComponent, canActivate: [NoAuthnGuard]},
       { path: "presenze", component: AttendanceComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
       { path: "registrazione", component: RegistrationComponent, canActivate: [NoAuthnGuard] },
@@ -134,6 +138,9 @@ import { HomeComponent } from './components/home/home.component';
       { path: "profilo", component: LateralmenuComponent},
       { path: "**", redirectTo: "home", pathMatch: "full"}
     ]),
+    AgmCoreModule.forRoot({
+      apiKey: "AIzaSyBvrioINDkg1n41aEPstcosZp4Tb5QB66o"
+    }),
     HttpClientModule,
     MatBadgeModule,
     MatButtonModule,

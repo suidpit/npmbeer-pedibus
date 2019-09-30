@@ -67,7 +67,12 @@ public class UserService implements IUserService {
 //            }
 
             User user = userRepository.findByEmail(email);
-            String jwt = jwtTokenProvider.createToken(email, Convertion.authoritiesToMap(user.getAuthorities()), user.getId().toString());
+            String jwt = jwtTokenProvider.createToken(
+                    email,
+                    Convertion.authoritiesToMap(user.getAuthorities()),
+                    user.getId().toString(),
+                    Convertion.childrenToMap(user.getChildren()));
+
             HashMap<String, String> userInfo = new HashMap<>();
             userInfo.put("jwt", jwt);
             return userInfo;

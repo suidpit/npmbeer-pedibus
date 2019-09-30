@@ -21,7 +21,6 @@ import java.util.List;
 @Data
 @Document(collection = "shifts")
 public class Shift implements Cloneable{
-    public enum Direction {OUTWARD, BACK}
 
     @Id
     @JsonSerialize(using = ObjectIdSerializer.class)
@@ -30,7 +29,7 @@ public class Shift implements Cloneable{
     private LocalDate date;
     private String lineName;
     // We're not sure an ID is needed here, since every stop name, in the context of a direction and tripIndex number, is unique.
-    private Direction direction;
+    private Reservation.Direction direction;
     // This just represents an index in the array of trips for that line, in that direction.
     private Integer tripIndex;
 

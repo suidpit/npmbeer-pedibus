@@ -1,0 +1,65 @@
+<div class="overall-container">
+  <mat-card role="group" fxLayout="column">
+    <mat-card-header fxLayout="column" fxFlexAlign="center center" fxFlex="0 1 50px">
+      <mat-card-title style="text-align: center;">
+        Kid Tracker
+      </mat-card-title>
+      <mat-card-subtitle style="text-align: center;">
+        Segui gli aggiornamenti in tempo reale sulla corsa di oggi.
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content fxFlex="2 1 100%">
+      <div class="card-content" fxLayoutAlign="start center" fxLayout="column" fxFlex="2 1 100%">
+        <div *ngIf="error" class="error">{{error}}</div>
+        <div class="selectors table">
+          <div class="tr">
+            <div class="td">
+              <mat-form-field class="element">
+                <mat-label>Figlio/a</mat-label>
+                <mat-select [(value)]="kiddo" (valueChange)="0">
+                  <mat-option *ngFor="let kid of auth.getCurrentUser().children" [value]="kid.name">{{kid.name}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="td">
+              <!-- Should be empty -->
+            </div>
+          </div>
+          <div class="tr">
+            <div class="td">
+              <p *ngIf="line$ | async as line; else noline">{{line}}</p>
+              <ng-template #noline><p style="color: #c9c9c9; text-align: center;">[ Nome Linea ]</p></ng-template>
+            </div>
+            <div class="td">
+              <mat-form-field>
+                <mat-label>Direzione</mat-label>
+                <mat-select [disabled]="!direction_on">
+                  <mat-option value="???">???</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+
+        <mat-divider [inset]="true"></mat-divider>
+
+        <div class="map-container">
+            <span *ngIf="geolocalization$ | async as geoloc; else polito">
+          <agm-map [latitude]="geoloc.position.y" [longitude]="geoloc.position.x" [zoom]="16">
+            <agm-marker [latitude]="geoloc.position.y" [longitude]="geoloc.position.x"></agm-marker>
+          </agm-map>
+        </span>
+
+            <ng-template #polito>
+              <agm-map [latitude]="localizationService.polito_coordinates.position.y"
+                       [longitude]="localizationService.polito_coordinates.position.x"
+                       [zoom]="16"></agm-map>
+            </ng-template>
+
+        </div>
+
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

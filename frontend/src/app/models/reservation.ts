@@ -2,7 +2,7 @@ import {Child} from "./child";
 
 export class Reservation {
     private _stopName: string;
-    private _childs: Array<Child>
+    private _childs: Array<Child>;
 
     get stopName(){
         return this._stopName;

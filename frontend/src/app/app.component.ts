@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {MatIconRegistry} from "@angular/material/icon";
 import {DomSanitizer} from "@angular/platform-browser";
+import {LocalizationService} from "./services/localization/localization.service";
 
 @Component({
     selector: 'app-root',
@@ -80,7 +81,9 @@ export class AppComponent {
         }
     ];
 
-    constructor(private matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer) {
+    constructor(private matIconRegistry: MatIconRegistry,
+                private domSanitizer: DomSanitizer,
+                private locService: LocalizationService) {
         for (let img of this.icons) {
             this.matIconRegistry.addSvgIcon(
                 img.name, this.domSanitizer.bypassSecurityTrustResourceUrl("../assets/icons/" + img.path)

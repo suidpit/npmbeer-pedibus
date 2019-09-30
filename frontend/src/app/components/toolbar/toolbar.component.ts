@@ -4,6 +4,7 @@ import {User} from "../../models/user";
 import {of} from "rxjs/internal/observable/of";
 import {Observable} from "rxjs/internal/Observable";
 import {Role} from "../../models/authority";
+import {MatSidenav} from "@angular/material";
 
 @Component({
   selector: 'app-toolbar',
@@ -12,6 +13,7 @@ import {Role} from "../../models/authority";
 })
 export class ToolbarComponent implements OnInit {
 
+  @ViewChild("sidenav", {static: true}) sidenav: MatSidenav;
   isAuthenticated: boolean;
   user: User;
 
@@ -21,17 +23,20 @@ export class ToolbarComponent implements OnInit {
     {
       displayName: "Home",
       url: "/home",
-      roles: []
+      roles: [],
+      icon: "home"
     },
     {
       displayName: "Kid Finder",
       url: "/trovaBambino",
-      roles: [Role.USER]
+      roles: [Role.USER],
+      icon: "map"
     },
     {
       displayName: "Prenotazione",
       url: "/prenotazione",
-      roles: [Role.USER]
+      roles: [Role.USER],
+      icon: "menu_book"
     }
   ];
 
@@ -39,12 +44,14 @@ export class ToolbarComponent implements OnInit {
     {
       displayName: "Presenze",
       url: "/presenze",
-      roles: [Role.COMPANION]
+      roles: [Role.COMPANION],
+      icon: "check_circle_outline"
     },
     {
       displayName: "Turni",
       url: "/admin/turni",
-      roles: [Role.COMPANION]
+      roles: [Role.COMPANION],
+      icon: "calendar_today"
     }
   ];
 
@@ -52,7 +59,8 @@ export class ToolbarComponent implements OnInit {
     {
       displayName: "Registrazione Utenti",
       url: "/registrazioneEmail",
-      roles: [Role.ADMIN]
+      roles: [Role.ADMIN],
+      icon: "person_add"
     }
     ];
   constructor(public auth: AuthService) {
@@ -79,5 +87,10 @@ export class ToolbarComponent implements OnInit {
         }
       }
     )
+  }
+
+  logout(){
+    this.auth.logout();
+    this.sidenav.toggle();
   }
 }

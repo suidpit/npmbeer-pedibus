@@ -1,5 +1,6 @@
 package it.polito.ai.pedibus.api.services;
 
+import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.models.Shift;
 import it.polito.ai.pedibus.api.repositories.ShiftRepository;
 
@@ -74,4 +75,17 @@ public class ShiftService {
         }
 
         return shiftRepository.insert(s); }
+
+    public ObjectId getCompanionIdByShiftId(ObjectId sid){
+        return this.shiftRepository.findById(sid).getCompanionId();
+    }
+
+    public List<Shift> getShiftsByDateAndCompanionId(LocalDate date, ObjectId id){
+        return this.shiftRepository.findByDateAndCompanionId(date, id);
+    }
+
+    public List<Shift> getShiftsByAllFields(LocalDate date, String lineName, Reservation.Direction direction, Integer tripIndex){
+        return this.shiftRepository.findByLineNameAndDirectionAndTripIndexAndDate(lineName, direction, tripIndex, date);
+    }
+
 }

@@ -11,6 +11,7 @@ import {LocalTime} from "js-joda";
 import {Stop} from "../../models/stop";
 import {Reservation} from "../../models/reservation";
 import {AuthService} from "../auth/auth.service";
+import {IReservation} from "../../models/ireservation";
 
 @Injectable({
   providedIn: 'root'
@@ -60,6 +61,7 @@ export class AttendanceService {
     }));
   }
 
+  // date has format: ddMMyyyy
   reservations(line: string, date): Observable<Reservations> {
     let api_url = this.base_url+"/reservations/admin/" + line + "/" + date;
     return this.http.get<Reservations>(api_url).pipe(map(data => {
@@ -109,5 +111,61 @@ export class AttendanceService {
           .backward(backs)
           .build();
     }));
+  }
+
+  // date has format: ddMMyyyy
+  todayReservations(): Observable<IReservation[]> {
+    let api_url = this.base_url+"/reservations/user/today";
+    return this.http.get<IReservation[]>(api_url);
+    /*.pipe(map(data => {
+      debugger;
+      if(data.length > 0){
+        let outwards: Array<Reservation[]> = [];
+        let backs: Array<Reservation[]> = [];
+        // map outwards
+        for (let out of data.outward) {
+          let o: Reservation[] = [];
+          for (let stop of Object.keys(out)) {
+            let childs: Child[] = [];
+            for (let c of out[stop]) {
+              let child = Builder(Child)
+                .name(c)
+                .present(false)
+                .build();
+              childs.push(child);
+            }
+            let res = Builder(Reservation)
+              .stopName(stop)
+              .childs(childs)
+              .build();
+            o.push(res);
+          }
+          outwards.push(o);
+        }
+        for (let back of data.backward) {
+          let b: Reservation[] = [];
+          for (let stop of Object.keys(back)) {
+            let childs: Child[] = [];
+            for (let c of back[stop]) {
+              let child = Builder(Child)
+                .name(c)
+                .present(false)
+                .build();
+              childs.push(child);
+            }
+            let res = Builder(Reservation)
+              .stopName(stop)
+              .childs(childs)
+              .build();
+            b.push(res);
+          }
+          backs.push(b);
+        }
+        return Builder(Reservations)
+          .outward(outwards)
+          .backward(backs)
+          .build();
+      }
+    }));*/
   }
 }

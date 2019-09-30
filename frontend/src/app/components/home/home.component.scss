@@ -18,7 +18,7 @@
 }
 
 .home-container .header{
-  margin: 50px auto;
+  margin: 35px auto;
   font-family: "Roboto";
   text-align: center;
   display: flex;
@@ -28,6 +28,8 @@
 
 .header h1{
   margin-bottom: 0;
+  font-style: italic;
+  font-size: 40pt;
 }
 
 .header h4{
@@ -36,7 +38,7 @@
 
 .home-container .content{
   height: 100%;
-  margin: 160px auto;
+  margin: 30px auto;
   font-family: Garamond;
   font-weight: 500;
   display: flex;
@@ -48,13 +50,17 @@
   display: inline-block;
   width: 70%;
   font-size: 20pt;
+  text-align: center;
 }
 
 .hands{
   width: 70%;
-  margin-top: 150px;
+  margin-top: 60px;
   margin-bottom: 20px;
   z-index: 2;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  border-radius: 8px;
 }
 
 .home-container::after {
@@ -62,7 +68,7 @@
   background: url('../../../assets/icons/p_logo_blue.png') no-repeat;
   -webkit-background-size: 500px;
   background-size: 500px;
-  opacity: 0.2;
+  opacity: 0.1;
   top: calc(50% - 250px);;
   left: calc(50% - 250px);
   bottom: 0;
@@ -75,4 +81,13 @@
   width: 40px;
   border-left: 1px solid #aeaeae55;
   box-shadow: -15px 0 15px  -15px;
+}
+
+mat-divider{
+  border-top: 2px solid black;
+  margin: 0 150px;
+}
+
+.m-30{
+  margin-bottom: 30px;
 }

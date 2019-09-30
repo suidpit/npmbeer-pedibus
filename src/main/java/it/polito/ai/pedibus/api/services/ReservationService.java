@@ -1,5 +1,6 @@
 package it.polito.ai.pedibus.api.services;
 
+import it.polito.ai.pedibus.api.dtos.LocalizationMessageDTO;
 import it.polito.ai.pedibus.api.dtos.ReservationDTO;
 import it.polito.ai.pedibus.api.models.Child;
 import it.polito.ai.pedibus.api.models.Reservation;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -202,5 +204,19 @@ public class ReservationService {
         } else {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    public Reservation getReservationByAllParams(ObjectId userId, String lineName, Integer tripIndex,
+                                                 Reservation.Direction direction, LocalDate date){
+        return this.reservationRepository.findFirstByLineNameAndDateAndTripIndexAndDirectionAndUser(
+                lineName,
+                date,
+                tripIndex,
+                direction,
+                userId);
+    }
+
+    public List<Reservation> getReservationsByDateAndUser(LocalDate date, ObjectId userId){
+        return this.reservationRepository.findByUserAndDate(userId, date);
     }
 }

@@ -26,7 +26,7 @@ public class ShiftRequestDTO {
     private String lineName;
 
     @NotNull
-    private Shift.Direction direction;
+    private Reservation.Direction direction;
 
     @NotNull
     private Integer tripIndex;

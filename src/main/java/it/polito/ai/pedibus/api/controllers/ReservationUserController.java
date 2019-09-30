@@ -6,11 +6,14 @@ import it.polito.ai.pedibus.api.constraints.ReservationPutFields;
 import it.polito.ai.pedibus.api.dtos.ReservationDTO;
 import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.services.ReservationService;
+import it.polito.ai.pedibus.security.CustomUserDetails;
 import org.bson.types.ObjectId;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @CrossOrigin
@@ -112,5 +115,13 @@ public class ReservationUserController {
                                       @PathVariable("id") ObjectId id) {
 
         return reservationService.getReservationUser(lineName, dateString, id);
+    }
+
+
+    @RequestMapping(value = "today", method = RequestMethod.GET)
+    public List<Reservation> getTodayReservations(){
+        LocalDate today = LocalDate.now();
+        ObjectId userId = ((CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        return this.reservationService.getReservationsByDateAndUser(today, userId);
     }
 }

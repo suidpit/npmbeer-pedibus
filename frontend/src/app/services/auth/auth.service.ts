@@ -11,6 +11,7 @@ import { throwError } from 'rxjs';
 import {from} from "rxjs/internal/observable/from";
 import {of} from "rxjs/internal/observable/of";
 import {Authority, Role} from "../../models/authority";
+import {LocalizationService} from "../localization/localization.service";
 
 
 @Injectable({
@@ -43,6 +44,7 @@ export class AuthService {
       for(let a of u._authorities){
         user.addAuthority(new Authority(a._role, a._lineName));
       }
+      user.children = u._children;
       this.currentUserSubject = new BehaviorSubject<User>(user);
       this.isLoggedInSubject = new BehaviorSubject<boolean>(true);
     }
@@ -145,6 +147,11 @@ export class AuthService {
       }
     }
 
+    let children = [];
+    for(let kid of userInfo["children"]){
+      children.push(JSON.parse(kid));
+    }
+    user.children = children;
     // add seconds to moment 0 (1 Jan 1970 00:00:00)
     const expiresAt = moment(0).add(exp, "second");
     const notBefore = moment(0).add(nbf, "second");
@@ -155,6 +162,7 @@ export class AuthService {
 
     this.currentUserSubject.next(user);
     this.isLoggedInSubject.next(true);
+
     return this.currentUser$;
   }
 
@@ -187,6 +195,9 @@ export class AuthService {
     return this.http.get<any>(this.profile_information_url + em).pipe(catchError(err=>this.handleError(err)));
   }
 
+  getCurrentUserJwt(){
+    return localStorage.getItem("token_id");
+  }
   addChild(email:string,name:string,surname:string,birthday:string, gender:string){
     return this.http.post<any>(this.add_child_url,{
       "email":email,
