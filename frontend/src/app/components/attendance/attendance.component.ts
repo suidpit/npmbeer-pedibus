@@ -10,6 +10,7 @@ import {AttendanceService} from 'src/app/services/attendance/attendance.service'
 import {Line} from "../../models/line";
 import {Subject} from "rxjs";
 import {take, takeUntil} from "rxjs/operators";
+import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-attendance',
@@ -40,7 +41,10 @@ export class AttendanceComponent implements OnInit, OnDestroy {
     return !(dayNum === 0);
   };
 
-  constructor(private attendanceService: AttendanceService) {
+  public downloadJsonHref: SafeUrl;
+  public jsonFilename = ".json";
+
+  constructor(private attendanceService: AttendanceService, private sanitizer: DomSanitizer) {
     this.selectedDate = new FormControl(new Date());
 
     // check if it is a mobile user, if so, use touchUI elements for better targeting
@@ -139,6 +143,7 @@ export class AttendanceComponent implements OnInit, OnDestroy {
               this.reservedStops["back"].push(arr);
               i++;
             }
+            this.buildDownloadFile();
           }
         });
   }
@@ -177,6 +182,61 @@ export class AttendanceComponent implements OnInit, OnDestroy {
     else
       return undefined;
 
+  }
+
+  addChild(child){
+
+  }
+
+  toggleChildPresence(child){
+
+  }
+
+  buildDownloadFile(){
+    let jsonObject = {
+      linea: this.selectedLine.name,
+      direzione: this.selectedDirection==="outward"?"scuola":"casa",
+      indiceCorsa: this.selectedRun,
+      fermate: []
+    };
+
+    for(let i in this.reservedStops[this.selectedDirection][this.selectedRun]){
+      let stop;
+      if(this.selectedDirection === "outward"){
+        stop = {
+          nomeFermata: this.selectedLine.outward[this.selectedRun].stops[i].name,
+          presenze: this.reservedStops[this.selectedDirection][this.selectedRun][i]
+        }
+      }
+      else{
+        stop = {
+          nomeFermata: this.selectedLine.back[this.selectedRun].stops[i].name,
+          presenze: this.reservedStops[this.selectedDirection][this.selectedRun][i]
+        }
+      }
+      jsonObject.fermate.push(stop);
+    }
+
+    let theJSON = JSON.stringify(jsonObject);
+    let uri = this.sanitizer.bypassSecurityTrustUrl("data:text/json;charset=UTF-8," + encodeURIComponent(theJSON));
+    this.downloadJsonHref = uri;
+
+    let day = this.selectedDate.value.getDate().toString();
+    let month = (this.selectedDate.value.getMonth() + 1).toString();
+
+    if(day.length < 2){
+      day = "0" + day;
+    }
+
+    if (month.length < 2){
+      month = "0" + month;
+    }
+
+    let year = this.selectedDate.value.getFullYear();
+    let dateString = day.toString() + month + year.toString();
+    this.jsonFilename = "FoglioPresenze_"+this.selectedLine.name+"_"+
+      this.selectedDirection+this.selectedRun+"_"+
+      dateString+".json";
   }
 
   ngOnDestroy(){

@@ -71,7 +71,6 @@ export class LocalizationService {
           })
         )
         .subscribe((shift: Shift) =>{
-            console.log(shift);
             if(shift && shift){
               let timems;
               let end_timems;

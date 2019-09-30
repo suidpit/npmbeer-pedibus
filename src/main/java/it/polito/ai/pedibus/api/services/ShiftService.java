@@ -74,6 +74,7 @@ public class ShiftService {
             }
         }
 
+        s.setLastUpdate(s.getFrom().getPosition());
         return shiftRepository.insert(s); }
 
     public ObjectId getCompanionIdByShiftId(ObjectId sid){

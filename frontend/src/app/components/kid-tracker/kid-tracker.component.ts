@@ -44,7 +44,7 @@ export class KidTrackerComponent implements OnInit {
           self.error = undefined;
 
           let res_object = {
-            
+
           }
         }
         else{

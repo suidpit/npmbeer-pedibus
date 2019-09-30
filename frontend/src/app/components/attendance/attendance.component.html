@@ -1,10 +1,14 @@
 <div style="width: 100%; height: 100%;" fxLayoutAlign="center center">
-  <mat-card class="container">
-    <mat-card-title>
-      Presenze
-    </mat-card-title>
-    <mat-card-content>
-      <div>
+  <mat-card class="container" fxLayout="column">
+
+    <mat-card-header fxLayout="column" fxFlexAlign="center center" fxFlex="1 1 50px">
+      <mat-card-title style="text-align: center">
+        Presenze
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content fxLayout="column" fxFlex="2 1 100%">
+      <div fxFlex="0 0 auto">
         <mat-grid-list cols="1" rowHeight="4:1">
           <mat-grid-tile class="row">
             <mat-form-field>
@@ -36,7 +40,7 @@
 
             <span class="fill-row"></span>
 
-            <span>
+            <!--span>
             <button mat-icon-button>
               <mat-icon>chevron_left</mat-icon>
             </button>
@@ -44,17 +48,17 @@
             <button mat-icon-button>
               <mat-icon>chevron_right</mat-icon>
             </button>
-          </span>
+          </span-->
           </mat-grid-tile>
 
         </mat-grid-list>
 
       </div>
-      <mat-divider></mat-divider>
-      <div>
-        <mat-tab-group mat-align-tabs="center" [(selectedIndex)]="selectedRun">
+      <mat-divider [inset]="true"></mat-divider>
+      <div class="tabs attendance-tabs" fxFlex="1 0 100%" fxLayout="column">
+        <mat-tab-group mat-align-tabs="center" [(selectedIndex)]="selectedRun" fxFlex="1 0 100%">
           <div *ngIf="selectedLine">
-            <mat-tab *ngFor="let run of selectedLine.outward; let i = index" label="Andata {{i+1}}">
+            <mat-tab *ngFor="let run of selectedLine.outward; let i = index" label="Andata {{i+1}}" fxLayout="column" fxFlexAlign="center center" fxFlex="1 0 100%">
               <mat-list dense>
                 <mat-list-item>
                   <app-stop-row [stop-name]="'Partenza'"[type]="'start'"></app-stop-row>
@@ -68,7 +72,9 @@
                                   [type]="'intermediate'"
                                   [children]="reservedStops['outward'][i][j]"
                                   [stop-name]="stop.name"
-                                  [stop-time]="stop.time"></app-stop-row>
+                                  [stop-time]="stop.time"
+                                  (add-child)="addChild($event)"
+                                  (child-presence)="toggleChildPresence($event)"></app-stop-row>
                   </mat-list-item>
                   <mat-list-item>
                     <app-stop-row [type]="'dots'"></app-stop-row>
@@ -107,7 +113,8 @@
           </div>
         </mat-tab-group>
       </div>
-      <mat-card-footer>
+      <mat-card-footer fxLayoutAlign="end center">
+        <a class="download-btn" [href]="downloadJsonHref" [download]="jsonFilename">Scarica Presenze</a>
       </mat-card-footer>
     </mat-card-content>
   </mat-card>

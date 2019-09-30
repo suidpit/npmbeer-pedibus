@@ -1,8 +1,21 @@
-.container{
-  width: 350px;
-  height: 750px;
+
+mat-card{
+  min-height: 99%;
+  max-height: 99%;
+  max-width: 99%;
+  margin: auto;
 }
 
+@media screen and (max-width: 600px) {
+
+  mat-card{
+    min-height: 750px;
+    max-height: 750px;
+    min-width: 380px;
+    max-width: 380px;
+    margin: auto;
+  }
+}
 .row{
   display: flex;
   justify-content: flex-start;
@@ -34,4 +47,44 @@ mat-list-item{
 .custom-list .mat-list-item{
   height: auto;
   min-height: 48px;
+}
+
+mat-tab-group{
+  height: 100%;
+ }
+
+mat-tab{
+  height: 100%;
+}
+
+.tabs{
+  height: 100%;
+}
+
+mat-card-footer{
+  padding: 5px;
+}
+
+.download-btn{
+  color: black;
+  text-decoration: none;
+  padding: 10px;
+  border: 1px solid #F0F0F0;
+
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+
+  -webkit-box-shadow: 0 3px 5px 0 rgba(0,0,0,0.55);
+  -moz-box-shadow: 0 3px 5px 0 rgba(0,0,0,0.55);
+  box-shadow: 0 3px 5px 0 rgba(0,0,0,0.55);
+}
+
+.download-btn:active{
+  color: black;
+  background-color: #F0F0F0;
+}
+
+.download-btn:visited{
+  color: black;
 }
