@@ -175,4 +175,5 @@ public class UserAuthController {
         User user = service.getUserByEmail(emailDTO.getEmail());
         return user != null;
     }
+
 }

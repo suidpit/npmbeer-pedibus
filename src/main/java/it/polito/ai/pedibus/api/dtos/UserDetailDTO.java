@@ -20,7 +20,7 @@ public class UserDetailDTO {
 
     private String email;
 
-    private List<Child> children;
+    private List<ObjectId> children;
 
     private boolean enabled;
 

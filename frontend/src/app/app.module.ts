@@ -3,12 +3,13 @@ import {NgModule} from '@angular/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AngularResizedEventModule} from 'angular-resize-event';
 import {
-  MatBadgeModule,
-  MatExpansionModule,
-  MatFormFieldModule,
-  MatPaginatorModule,
-  MatSortModule,
-  MatTableModule
+    MatBadgeModule,
+    MatExpansionModule,
+    MatFormFieldModule,
+    MatPaginatorModule,
+    MatRadioModule,
+    MatSortModule,
+    MatTableModule
 } from "@angular/material";
 import {MatButtonModule} from '@angular/material/button';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
@@ -75,9 +76,14 @@ import { UserPasswordSetupComponent, PizzaPartyComponent } from './components/us
 import { UnauthorizedComponent } from './components/unauthorized/unauthorized.component';
 import {NoAuthnGuard} from "./guards/no-authn-guard/no-authn-guard.service";
 import { ShiftConfirmationComponent } from './components/shifts/shift-confirmation/shift-confirmation.component';
-import { LateralmenuComponent } from './components/lateralmenu/lateralmenu.component';
+import { LateralmenuComponent } from './components/profileInfo/lateralmenu/lateralmenu.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import { ProfileComponent } from './components/profileInfo/profile/profile.component';
+import {
+    ChildCardComponent,
+    ManageChildrenComponent
+} from './components/profileInfo/manage-children/manage-children.component';
+import { ChangePasswordComponent } from './components/profileInfo/change-password/change-password.component';
 
 
 @NgModule({
@@ -115,6 +121,9 @@ import { ProfileComponent } from './components/profileInfo/profile/profile.compo
     ShiftConfirmationComponent,
     LateralmenuComponent,
     ProfileComponent,
+    ManageChildrenComponent,
+    ChildCardComponent,
+    ChangePasswordComponent,
   ],
   imports: [
     BrowserModule,
@@ -128,7 +137,7 @@ import { ProfileComponent } from './components/profileInfo/profile/profile.compo
       { path: "impostaPassword/:token", component: UserPasswordSetupComponent},
       { path: "auth_error" , component: UnauthorizedComponent},
       { path: "prenotazione", component: ReservationsComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
-      { path: "profilo", component: LateralmenuComponent},
+      { path: "profilo", component: LateralmenuComponent, canActivate: [AuthGuard], data:{roles: [Role.USER]}},
       { path: "**", redirectTo: "login", pathMatch: "full"}
     ]),
     HttpClientModule,
@@ -136,6 +145,7 @@ import { ProfileComponent } from './components/profileInfo/profile/profile.compo
     MatButtonModule,
     MatIconModule,
     MatCheckboxModule,
+    MatRadioModule,
     MatCardModule,
     MatMenuModule,
     MatButtonToggleModule,

@@ -244,7 +244,6 @@ export class DialogEventAdmin{
 
   setCompanion(){
     let to;
-    debugger;
     if(this.shiftInputs.controls["stop"].value === this.shift.to.toString())
       to = null;
     else

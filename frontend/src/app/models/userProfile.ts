@@ -1,16 +1,14 @@
 import { User } from './user';
 
-export class userProfile {
-    private readonly _user;
-    private readonly _name ;
-    private readonly _surname;
-    private readonly _address;
-    private readonly _telephone;
-    constructor(user:User,name:string,surname:string,address:string,telephone:string){
-        this._user = user;
-        this._name = name;
-        this._surname = surname;
-        this._address = address;
-        this._telephone = telephone;
-    }
+export class UserProfile {
+    public name : String;
+    public surname : String;
+    public address : String;
+    public telephone: String;
+    public alt_email: String;
+    public readonly email: String;
+    public photo: String;
+    public photoFile: boolean;
+    public defaultLine: String;
+    public defaultStop: String;
 }

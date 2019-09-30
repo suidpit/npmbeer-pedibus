@@ -38,7 +38,7 @@
                     </p>
                     <mat-divider [inset]="true"></mat-divider>
                     <mat-tab-group dynamicHeight class="tabs" (resized)="onResize($event)" mat-stretch-tabs
-                                   [(selectedIndex)]="selectedRun">
+                                   [(selectedIndex)]="selectedRun" (selectedIndexChange)="changeTab()">
                         <div>
                             <mat-tab *ngFor="let run of selectedLine.outward; let i = index" label="Andata {{i+1}}">
                                 <div class="stops">

@@ -1,16 +1,15 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import * as moment from "moment";
-import {not} from "rxjs/internal-compatibility";
 import {User} from "../../models/user";
 import {BehaviorSubject} from "rxjs/internal/BehaviorSubject";
 import {Observable} from "rxjs/internal/Observable";
-import {mapEntry} from "@angular/compiler/src/output/map_util";
 import { map, catchError, toArray, mergeMap, concatMap} from "rxjs/operators";
 import { throwError } from 'rxjs';
 import {from} from "rxjs/internal/observable/from";
 import {of} from "rxjs/internal/observable/of";
 import {Authority, Role} from "../../models/authority";
+import {UserProfile} from "../../models/userProfile";
 
 
 @Injectable({
@@ -26,7 +25,6 @@ export class AuthService {
   send_pwd_url = "http://localhost:8080/confirm/";
   retrieve_user_url = "http://localhost:8080/users/retrieve/";
   profile_information_url = "http://localhost:8080/profile/information/";
-  add_child_url =  "http://localhost:8080/profile/addChild";
   change_profile_information_url =  "http://localhost:8080/profile"
 
   private currentUserSubject: BehaviorSubject<User>;
@@ -180,21 +178,6 @@ export class AuthService {
 
   hasAuthorityOnLine(line: string) {
     return this.getCurrentUser().hasAuthorityOnLine(line);
-  }
-
-  getProfileinformation(current:User) {
-    let em = current['_email'];
-    return this.http.get<any>(this.profile_information_url + em).pipe(catchError(err=>this.handleError(err)));
-  }
-
-  addChild(email:string,name:string,surname:string,birthday:string, gender:string){
-    return this.http.post<any>(this.add_child_url,{
-      "email":email,
-      "name" : name,
-      "surname" : surname,
-      "birthday" : birthday,
-      "gender" : gender
-    })
   }
 
   editProfileInformation(email:string,name:string,surname:string,address:string, telephone:string){

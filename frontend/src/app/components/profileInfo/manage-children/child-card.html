@@ -1,0 +1,15 @@
+<mat-card>
+    <mat-card-content>
+        <div fxLayout="column nowrap">
+            <div fxLayout="row nowrap">
+                <img mat-card-avatar class="avatar"
+                     [src]="pic ? pic : '../../../../assets/icons/img_avatar.png'">
+                <div fxLayout="column nowrap">
+                    <p>{{name}}</p>
+                    <p>{{sex}}</p>
+                </div>
+            </div>
+            <p>{{birthday}}</p>
+        </div>
+    </mat-card-content>
+</mat-card>

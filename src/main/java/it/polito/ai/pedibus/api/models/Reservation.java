@@ -28,7 +28,7 @@ public class Reservation {
     private LocalDate date;
     private String lineName;
     // We're not sure an ID is needed here, since every stop name, in the context of a direction and tripIndex number, is unique.
-    private List<String> childName;
+    private List<ObjectId> childId;
 
     //TODO:
     //Change to USER ID
