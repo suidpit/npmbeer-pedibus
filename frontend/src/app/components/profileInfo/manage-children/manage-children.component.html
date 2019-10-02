@@ -1,6 +1,5 @@
 <mat-card>
     <mat-card-title>Gestione bambini</mat-card-title>
-    <app-spinner *ngIf="children==null"></app-spinner>
     <mat-card-content *ngIf="children" class="children" fxLayout="row nowrap" fxLayoutAlign="left">
         <div *ngFor="let child of children" fxLayout="row nowrap" class="child" fxLayoutAlign="left">
             <app-child-card (click)="task_children(child)"
@@ -12,7 +11,7 @@
         </div>
 
         <div class="child">
-            <mat-card class="add" (click)="task_children(null)">
+            <mat-card fxFill fxLayoutAlign="center center" class="add" (click)="task_children(null)">
                 <mat-icon svgIcon="add"></mat-icon>
             </mat-card>
         </div>
@@ -22,76 +21,68 @@
             <mat-card-title>{{title}}</mat-card-title>
             <mat-card-content>
                 <p class="error">{{error}}</p>
-                <form #child_form="ngForm">
+                <form #f="ngForm" (ngSubmit)="f.valid && onSubmit()">
                     <div fxLayout="column">
                         <div fxFill fxLayout="row">
-                            <label fxFlex="33%">
+                            <div fxFlex="33%">
                                 <p>Nome*</p>
                                 <input name="name" placeholder="Nome*" [(ngModel)]="child_to_update.name" ngModel
-                                       required>
-                            </label>
-                            <label fxFlex="33%" class="btn btn-default" fxFlexAlign="center">
+                                       required #name="ngModel">
+                                <div *ngIf="f.submitted && name.invalid" class="error">Inserire un nome</div>
+                            </div>
+                            <div fxFlex="33%" class="btn btn-default">
                                 <input type="file" (change)="selectFile($event)">
-                            </label>
+                            </div>
                         </div>
-                        <div fxLayout="row">
-                            <label fxFlex="33%">
-                                <p>Cognome*</p>
-                                <input placeholder="Cognome*" name="surname" [(ngModel)]="child_to_update.surname"
-                                       ngModel required>
-                            </label>
-                            <label fxFlex="33%">
+                        <div fxFill fxLayout="row">
+                            <div fxFlex="33%" fxLayout="column">
+                                <div>
+                                    <p>Cognome*</p>
+                                    <input placeholder="Cognome*" name="surname" [(ngModel)]="child_to_update.surname"
+                                           ngModel required #cognome="ngModel">
+                                    <div *ngIf="f.submitted && cognome.invalid" class="error">Inserire un cognome</div>
+                                </div>
+                                <div>
+                                    <p>Data di nascita*</p>
+                                    <input placeholder="01/01/2001*" [matDatepicker]="picker" name="birthday"
+                                           [(ngModel)]="child_to_update.birthday"
+                                           ngModel required #nascita="ngModel">
+                                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                    <div *ngIf="f.submitted && nascita.invalid" class="error">Inserire la data di nascita</div>
+                                </div>
+                            </div>
+                            <div fxFlex="33%">
                                 <img *ngIf="previewUrl" [src]="previewUrl" class="preview">
-                            </label>
-                            <label fxFlex="33%">
+                            </div>
+                            <div fxFlex="33%">
                                 <img [src]="child_to_update.photo ? child_to_update.photo : '../../../../assets/icons/img_avatar.png'"
                                      class="preview">
-                            </label>
+                            </div>
                         </div>
                         <div fxFill fxLayout="row">
-                            <label fxFlex="33%">
-                                <p>Data di nascita*</p>
-                                <input placeholder="01/01/2001*" [matDatepicker]="picker" name="birthday"
-                                       [(ngModel)]="child_to_update.birthday"
-                                       ngModel required>
-                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                                <mat-datepicker #picker></mat-datepicker>
-                            </label>
-                            <label fxFlex="33%">
-                                <p>Linea di default*</p>
-                                <select name="default_line">
-                                    <option>LINEA1</option>
-                                </select>
-                            </label>
-                            <label fxFlex="33%">
-                                <p>Fermata di default*</p>
-                                <select name="default_stop">
-                                    <option>STOP1</option>
-                                </select>
-                            </label>
-                        </div>
-                        <div fxFill fxLayout="row">
-                            <label fxFlex="33%">
+                            <div fxFlex="33%">
                                 <p>Sesso*</p>
                                 <mat-radio-group name="gender"
-                                                 [(ngModel)]="child_to_update.gender" required>
+                                                 [(ngModel)]="child_to_update.gender" required #sesso="ngModel">
                                     <mat-radio-button value="M">M</mat-radio-button>
                                     <mat-radio-button value="F">F</mat-radio-button>
                                 </mat-radio-group>
-                            </label>
-                            <label fxFlex="33%">
-                                <mat-checkbox name="disability" [(ngModel)]="child_to_update.disability" required>
+                                <div *ngIf="f.submitted && sesso.invalid" class="error">Inserire il sesso</div>
+                            </div>
+                            <div fxFlex="33%" fxFlexAlign="center">
+                                <mat-checkbox name="disability" [(ngModel)]="child_to_update.disability">
                                     Disabilità
                                 </mat-checkbox>
-                            </label>
-                            <label fxFlex="33%">
+                            </div>
+                            <div fxFlex="33%" fxFlexAlign="center">
                                 <input placeholder="Altro" name="other" [(ngModel)]="child_to_update.other"
                                        ngModel>
-                            </label>
+                            </div>
                         </div>
                         <div fxFill fxLayout="row">
-                            <button mat-raised-button (click)="onSubmit()">SALVA</button>
-                            <button mat-raised-button (click)="onDelete()" *ngIf="child_to_update.id">ELIMINA
+                            <button mat-raised-button>SALVA</button>
+                            <button mat-raised-button type="button" (click)="f.valid && onDelete()" *ngIf="child_to_update.id">ELIMINA
                             </button>
                         </div>
                     </div>
@@ -100,3 +91,4 @@
         </mat-card>
     </mat-card-content>
 </mat-card>
+<app-spinner *ngIf="children==null || task=='loading'"></app-spinner>
