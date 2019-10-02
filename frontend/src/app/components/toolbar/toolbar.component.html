@@ -30,7 +30,7 @@
           <!--a (click)="auth.logout()" routerLink="/login" mat-button class="pointer logged-user-style">Logout</a-->
         </div>
         <mat-menu #userMenu="matMenu">
-          <button mat-menu-item >Il mio profilo</button>
+          <button mat-menu-item routerLink="/profilo" >Il mio profilo</button>
           <button mat-menu-item (click)="auth.logout()" routerLink="/login">Logout</button>
         </mat-menu>
 
