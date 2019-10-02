@@ -2,11 +2,14 @@ package it.polito.ai.pedibus.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
-import it.polito.ai.pedibus.api.models.*;
-import it.polito.ai.pedibus.api.repositories.*;
+import it.polito.ai.pedibus.api.models.Line;
+import it.polito.ai.pedibus.api.models.Shift;
+import it.polito.ai.pedibus.api.models.User;
+import it.polito.ai.pedibus.api.repositories.LineRepository;
+import it.polito.ai.pedibus.api.repositories.ShiftRepository;
+import it.polito.ai.pedibus.api.repositories.UserRepository;
 import it.polito.ai.pedibus.api.services.PhotoService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;

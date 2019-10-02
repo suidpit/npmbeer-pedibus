@@ -34,6 +34,11 @@ export class ToolbarComponent implements OnInit {
       displayName: "Registrazione Utenti",
       url: "/registrazioneEmail",
       roles: []
+    },
+    {
+      displayName: "Eventi",
+      url: "/eventi",
+      roles: []
     }
   ];
 

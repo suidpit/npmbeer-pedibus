@@ -79,11 +79,13 @@ import { ShiftConfirmationComponent } from './components/shifts/shift-confirmati
 import { LateralmenuComponent } from './components/profileInfo/lateralmenu/lateralmenu.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import { ProfileComponent } from './components/profileInfo/profile/profile.component';
+import { SimpleEventLoggerComponent } from './components/simple-event-logger/simple-event-logger.component';
 import {
     ChildCardComponent,
     ManageChildrenComponent
 } from './components/profileInfo/manage-children/manage-children.component';
 import { ChangePasswordComponent } from './components/profileInfo/change-password/change-password.component';
+
 
 
 @NgModule({
@@ -121,6 +123,7 @@ import { ChangePasswordComponent } from './components/profileInfo/change-passwor
     ShiftConfirmationComponent,
     LateralmenuComponent,
     ProfileComponent,
+    SimpleEventLoggerComponent,
     ManageChildrenComponent,
     ChildCardComponent,
     ChangePasswordComponent,
@@ -137,6 +140,7 @@ import { ChangePasswordComponent } from './components/profileInfo/change-passwor
       { path: "impostaPassword/:token", component: UserPasswordSetupComponent},
       { path: "auth_error" , component: UnauthorizedComponent},
       { path: "prenotazione", component: ReservationsComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
+      { path: "eventi", component: SimpleEventLoggerComponent},
       { path: "profilo", component: LateralmenuComponent, canActivate: [AuthGuard], data:{roles: [Role.USER]}},
       { path: "**", redirectTo: "login", pathMatch: "full"}
     ]),
