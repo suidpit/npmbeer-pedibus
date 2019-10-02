@@ -1,0 +1,54 @@
+<div fxLayout="row nowrap" fxLayoutAlign="center">
+    <mat-card class="container">
+        <mat-card-content>
+            <mat-card>
+                <mat-card-content>
+                    <div fxLayout="row nowrap">
+                        <img mat-card-avatar class="avatar"
+                             [src]="(user && user.photo) ? user.photo : '../../../../assets/icons/img_avatar.png'">
+                        <p *ngIf="user" class="name">{{user.name}}</p>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+            <mat-card>
+                <mat-card-content>
+                    <mat-list-item (click)=selectTaskProfilo()>
+                        <button
+                                class="menu-item"
+                                mat-flat-button>
+                            <mat-icon>dashboard</mat-icon>
+                            Profilo
+                        </button>
+                    </mat-list-item>
+
+                    <mat-list-item (click)=selectTaskBambini()>
+                        <button
+                                class="menu-item"
+                                mat-flat-button>
+                            <mat-icon>work</mat-icon>
+                            Bambini
+                        </button>
+                    </mat-list-item>
+
+                    <mat-list-item (click)=selectTaskCambioPassword()>
+                        <button
+                                class="menu-item"
+                                mat-flat-button>
+                            <mat-icon>settings_application</mat-icon>
+                            Cambia Password
+                        </button>
+                    </mat-list-item>
+                </mat-card-content>
+            </mat-card>
+        </mat-card-content>
+    </mat-card>
+    <div class="task" *ngIf="task==='bambini'">
+        <app-manage-children></app-manage-children>
+    </div>
+    <div class="task" *ngIf="task==='profilo'">
+        <app-profile></app-profile>
+    </div>
+    <div class="task" *ngIf="task==='cambioPwd'">
+        <app-change-password></app-change-password>
+    </div>
+</div>

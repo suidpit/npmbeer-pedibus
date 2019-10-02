@@ -1,6 +1,87 @@
-<app-lateralmenu>
+<mat-card>
+    <mat-card-title>Profilo</mat-card-title>
+    <mat-card-content *ngIf="user" fxLayout="column">
+        <form role=form name="profileForm" #f="ngForm" (submit)="f.form.valid && saveUser()">
+                <div fxFill fxLayout="row">
+                    <div fxFlex="50%">
+                        <p>Avatar: </p>
+                        <img [src]="(user && user.photo) ? user.photo : '../../../../assets/icons/img_avatar.png'"
+                             class="preview">
+                    </div>
+                    <div fxFlex="50%" class="btn btn-default">
+                        <input class="input_file" type="file" (change)="selectFile($event)">
+                        <p class="error" *ngIf="image_error">{{image_error}}</p>
+                        <img *ngIf="previewUrl" [src]="previewUrl" class="preview">
+                    </div>
+                    <div>
 
-<p>
-  profile workssssssssssssssssssssssssssssssssssssssssssssssssssssss!
-</p>
-</app-lateralmenu>
+                    </div>
+                </div>
+                <div fxFill fxLayout="row">
+                    <div fxFlex="50%">
+                        <p>Email: </p>
+                        <p class="email">{{user.email}}</p>
+                    </div>
+                    <div fxFlex="50%">
+                        <p>Email alternativa: </p>
+                        <input type="email" placeholder="mario.rossi@example.com" class="form-control"
+                               name="alt_email" [(ngModel)]="user.alt_email" #alt_email="ngModel" email>
+                        <div *ngIf="f.submitted && alt_email.invalid " class="invalid-feedback">
+                            <div class="error">Email deve essere un indirizzo valido</div>
+                        </div>
+                    </div>
+                </div>
+                <div fxFill fxLayout="row">
+                    <div fxFlex="50%">
+                        <p>Nome: </p>
+                        <input placeholder="Mario" [(ngModel)]="user.name" name="name">
+                    </div>
+                    <div fxFlex="50%">
+                        <p>Cognome: </p>
+                        <input placeholder="Rossi" [(ngModel)]="user.surname" name="surname">
+                    </div>
+                </div>
+                <div fxFill fxLayout="row">
+                    <div fxFlex="50%">
+                        <p>Indirizzo: </p>
+                        <input [(ngModel)]="user.address" name="address">
+                    </div>
+                    <div fxFlex="50%">
+                        <p>Telefono: </p>
+                        <input [(ngModel)]="user.telephone" placeholder="+39333333333" name="telephone" #tel="ngModel" pattern="(\+[0-9][0-9])?[0-9]+">
+                        <div *ngIf="tel.invalid" class="invalid-feedback">
+                            <div class="error">Formato numero non valido</div>
+                        </div>
+                    </div>
+                </div>
+                <div fxFill fxLayout="row">
+                    <div fxFlex="50%">
+                        <p>Seleziona una linea di default</p>
+                        <mat-form-field>
+                            <mat-select placeholder="Seleziona una linea" name="defaultLine"
+                                        [(ngModel)]="user.defaultLine" (valueChange)="user.defaultStop = null">
+                                <mat-option>Nessuna linea selezionata</mat-option>
+                                <mat-option *ngFor="let line of lines" [value]="line.name">
+                                    {{line.name}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div fxFlex="50%">
+                        <p>Seleziona una fermata di default</p>
+                        <mat-form-field>
+                            <mat-select placeholder="Seleziona una fermata" [(value)]="user.defaultStop">
+                                <mat-option>Nessuna fermata selezionata</mat-option>
+                                <mat-option *ngFor="let stop of findStops()" [value]="stop">
+                                    {{stop}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <button mat-raised-button>SALVA</button>
+                <p class="error">{{error}}</p>
+        </form>
+    </mat-card-content>
+    <app-spinner *ngIf="task=='loading'"></app-spinner>
+</mat-card>

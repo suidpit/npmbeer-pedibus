@@ -33,7 +33,14 @@
   font-family: Roboto,"Helvetica Neue",sans-serif;
   font-size: 10px;
   font-weight: 200;
-  border-bottom: 1px solid white;
+  height: min-content;
+  cursor: pointer;
+  padding: 0 4px;
+  border-radius: 4px;
+}
+
+.logged-user-style:hover{
+  background-color: #385169;
 }
 
 .user-email{

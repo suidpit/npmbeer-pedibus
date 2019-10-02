@@ -15,10 +15,9 @@ import {ReservationReq} from "../../models/reservation-req";
 })
 export class ReservationsService {
 
-    private baseUrl: String = 'http://localhost:8080'
+    private baseUrl: String = 'http://localhost:8080';
 
-    constructor(private http: HttpClient) {
-    } // using Angular Dependency Injection
+    constructor(private http: HttpClient) {} // using Angular Dependency Injection
 
     getLines(): Observable<Line[]> {
         return this.http.get<Line[]>(this.baseUrl + "/lines").pipe(map((data) => {

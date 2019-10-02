@@ -11,7 +11,7 @@
     <div class="calendar-container" >
       <full-calendar defaultView="dayGridMonth" (eventClick)="eventShowPopup($event)"
                      [plugins]="calendarPlugins" [hiddenDays]="[0]"
-                     [events]="shiftService.getCalendarShifts() | async"></full-calendar>
+                     [events]="shiftService.getCalendarShifts() | async" #calendar></full-calendar>
     </div>
   </mat-card-content>
 </mat-card>

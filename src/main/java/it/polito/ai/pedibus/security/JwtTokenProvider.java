@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,10 +19,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class JwtTokenProvider {
@@ -52,15 +50,17 @@ public class JwtTokenProvider {
         this.signingAlgorithm = Algorithm.HMAC256(this.key);
     }
 
-    public String createToken(String username, List<String> Roles, String user_id){
+    public String createToken(String username, HashMap<String,List<String>> authorities, String user_id){
         Date notBefore = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(notBefore);
         calendar.add(Calendar.HOUR_OF_DAY, this.validityHours);
         Date expiresAt = calendar.getTime();
+
         return JWT.create() // returns a Builder
                 .withClaim("email", username)
                 .withClaim("user_id", user_id)
+                .withClaim("authorities", new JSONObject(authorities).toString())
                 .withNotBefore(notBefore)
                 .withExpiresAt(expiresAt)
                 .withIssuer(this.issuer)

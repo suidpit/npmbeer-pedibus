@@ -20,5 +20,6 @@ public interface ReservationRepository extends MongoRepository<Reservation, Stri
     List<Reservation> findByLineNameAndDateAndUser(String linename, LocalDate date, ObjectId user);
     List<Reservation> findByUser(ObjectId user);
 
+    void deleteByChildId(ObjectId childId);
 }
 

@@ -22,7 +22,6 @@ export class AttendanceService {
   }
 
   lines(): Observable<Line[]> {
-
     //TODO:  This will go in a config file
     let api_url = this.base_url + "/lines";
     return this.http.get<Line[]>(api_url).pipe(map((data) => {

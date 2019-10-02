@@ -1,11 +1,14 @@
 [
   {
-    "date": "11-11-2011",
+    "id": null,
+    "date": "11-11-2019",
     "lineName": "linea2",
-    "companionId": "5d419c8d46ee032d40ae822d",
+    "companionId": "",
     "direction": "BACK",
     "tripIndex": 0,
-    "availabilities": ["5d419c8d46ee032d40ae822d"],
+    "availabilities": [],
+    "from": {"name":"P.za Solferino", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"08:00"},
+    "to": {"name":"Sansa", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"08:30"},
     "open": true
   }
 ]

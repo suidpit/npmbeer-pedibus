@@ -6,7 +6,7 @@
     </div>
     <div fxShow="true" fxHide.lt-md="true">
       <img src="../../../assets/icons/p_logo_blue.png" style="width: 45px; height: 45px;">
-      
+
     </div>
     <span class="pointer site-name side-container" routerLink="/" >Pedibus</span>
 
@@ -23,11 +23,18 @@
         <div mat-card-avatar class="avatar"></div>
         <div fxLayout="column" fxLayoutAlign="center center">
           <span class="logged-user-style" *ngIf="auth.currentUser$ | async as user">
-            <span class="user-email">{{user.email}}</span>
+            <span class="user-email" [matMenuTriggerFor]="userMenu">
+              {{ (user.email.length>12)? (user.email | slice:0:12)+'..':(user.email) }}
+            </span>
           </span>
-          <a (click)="auth.logout()" routerLink="/login" mat-button class="pointer logged-user-style">Logout</a>
+          <!--a (click)="auth.logout()" routerLink="/login" mat-button class="pointer logged-user-style">Logout</a-->
         </div>
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item routerLink="/profilo" >Il mio profilo</button>
+          <button mat-menu-item (click)="auth.logout()" routerLink="/login">Logout</button>
+        </mat-menu>
 
+        <mat-icon matBadge="1" matBadgePosition="above after">notifications</mat-icon>
     </span>
 
     <span fxShow="true" fxHide.lt-md="true" fxLayoutAlign="end center" class="side-container" *ngIf="!(auth.isLoggedIn$ | async)">

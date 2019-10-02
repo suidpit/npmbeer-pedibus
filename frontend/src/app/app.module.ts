@@ -2,6 +2,15 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AngularResizedEventModule} from 'angular-resize-event';
+import {
+    MatBadgeModule,
+    MatExpansionModule,
+    MatFormFieldModule,
+    MatPaginatorModule,
+    MatRadioModule,
+    MatSortModule,
+    MatTableModule
+} from "@angular/material";
 import {MatButtonModule} from '@angular/material/button';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatCardModule} from '@angular/material/card';
@@ -46,24 +55,37 @@ import { UpcomingShiftsComponent } from './components/shifts/upcoming-shifts/upc
 import { ShiftChipComponent } from './components/shifts/shift-chip/shift-chip.component';
 import { DialogEventInfo, ShiftCalendarComponent} from './components/shifts/shift-calendar/shift-calendar.component';
 import { ShiftPageComponent } from './components/shifts/shift-page/shift-page.component';
-import { ShiftAvailabilitiesComponent } from './components/shifts/shift-availabilities/shift-availabilities.component';
+import {
+  DialogEventAdmin,
+  DialogEventNormal,
+  ShiftAvailabilitiesComponent
+} from './components/shifts/shift-availabilities/shift-availabilities.component';
 import {AttendanceComponent} from './components/attendance/attendance.component';
 import {StopListRowComponent} from './components/stop-list/stop-list-row/stop-list-row.component';
 import {StopListComponent} from './components/stop-list/stop-list.component';
 import {StopElementComponent} from './components/stop-list/stop-element/stop-element.component';
 import {SpinnerComponent} from './components/spinner/spinner.component';
 import {AuthGuard} from "./guards/auth-guard/auth-guard";
-import {Role} from "./models/user";
+import {Role} from "./models/authority";
 import {
   NewRegistrationEmailComponent,
   DialogEmailExistsNewReg,
   DialogEmailSendedNewReg
 } from './components/new-registration-email/new-registration-email.component';
 import { UserPasswordSetupComponent, PizzaPartyComponent } from './components/user-password-setup/user-password-setup.component';
-import { LateralmenuComponent } from './components/lateralmenu/lateralmenu.component';
+import { UnauthorizedComponent } from './components/unauthorized/unauthorized.component';
+import {NoAuthnGuard} from "./guards/no-authn-guard/no-authn-guard.service";
+import { ShiftConfirmationComponent } from './components/shifts/shift-confirmation/shift-confirmation.component';
+import { LateralmenuComponent } from './components/profileInfo/lateralmenu/lateralmenu.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import { ProfileComponent } from './components/profileInfo/profile/profile.component';
 import { SimpleEventLoggerComponent } from './components/simple-event-logger/simple-event-logger.component';
+import {
+    ChildCardComponent,
+    ManageChildrenComponent
+} from './components/profileInfo/manage-children/manage-children.component';
+import { ChangePasswordComponent } from './components/profileInfo/change-password/change-password.component';
+
 
 
 @NgModule({
@@ -79,6 +101,8 @@ import { SimpleEventLoggerComponent } from './components/simple-event-logger/sim
     DialogEmailSended,
     DialogEmailExists,
     DialogEventInfo,
+    DialogEventNormal,
+    DialogEventAdmin,
     UpcomingShiftsComponent,
     ShiftChipComponent,
     ShiftCalendarComponent,
@@ -95,29 +119,37 @@ import { SimpleEventLoggerComponent } from './components/simple-event-logger/sim
     StopListComponent,
     StopElementComponent,
     SpinnerComponent,
+    UnauthorizedComponent,
+    ShiftConfirmationComponent,
     LateralmenuComponent,
     ProfileComponent,
     SimpleEventLoggerComponent,
+    ManageChildrenComponent,
+    ChildCardComponent,
+    ChangePasswordComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     RouterModule.forRoot([
-      { path: "login", component: LoginComponent},
+      { path: "login", component: LoginComponent, canActivate: [NoAuthnGuard]},
       { path: "presenze", component: AttendanceComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
-      { path: "registrazione", component: RegistrationComponent },
+      { path: "registrazione", component: RegistrationComponent, canActivate: [NoAuthnGuard] },
       { path: "admin/turni", component: ShiftPageComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
       { path: "registrazioneEmail", component: NewRegistrationEmailComponent},
       { path: "impostaPassword/:token", component: UserPasswordSetupComponent},
+      { path: "auth_error" , component: UnauthorizedComponent},
       { path: "prenotazione", component: ReservationsComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
-      { path: "profilo", component: LateralmenuComponent},
       { path: "eventi", component: SimpleEventLoggerComponent},
+      { path: "profilo", component: LateralmenuComponent, canActivate: [AuthGuard], data:{roles: [Role.USER]}},
       { path: "**", redirectTo: "login", pathMatch: "full"}
     ]),
     HttpClientModule,
+    MatBadgeModule,
     MatButtonModule,
     MatIconModule,
     MatCheckboxModule,
+    MatRadioModule,
     MatCardModule,
     MatMenuModule,
     MatButtonToggleModule,
@@ -136,6 +168,11 @@ import { SimpleEventLoggerComponent } from './components/simple-event-logger/sim
     MatToolbarModule,
     MatSidenavModule,
     MatDialogModule,
+    MatSortModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatFormFieldModule,
+    MatExpansionModule,
     FlexLayoutModule,
     CdkStepperModule,
     MatStepperModule,
@@ -150,7 +187,7 @@ import { SimpleEventLoggerComponent } from './components/simple-event-logger/sim
     multi: true
   }],
   entryComponents: [DialogAddKid,DialogAddKidReg,DialogEmailSended, DialogEmailExists, DialogEmailExistsNewReg,
-                    DialogEventInfo, DialogEmailSendedNewReg, PizzaPartyComponent, BookingDialog],
+                    DialogEventInfo, DialogEventNormal, DialogEventAdmin, DialogEmailSendedNewReg, PizzaPartyComponent, BookingDialog],
   bootstrap: [AppComponent]
 
 })
