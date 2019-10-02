@@ -171,7 +171,7 @@ public class UserAdministrationController {
     }
 
 
-    private boolean hasAuthority(Collection<? extends GrantedAuthority> authorities, String authority){
+    public static boolean hasAuthority(Collection<? extends GrantedAuthority> authorities, String authority){
         boolean hasAuthority = false;
         for (GrantedAuthority grantedAuthority : authorities) {
             hasAuthority = grantedAuthority.getAuthority().equals(authority);

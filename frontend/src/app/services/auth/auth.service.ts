@@ -1,18 +1,15 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import * as moment from "moment";
-import {not} from "rxjs/internal-compatibility";
 import {User} from "../../models/user";
 import {BehaviorSubject} from "rxjs/internal/BehaviorSubject";
 import {Observable} from "rxjs/internal/Observable";
-import {mapEntry} from "@angular/compiler/src/output/map_util";
 import { map, catchError, toArray, mergeMap, concatMap} from "rxjs/operators";
 import { throwError } from 'rxjs';
 import {from} from "rxjs/internal/observable/from";
 import {of} from "rxjs/internal/observable/of";
 import {Authority, Role} from "../../models/authority";
-import {LocalizationService} from "../localization/localization.service";
-
+import {UserProfile} from "../../models/userProfile";
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +24,6 @@ export class AuthService {
   send_pwd_url = "http://localhost:8080/confirm/";
   retrieve_user_url = "http://localhost:8080/users/retrieve/";
   profile_information_url = "http://localhost:8080/profile/information/";
-  add_child_url =  "http://localhost:8080/profile/addChild";
   change_profile_information_url =  "http://localhost:8080/profile"
 
   private currentUserSubject: BehaviorSubject<User>;
@@ -44,7 +40,6 @@ export class AuthService {
       for(let a of u._authorities){
         user.addAuthority(new Authority(a._role, a._lineName));
       }
-      user.children = u._children;
       this.currentUserSubject = new BehaviorSubject<User>(user);
       this.isLoggedInSubject = new BehaviorSubject<boolean>(true);
     }
@@ -147,11 +142,6 @@ export class AuthService {
       }
     }
 
-    let children = [];
-    for(let kid of userInfo["children"]){
-      children.push(JSON.parse(kid));
-    }
-    user.children = children;
     // add seconds to moment 0 (1 Jan 1970 00:00:00)
     const expiresAt = moment(0).add(exp, "second");
     const notBefore = moment(0).add(nbf, "second");
@@ -190,6 +180,7 @@ export class AuthService {
     return this.getCurrentUser().hasAuthorityOnLine(line);
   }
 
+
   getProfileinformation(current:User) {
     let em = current['_email'];
     return this.http.get<any>(this.profile_information_url + em).pipe(catchError(err=>this.handleError(err)));
@@ -198,6 +189,8 @@ export class AuthService {
   getCurrentUserJwt(){
     return localStorage.getItem("token_id");
   }
+
+  /*
   addChild(email:string,name:string,surname:string,birthday:string, gender:string){
     return this.http.post<any>(this.add_child_url,{
       "email":email,
@@ -206,7 +199,7 @@ export class AuthService {
       "birthday" : birthday,
       "gender" : gender
     })
-  }
+  }*/
 
   editProfileInformation(email:string,name:string,surname:string,address:string, telephone:string){
     return this.http.post<any>(this.change_profile_information_url,{

@@ -9,8 +9,17 @@ import {StopList} from "../../models/stop-list";
 import {AttendanceService} from 'src/app/services/attendance/attendance.service';
 import {Line} from "../../models/line";
 import {Subject} from "rxjs";
-import {take, takeUntil} from "rxjs/operators";
+import {filter, map, take, takeUntil} from "rxjs/operators";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
+import {ProfileService} from "../../services/profile/profile.service";
+import {Observable} from "rxjs/internal/Observable";
+import {BehaviorSubject} from "rxjs/internal/BehaviorSubject";
+import {MatTab} from "@angular/material";
+
+export interface IReservedStops {
+  outward: Array<any[]>;
+  back: Array<any[]>;
+}
 
 @Component({
   selector: 'app-attendance',
@@ -23,15 +32,22 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 
   selectedLine = null;
   selectedRun = 0;
+  tripIndex = 0;
   lines = [];
   selectedDate = null;
   selectedDirection = "outward";
 
   reservations ;
   reservedStops;
+  reservedStopsSubject: BehaviorSubject<IReservedStops> = new BehaviorSubject<IReservedStops>(null);
+  reservedStops$: Observable<IReservedStops> = this.reservedStopsSubject.asObservable();
 
+
+  notReservedKidsSubject: BehaviorSubject<Child[]> = new BehaviorSubject(null);
+  notReservedKids$: Observable<Child[]> = this.notReservedKidsSubject.asObservable();
   isMobile = false;
   public res = [];
+  isFirst=true;
 
   /**
    * Filter passed to the date picker to filter out non-school days, i.e. sundays (0) and saturdays(6)
@@ -44,9 +60,10 @@ export class AttendanceComponent implements OnInit, OnDestroy {
   public downloadJsonHref: SafeUrl;
   public jsonFilename = ".json";
 
-  constructor(private attendanceService: AttendanceService, private sanitizer: DomSanitizer) {
+  constructor(private attendanceService: AttendanceService,
+              private profileService: ProfileService,
+              private sanitizer: DomSanitizer) {
     this.selectedDate = new FormControl(new Date());
-
     // check if it is a mobile user, if so, use touchUI elements for better targeting
     // see https://stackoverflow.com/a/25394023/6945436 for userAgent checking
     // TODO: check this on mobile, seems to work on desktop
@@ -70,27 +87,40 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 
   }
 
+  /**
+   * This method is called whenever line or date is changed: its basic functionality
+   * is to decide which will be the next sooner ride to display as first.
+   */
   updateData() {
+    let index;
     if (this.selectedLine != null) {
       if (this.selectedLine.outward[0].endsAt.isAfter(LocalTime.now()) || this.selectedDirection === 'outward') {
-        this.selectedRun = 0;
+        index = 0;
       } else if (this.selectedLine.back[0].endsAt.isAfter(LocalTime.now())) {
-        this.selectedRun = 1;
+        index = 1;
       } else if (this.selectedLine.back[1].endsAt.isAfter(LocalTime.now())) {
-        this.selectedRun = 2;
+        index = 2;
       } else if (this.selectedDirection === 'back') {
-        this.selectedRun = 1;
+        index = 1;
       } else {
-        this.selectedRun = 0;
+        index = 0;
         let today = new Date();
         today.setDate(today.getDate() + 1);
         this.selectedDate.setValue(today);
       }
 
       this.updateReservation();
+      this.selectedRun = index;
     }
   }
 
+
+  /**
+   * This method performs the actual update of the reservations, pulling down all of them for a given date and line.
+   * An other function is to update the reservedStop (actual object passed down to the mat-list items) and the
+   * NotReservedKidsSubject, which contains the list of children NOT reserved for the current run (so to display them
+   * for on-the-fly-addition).
+   */
   updateReservation() {
     let day = this.selectedDate.value.getDate().toString();
     let month = (this.selectedDate.value.getMonth() + 1).toString();
@@ -105,6 +135,8 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 
     let year = this.selectedDate.value.getFullYear();
     let date = day.toString() + month + year.toString();
+    this.reservations = null;
+    // Retrieve reservations
     this.attendanceService.reservations(this.selectedLine.name, date)
         .pipe(
             takeUntil(this.unsubscribe$)
@@ -113,12 +145,13 @@ export class AttendanceComponent implements OnInit, OnDestroy {
           this.reservations = data;
         }, () => null, () => {
           if(this.selectedLine != null){
-
             this.reservedStops = {"outward": [], "back": []};
             let arr = [];
 
             let i =0;
-            for(let stop of this.selectedLine.outward[0].stops){
+
+            // build ReservedStops object.
+            for(let stop of this.selectedLine.outward[0].stops){ // we want to consider only one outward (i.e. towards school)
               let children = this.childrenByStop(stop.name, 0, "outward");
               if(children !== undefined){
                 arr.push(children);
@@ -143,9 +176,37 @@ export class AttendanceComponent implements OnInit, OnDestroy {
               this.reservedStops["back"].push(arr);
               i++;
             }
+
+            debugger;
+            this.reservedStopsSubject.next(this.reservedStops);
             this.buildDownloadFile();
           }
-        });
+
+          /*
+          * retrieve all the ids of the non reserved kids, retrieve the whole of them with all of their data
+          * then filter out those who had reservation.
+          * */
+          this.attendanceService.getNotReservedKids(date, this.selectedLine.name, this.selectedDirection, this.tripIndex)
+            .pipe(
+              takeUntil(this.unsubscribe$)
+            )
+            .subscribe((childIds) => {
+                this.profileService.getAllChildren()
+                  .pipe(
+                    map((children) => {
+                      let filtered: Child[] = [];
+                      for (let c of children) {
+                        if (childIds.includes(c.id)) {
+                          filtered.push(c);
+                        }
+                      }
+                      return filtered;
+                    }),
+                    takeUntil(this.unsubscribe$))
+                  .subscribe((children) => this.notReservedKidsSubject.next(children));
+              }
+              );
+          });
   }
 
   childrenByStop(stopName, index, direction) {
@@ -184,34 +245,50 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 
   }
 
-  addChild(child){
-
+  /**
+   * Calls the service method to add a child on-the-fly
+   * @param childResInfo: event emitted by component
+   */
+  addChild(childResInfo){
+    let dateString = this.getDateString();
+    this.attendanceService.addOnTheFlyChild(
+      childResInfo.id, childResInfo.stop,
+      this.selectedLine.name, this.selectedDirection,
+       this.tripIndex, dateString).subscribe((result) =>{
+      this.updateData();
+    })
   }
 
-  toggleChildPresence(child){
-
+  /**
+   * Toggles child presence for a reservation.
+   * @param childResInfo: event emitted by component
+   */
+  toggleChildPresence(childResInfo){
+    this.attendanceService.togglePresence(childResInfo.resid, childResInfo.isPresent).subscribe((result) =>{
+      this.updateData();
+    })
   }
 
   buildDownloadFile(){
     let jsonObject = {
       linea: this.selectedLine.name,
       direzione: this.selectedDirection==="outward"?"scuola":"casa",
-      indiceCorsa: this.selectedRun,
+      indiceCorsa: this.tripIndex,
       fermate: []
     };
 
-    for(let i in this.reservedStops[this.selectedDirection][this.selectedRun]){
+    for(let i in this.reservedStops[this.selectedDirection][this.tripIndex]){
       let stop;
       if(this.selectedDirection === "outward"){
         stop = {
-          nomeFermata: this.selectedLine.outward[this.selectedRun].stops[i].name,
-          presenze: this.reservedStops[this.selectedDirection][this.selectedRun][i]
+          nomeFermata: this.selectedLine.outward[this.tripIndex].stops[i].name,
+          presenze: this.reservedStops[this.selectedDirection][this.tripIndex][i]
         }
       }
       else{
         stop = {
-          nomeFermata: this.selectedLine.back[this.selectedRun].stops[i].name,
-          presenze: this.reservedStops[this.selectedDirection][this.selectedRun][i]
+          nomeFermata: this.selectedLine.back[this.tripIndex].stops[i].name,
+          presenze: this.reservedStops[this.selectedDirection][this.tripIndex][i]
         }
       }
       jsonObject.fermate.push(stop);
@@ -221,6 +298,13 @@ export class AttendanceComponent implements OnInit, OnDestroy {
     let uri = this.sanitizer.bypassSecurityTrustUrl("data:text/json;charset=UTF-8," + encodeURIComponent(theJSON));
     this.downloadJsonHref = uri;
 
+    let dateString = this.getDateString();
+    this.jsonFilename = "FoglioPresenze_"+this.selectedLine.name+"_"+
+      this.selectedDirection+this.tripIndex+"_"+
+      dateString+".json";
+  }
+
+  private getDateString(){
     let day = this.selectedDate.value.getDate().toString();
     let month = (this.selectedDate.value.getMonth() + 1).toString();
 
@@ -233,10 +317,28 @@ export class AttendanceComponent implements OnInit, OnDestroy {
     }
 
     let year = this.selectedDate.value.getFullYear();
-    let dateString = day.toString() + month + year.toString();
-    this.jsonFilename = "FoglioPresenze_"+this.selectedLine.name+"_"+
-      this.selectedDirection+this.selectedRun+"_"+
-      dateString+".json";
+    return day.toString() + month + year.toString();
+  }
+
+  /**
+   * Updates the tripIndex (run number) taking into consideration the current selected tab index (later updated) and
+   * the direction.
+   * @param event
+   */
+  public tabSwitch(event){
+    this.selectedRun = event.index;
+    let fields = event.tab.textLabel.split(" ");
+    this.tripIndex = event.index;
+    // the following is because the backward tabs indexes start with an offset = to the number of outward runs.
+    if(fields[0].match(/Ritorno/i)){
+      this.tripIndex -= this.selectedLine.outward.length;
+      this.selectedDirection = "back";
+    }
+    else{
+      this.selectedDirection = "outward";
+    }
+    if(this.isFirst) this.isFirst = false;
+    else this.updateReservation();
   }
 
   ngOnDestroy(){

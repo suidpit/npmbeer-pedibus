@@ -3,6 +3,7 @@ package it.polito.ai.pedibus.api.dtos;
 import it.polito.ai.pedibus.api.models.Child;
 import it.polito.ai.pedibus.api.models.Reservation;
 import lombok.Data;
+import org.bson.types.ObjectId;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -14,7 +15,7 @@ public class ReservationDTO {
     @NotNull
     private String stopName;
     @NotNull
-    private List<String> child;
+    private List<ObjectId> child;
     @NotNull
     private Reservation.Direction direction;
     @NotNull

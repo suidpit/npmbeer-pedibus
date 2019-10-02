@@ -1,6 +1,53 @@
-<app-lateralmenu>
+<mat-card>
+    <mat-card-title>Profilo</mat-card-title>
+    <mat-card-content *ngIf="user" fxLayout="column">
+        <form>
+            <div fxFill fxLayout="row">
+                <label fxFlex="50%">
+                    <p>Avatar: </p>
+                    <img [src]="(user && user.photo) ? user.photo : '../../../../assets/icons/img_avatar.png'"
+                         class="preview">
+                </label>
+                <label fxFlex="50%" class="btn btn-default">
+                    <input class="input_file" type="file" (change)="selectFile($event)">
+                    <img *ngIf="previewUrl" [src]="previewUrl" class="preview">
+                </label>
+                <label>
 
-<p>
-  profile workssssssssssssssssssssssssssssssssssssssssssssssssssssss!
-</p>
-</app-lateralmenu>
+                </label>
+            </div>
+            <div fxFill fxLayout="row">
+                <label fxFlex="50%">
+                    <p>Email: </p>
+                    <p>{{user.email}}</p>
+                </label>
+                <label fxFlex="50%">
+                    <p>Email alternativa: </p>
+                    <input type="email"  name="alt_email" [(ngModel)]="user.alt_email">
+                </label>
+            </div>
+            <div fxFill fxLayout="row">
+                <label fxFlex="50%">
+                    <p>Nome: </p>
+                    <input [(ngModel)]="user.name" name="name">
+                </label>
+                <label fxFlex="50%">
+                    <p>Cognome: </p>
+                    <input [(ngModel)]="user.surname" name="surname">
+                </label>
+            </div>
+            <div fxFill fxLayout="row">
+                <label fxFlex="50%">
+                    <p>Indirizzo: </p>
+                    <input [(ngModel)]="user.address" name="address">
+                </label>
+                <label fxFlex="50%">
+                    <p>Telefono: </p>
+                    <input type="tel" [(ngModel)]="user.telephone" name="telephone">
+                </label>
+            </div>
+            <button mat-raised-button (click)="saveUser()">SALVA</button>
+        </form>
+    </mat-card-content>
+    <app-spinner *ngIf="task=='loading'"></app-spinner>
+</mat-card>

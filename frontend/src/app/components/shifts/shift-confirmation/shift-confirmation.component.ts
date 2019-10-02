@@ -71,7 +71,6 @@ export class ShiftConfirmationComponent implements OnInit {
     switch(column){
       case "lineName":
         this.dataSource.data.sort((a: DataHolder, b: DataHolder) =>{
-          debugger;
           if(direction === "desc") return a.shift.lineName > b.shift.lineName?+1:-1;
           return a.shift.lineName > b.shift.lineName?-1:+1;
         });

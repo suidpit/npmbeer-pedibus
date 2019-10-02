@@ -70,8 +70,7 @@ public class UserService implements IUserService {
             String jwt = jwtTokenProvider.createToken(
                     email,
                     Convertion.authoritiesToMap(user.getAuthorities()),
-                    user.getId().toString(),
-                    Convertion.childrenToMap(user.getChildren()));
+                    user.getId().toString());
 
             HashMap<String, String> userInfo = new HashMap<>();
             userInfo.put("jwt", jwt);
@@ -155,7 +154,6 @@ public class UserService implements IUserService {
 
     @Override
     public void userChangePassword(User user, String pass) {
-
         user.setPassword(pass);
         userRepository.save(user);
     }
@@ -255,6 +253,4 @@ public class UserService implements IUserService {
         user.setPassword(encoder.encode(pass));
         userRepository.save(user);
     }
-
-
 }

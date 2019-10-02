@@ -16,13 +16,6 @@ export class ShiftPageComponent implements OnInit {
   @ViewChild("confirm", {static: true}) confirmTab: ShiftConfirmationComponent;
 
   constructor(private auth: AuthService) {
-    let socket = new SockJs('http://localhost:8080/localization-endpoint');
-    let stompClient = Stomp.over(socket);
-    let self = this;
-    let headers = {Authentication: "bearer "+auth.getCurrentUserJwt()};
-    stompClient.connect(headers, () =>{
-      stompClient.send("/app/localize/1", headers, JSON.stringify("MESSAGGIONE"));
-    });
   }
 
   ngOnInit() {

@@ -64,6 +64,11 @@ export class ShiftService {
     });
   }
 
+  /**
+   * This method updates the subject to which calendar component refers to when rendering calendar events.
+   * Shift retrieved are the assigned ones to current user, both closed and open shifts are retrieved.
+   * @param {Date} startDate
+   */
   updateCalendarShifts(startDate: Date){
     // take always the whole month.
     let start = LocalDate.of(startDate.getFullYear(), startDate.getMonth()+1, 1);
@@ -121,6 +126,12 @@ export class ShiftService {
     });
   }
 
+  /**
+   * Upcoming events are those starting from the current day. The difference with updateCalendarShifts is in the Subject
+   * type since this populates a Subject<Shift[]> rather than a Subject<any[]>.
+   * What's more is that updateCalendarShifts considers always the first day of the month.
+   * buildUpcoming event considers the current day.
+   */
   buildUpcomingEvents(){
     let startDate = new Date();
     let start = LocalDate.of(startDate.getFullYear(), startDate.getMonth()+1, startDate.getDate());
@@ -169,6 +180,9 @@ export class ShiftService {
     });
   }
 
+  /**
+   * This method is principally needed to handle localization timeouts. For the rest is equal to buildUpcomingEvents.
+   */
   updateTodaysShifts(){
     let startDate = new Date();
     let start = LocalDate.of(startDate.getFullYear(), startDate.getMonth()+1, startDate.getDate());
@@ -224,7 +238,12 @@ export class ShiftService {
     return this.http.get<string[]>(`${this.shift_url}/by-resid/${reservationId}`);
   }
 
-  // TODO implement end date.
+  /**
+   * This method retrieves all the shifts appearing in the db and build all the other possible ones from the lines
+   * information. Everything is encapsulated in fullcalendar-compatible events
+   * @param {Date} startDate
+   * @param {Date} endDate
+   */
   buildShifts(startDate: Date=null, endDate: Date=null){
 
     if(startDate === null) startDate = this.currentStartDate;
@@ -374,6 +393,13 @@ export class ShiftService {
     });
   }
 
+  /**
+   * Depending on the shift properties, it returns the event background color.
+   * @param {Shift} shift
+   * @param {string} lineName
+   * @param {any[]} availabilities
+   * @returns {string}
+   */
   private getBackgroundColor(shift: Shift, lineName: string, availabilities = []){
     let color = "";
     if(shift.date.isBefore(LocalDate.now(ZoneId.of("+01:00"))) || shift.date.isEqual(LocalDate.now(ZoneId.of("+01:00")))){

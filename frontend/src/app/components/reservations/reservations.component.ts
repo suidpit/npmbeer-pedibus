@@ -74,10 +74,10 @@ export class ReservationsComponent implements OnInit, OnDestroy {
                     if (stop != undefined) {
                         let index;
 
-                        if (this.selectedDirection == 'OUTWARD') {
+                        if (this.selectedDirection == 'outward') {
                             index = this.selectedRun
                         } else {
-                            index = this.selectedRun - this.selectedLine.outward.length + 1
+                            index = this.selectedRun - this.selectedLine.outward.length;
                         }
 
                         //get date
@@ -95,7 +95,7 @@ export class ReservationsComponent implements OnInit, OnDestroy {
                         );
 
                         let dialogRef = this.dialog.open(BookingDialog, {
-                          panelClass: "reservation-dialog",
+                            panelClass: "reservation-dialog",
                             data: {
                                 line: this.selectedLine.name,
                                 stop: stop,
@@ -169,6 +169,14 @@ export class ReservationsComponent implements OnInit, OnDestroy {
         this.unsubscribe$.complete();
     }
 
+    changeTab() {
+        let size = this.selectedLine.outward.length;
+        if (this.selectedRun < size) {
+            this.selectedDirection = 'outward';
+        } else {
+            this.selectedDirection = 'back';
+        }
+    }
 }
 
 export interface BookingData {
@@ -205,7 +213,6 @@ export class BookingDialog implements OnInit, OnDestroy {
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe(
                 (children) => {
-                    console.log(children);
                     this.children = new Map<Child, boolean>();
                     for (let c of children) {
                         this.children.set(c, false);
@@ -248,7 +255,7 @@ export class BookingDialog implements OnInit, OnDestroy {
             let children = [];
             this.children.forEach((value, child) => {
                 if (value)
-                    children.push(child.name);
+                    children.push(child.id);
             });
             this.status = "request";
             this.reservationsService.reserve(this.data.line, this.data.date, children, this.data.stop.name, this.data.direction, this.data.index)

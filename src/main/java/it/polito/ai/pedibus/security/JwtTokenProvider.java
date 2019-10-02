@@ -51,29 +51,17 @@ public class JwtTokenProvider {
     }
 
     public String createToken(String username, HashMap<String,List<String>> authorities,
-                              String user_id, List<HashMap<String, String>> kids){
+                              String user_id){
         Date notBefore = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(notBefore);
         calendar.add(Calendar.HOUR_OF_DAY, this.validityHours);
         Date expiresAt = calendar.getTime();
 
-        String[] children;
-        if(kids != null){
-            children = new String[kids.size()];
-
-            for(int i = 0; i < children.length; i++) {
-                children[i] = new JSONObject(kids.get(i)).toString();
-            }
-        }
-
-        else children = new String[0];
-
         return JWT.create() // returns a Builder
                 .withClaim("email", username)
                 .withClaim("user_id", user_id)
                 .withClaim("authorities", new JSONObject(authorities).toString())
-                .withArrayClaim("children", children)
                 .withNotBefore(notBefore)
                 .withExpiresAt(expiresAt)
                 .withIssuer(this.issuer)

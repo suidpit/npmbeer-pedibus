@@ -1,12 +1,9 @@
 <h1 mat-dialog-title>Aggiungi bambino a {{data.stop}}</h1>
 <div mat-dialog-content>
-  <mat-form-field>
-    <input matInput placeholder="Nome" [(ngModel)]="data.name">
-  </mat-form-field>
-  <mat-form-field>
-    <mat-select placeholder="Sesso" [(ngModel)]="data.gender">
-      <mat-option value="F">Femmina</mat-option>
-      <mat-option value="M">Maschio</mat-option>
+  <mat-form-field *ngIf="data.child_list$ | async as children">
+    <mat-label>Bambino/a</mat-label>
+    <mat-select placeholder="Kiddo" [(ngModel)]="data.id">
+      <mat-option *ngFor="let c of children" [value]="c.id">{{c.name}} {{c.surname | slice:0:1}}.</mat-option>
     </mat-select>
   </mat-form-field>
 </div>

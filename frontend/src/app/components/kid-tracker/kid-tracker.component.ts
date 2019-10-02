@@ -39,7 +39,6 @@ export class KidTrackerComponent implements OnInit {
     let yyyy = today.getFullYear();
 
     this.attendanceService.todayReservations().subscribe((reservations) =>{
-        debugger;
         if(reservations && reservations.length > 0){
           self.error = undefined;
 

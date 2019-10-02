@@ -10,8 +10,9 @@ import {StopList} from "../../models/stop-list";
 import {LocalTime} from "js-joda";
 import {Stop} from "../../models/stop";
 import {Reservation} from "../../models/reservation";
-import {AuthService} from "../auth/auth.service";
 import {IReservation} from "../../models/ireservation";
+import {IChildReservationInfo} from "../../models/ichild-reservation-info";
+import {ReservationReq} from "../../models/reservation-req";
 
 @Injectable({
   providedIn: 'root'
@@ -70,15 +71,15 @@ export class AttendanceService {
       // map outwards
       for (let out of data.outward) {
         let o: Reservation[] = [];
+
         for (let stop of Object.keys(out)) {
-          let childs: Child[] = [];
-          for (let c of out[stop]) {
-            let child = Builder(Child)
-                .name(c)
-                .present(false)
-                .build();
-            childs.push(child);
+          let childs: IChildReservationInfo[] = [];
+          let childResInfo: IChildReservationInfo;
+
+          for (childResInfo of out[stop]) {
+            childs.push(childResInfo);
           }
+
           let res = Builder(Reservation)
               .stopName(stop)
               .childs(childs)
@@ -89,15 +90,15 @@ export class AttendanceService {
       }
       for (let back of data.backward) {
         let b: Reservation[] = [];
+
         for (let stop of Object.keys(back)) {
-          let childs: Child[] = [];
-          for (let c of back[stop]) {
-            let child = Builder(Child)
-                .name(c)
-                .present(false)
-                .build();
-            childs.push(child);
+          let childs: IChildReservationInfo[] = [];
+          let childResInfo: IChildReservationInfo;
+
+          for (childResInfo of back[stop]) {
+            childs.push(childResInfo);
           }
+
           let res = Builder(Reservation)
               .stopName(stop)
               .childs(childs)
@@ -167,5 +168,23 @@ export class AttendanceService {
           .build();
       }
     }));*/
+  }
+
+  getNotReservedKids(dateString: string, lineName: string, direction: string, tripIndex: number):Observable<string[]>{
+    return this.http.get<string[]>(`${this.base_url}/reservations/admin/not-reserved/${dateString}/${lineName}/${direction}/${tripIndex}`);
+  }
+
+  togglePresence(resid: string, isPresent: boolean): Observable<any>{
+    return this.http.post(`${this.base_url}/reservations/admin/presence/${resid}`, {});
+  }
+
+  addOnTheFlyChild(childId: string, stopName: string, lineName: string, direction: string, tripIndex: number, dateString: string){
+    const reservation = Builder(ReservationReq)
+      .stopName(stopName)
+      .child([childId])
+      .direction(direction.toUpperCase())
+      .tripIndex(tripIndex)
+      .build();
+    return this.http.post(`${this.base_url}/reservations/admin/add-on-the-fly/${lineName}/${dateString}`, JSON.stringify(reservation));
   }
 }

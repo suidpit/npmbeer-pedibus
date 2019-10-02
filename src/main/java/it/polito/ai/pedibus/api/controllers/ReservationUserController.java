@@ -59,7 +59,7 @@ public class ReservationUserController {
     @Transactional
     @ReservationPostFields
     @RequestMapping(value = "{lineName}/{date}", method = RequestMethod.POST)
-    public Reservation insert(@PathVariable("lineName") String lineName,
+    public List<Reservation> insert(@PathVariable("lineName") String lineName,
                          @PathVariable("date") String dateString,
                          @RequestBody ReservationDTO resd) {
         return reservationService.insertReservationUser(lineName, dateString, resd);
@@ -67,7 +67,9 @@ public class ReservationUserController {
 
     /**
      * PUT /reservations/user/{nome_linea}/{data}/{reservation_id} – invia un oggetto JSON che
-     * permette di aggiornare i dati relativi alla prenotazione indicata
+     * permette di aggiornare i dati relativi alla prenotazione indicata.
+     *
+     * NOTA BENE: id è l'identificativo della prenotazione da aggiornare, di fatto, l'unico campo modificabile è la fermata.
      *
      * @param lineName
      * @param dateString
@@ -76,7 +78,7 @@ public class ReservationUserController {
      */
     @Transactional
     @ReservationPutFields
-    @RequestMapping(value = "{lineName}/{date}/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "{lineName}/{date}", method = RequestMethod.PUT)
     public void update(@PathVariable("lineName") String lineName,
                        @PathVariable("date") String dateString,
                        @PathVariable("id") ObjectId id,

@@ -20,6 +20,7 @@ public class Convertion {
         return authorityMap;
     }
 
+    @Deprecated
     public static List<HashMap<String, String>> childrenToMap(List<Child> children) {
         if (children != null) {
             List<HashMap<String, String>> childrenList = new ArrayList<>();

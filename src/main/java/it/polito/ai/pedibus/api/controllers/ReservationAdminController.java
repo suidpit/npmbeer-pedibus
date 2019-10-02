@@ -1,15 +1,18 @@
 package it.polito.ai.pedibus.api.controllers;
 
 
+import com.sun.javaws.exceptions.InvalidArgumentException;
 import it.polito.ai.pedibus.api.constraints.ReservationPutFields;
 import it.polito.ai.pedibus.api.dtos.ReservationDTO;
 import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.services.ReservationService;
 import org.bson.types.ObjectId;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +47,7 @@ public class ReservationAdminController {
      */
     @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN') or hasAuthority('COMPANION')")
     @RequestMapping(value = "/{lineName}/{date}", method = RequestMethod.GET)
-    public HashMap<String, ArrayList<HashMap<String, ArrayList<String>>>> getAllChildsForStop(@PathVariable("lineName") String lineName,
+    public HashMap<String, ArrayList<HashMap<String, ArrayList<HashMap<String, Object>>>>> getAllChildsForStop(@PathVariable("lineName") String lineName,
                                                                                               @PathVariable("date") String dateString) {
         return reservationService.getAllReservationStops(lineName, dateString);
     }
@@ -61,4 +64,47 @@ public class ReservationAdminController {
 
         return reservationService.getReservation(id);
     }
+
+
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN') or hasAuthority('COMPANION')")
+    @RequestMapping(value = "not-reserved/{date}/{lineName}/{direction}/{tripIndex}", method = RequestMethod.GET)
+    public List<String> getNotReservedChildren(@PathVariable("date") String dateString,
+                                                 @PathVariable("lineName") String lineName,
+                                                 @PathVariable("direction") String direction,
+                                                 @PathVariable("tripIndex") Integer tripIndex){
+
+        return this.reservationService.notReservedChildrenOnTrip(
+                dateString, lineName,
+                Reservation.Direction.valueOf(direction.toUpperCase()), tripIndex);
+    }
+
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN') or hasAuthority('COMPANION')")
+    @RequestMapping(value = "presence/{resid}", method = RequestMethod.POST)
+    public void toggleReservationPresence(@PathVariable("resid") String resid){
+        try{
+            this.reservationService.togglePresenceOnReservation(new ObjectId(resid));
+        }
+        catch(Exception e){
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN') or hasAuthority('COMPANION')")
+    @RequestMapping(value = "add-on-the-fly/{lineName}/{dateString}", method = RequestMethod.POST)
+    public void addOnTheFlyChild(@PathVariable("lineName") String lineName,
+                                 @PathVariable("dateString") String dateString,
+                                 @RequestBody ReservationDTO reservationDTO){
+        try{
+            this.reservationService.addOnTheFlyChild(
+                    dateString, lineName,
+                    reservationDTO.getDirection(),
+                    reservationDTO.getTripIndex(),
+                    reservationDTO.getStopName(),
+                    reservationDTO.getChild().get(0));
+        }
+        catch(Exception e){
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }

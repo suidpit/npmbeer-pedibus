@@ -3,6 +3,7 @@ package it.polito.ai.pedibus.api.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.mongodb.lang.Nullable;
 import it.polito.ai.pedibus.api.serializers.ObjectIdSerializer;
 import lombok.Builder;
 import lombok.Data;
@@ -28,7 +29,7 @@ public class Reservation {
     private LocalDate date;
     private String lineName;
     // We're not sure an ID is needed here, since every stop name, in the context of a direction and tripIndex number, is unique.
-    private List<String> childName;
+    private ObjectId childId;
 
     //TODO:
     //Change to USER ID
@@ -38,4 +39,9 @@ public class Reservation {
     private String stopName;
     // This just represents an index in the array of trips for that line, in that direction.
     private Integer tripIndex;
+
+    private boolean present;
+
+    @Nullable
+    private ObjectId companionWhoInserted;
 }
