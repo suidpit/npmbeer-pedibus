@@ -6,7 +6,7 @@
                     <div fxLayout="row nowrap">
                         <img mat-card-avatar class="avatar"
                              [src]="(user && user.photo) ? user.photo : '../../../../assets/icons/img_avatar.png'">
-                        <p *ngIf="user">{{user.name}}</p>
+                        <p *ngIf="user" class="name">{{user.name}}</p>
                     </div>
                 </mat-card-content>
             </mat-card>

@@ -42,7 +42,7 @@ public class User {
     private String surname;
     @Nullable
     private String address;
-    @Nullable
+    @Nullable @Pattern(regexp = "(\\+[0-9][0-9])?[0-9]+")
     private String telNumber;
     @Nullable
     @Email

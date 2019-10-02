@@ -130,6 +130,6 @@ export class ProfileService {
     }
 
     changePassword(cp: ChangePassword) {
-        this.http.put(this.baseUrl+"/profile/changePassword", cp).subscribe(()=>{}, ()=>{}, ()=>{})
+        return this.http.put(this.baseUrl+"/profile/changePassword", cp);
     }
 }

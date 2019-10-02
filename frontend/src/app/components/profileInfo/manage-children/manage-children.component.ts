@@ -66,12 +66,14 @@ export class ManageChildrenComponent implements OnInit, OnDestroy {
             takeUntil(this.unsubscribe$)
         ).subscribe((error) => {
             if (error == "Operation completed") {
+                this.task = '';
                 this.title = null;
                 this.error = null;
                 this.child_to_update = null;
                 this.selectedFile = null;
                 this.previewUrl = null;
             } else {
+                this.task = '';
                 this.error = error;
             }
         })
@@ -99,7 +101,9 @@ export class ManageChildrenComponent implements OnInit, OnDestroy {
         }
     }
 
+    task = '';
     onSubmit() {
+        this.task = 'loading';
         let child = Object.assign({}, this.child_to_update);
         let day = child.birthday.getDate().toString();
         if (day.length == 1)
@@ -118,6 +122,7 @@ export class ManageChildrenComponent implements OnInit, OnDestroy {
     }
 
     onDelete() {
+        this.task = 'loading';
         this.profileService.deleteChild(Object.assign({}, this.child_to_update))
     }
 }
