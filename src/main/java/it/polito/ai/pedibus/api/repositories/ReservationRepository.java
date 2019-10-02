@@ -6,10 +6,12 @@ import org.apache.tomcat.jni.Local;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Repository
 public interface ReservationRepository extends MongoRepository<Reservation, String> {
     List<Reservation> findByLineNameAndDate(String lineName, LocalDate date);
     Reservation findById(ObjectId objectId);

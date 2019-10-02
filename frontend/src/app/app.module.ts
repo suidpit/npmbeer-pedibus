@@ -83,6 +83,8 @@ import { ProfileComponent } from './components/profileInfo/profile/profile.compo
 import { HomeComponent } from './components/home/home.component';
 import { KidTrackerComponent } from './components/kid-tracker/kid-tracker.component';
 import {AgmCoreModule} from "@agm/core";
+import { SimpleEventLoggerComponent } from './components/simple-event-logger/simple-event-logger.component';
+
 import {
     ChildCardComponent,
     ManageChildrenComponent
@@ -128,6 +130,7 @@ import { ChangePasswordComponent } from './components/profileInfo/change-passwor
     ProfileComponent,
     HomeComponent,
     KidTrackerComponent,
+    SimpleEventLoggerComponent,
     ManageChildrenComponent,
     ChildCardComponent,
     ChangePasswordComponent,
@@ -146,6 +149,7 @@ import { ChangePasswordComponent } from './components/profileInfo/change-passwor
       { path: "impostaPassword/:token", component: UserPasswordSetupComponent},
       { path: "auth_error" , component: UnauthorizedComponent},
       { path: "prenotazione", component: ReservationsComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
+      { path: "eventi", component: SimpleEventLoggerComponent},
       { path: "profilo", component: LateralmenuComponent, canActivate: [AuthGuard], data:{roles: [Role.USER]}},
       { path: "**", redirectTo: "home", pathMatch: "full"}
     ]),

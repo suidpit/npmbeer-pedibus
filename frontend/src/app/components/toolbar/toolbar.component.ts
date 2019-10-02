@@ -52,6 +52,12 @@ export class ToolbarComponent implements OnInit {
       url: "/admin/turni",
       roles: [Role.COMPANION],
       icon: "calendar_today"
+    },
+    {
+      displayName: "Notifiche",
+      url: "/eventi",
+      roles: [Role.COMPANION],
+      icon: "list"
     }
   ];
 
