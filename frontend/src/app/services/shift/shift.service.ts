@@ -8,7 +8,7 @@ import {Observable} from "rxjs/internal/Observable";
 import { ReservationsService } from "../reservations/reservations.service";
 import {AuthService} from "../auth/auth.service";
 import {Colors} from "../../utils/colors";
-import {map, toArray} from "rxjs/operators";
+import {map, mergeMap, toArray} from "rxjs/operators";
 import {range} from "rxjs/internal/observable/range";
 import {Line} from "../../models/line";
 import {HttpClient} from "@angular/common/http";
@@ -17,6 +17,7 @@ import {collectExternalReferences} from "@angular/compiler";
 import {AttendanceService} from "../attendance/attendance.service";
 import {Role} from "../../models/authority";
 import {of} from "rxjs/internal/observable/of";
+import {from} from "rxjs/internal/observable/from";
 
 @Injectable({
   providedIn: 'root'
@@ -48,14 +49,27 @@ export class ShiftService {
   private availabilities_subject: Subject<any[]> = new BehaviorSubject([]);
   availabilities$: Observable<any[]> = this.availabilities_subject.asObservable();
 
+  private todays_shift_subject: Subject<any[]> = new BehaviorSubject([]);
+  todays_shifts$: Observable<any[]> = this.todays_shift_subject.asObservable();
+
   private currentStartDate: Date;
   private currentEndDate: Date;
 
   constructor(private lineService: AttendanceService, private auth: AuthService, private http: HttpClient) {
-    this.updateCalendarShifts(new Date());
-    this.buildUpcomingEvents();
+    this.auth.isLoggedIn$.subscribe((login) =>{
+      if(login){
+        this.updateCalendarShifts(new Date());
+        this.buildUpcomingEvents();
+        this.updateTodaysShifts();
+      }
+    });
   }
 
+  /**
+   * This method updates the subject to which calendar component refers to when rendering calendar events.
+   * Shift retrieved are the assigned ones to current user, both closed and open shifts are retrieved.
+   * @param {Date} startDate
+   */
   updateCalendarShifts(startDate: Date){
     // take always the whole month.
     let start = LocalDate.of(startDate.getFullYear(), startDate.getMonth()+1, 1);
@@ -94,7 +108,6 @@ export class ShiftService {
         shift.availabilities = this.auth.getUsersDetails(s.availabilities);
         shift.companionId = s.companionId;
         shift.defaultCompanion = s.defaultCompanion;
-
         let color = this.getBackgroundColor(shift, s.lineName, s.availabilities);
         shift.color = color === Colors.GREEN?Colors.GREEN : Colors.BLUE;
 
@@ -114,6 +127,12 @@ export class ShiftService {
     });
   }
 
+  /**
+   * Upcoming events are those starting from the current day. The difference with updateCalendarShifts is in the Subject
+   * type since this populates a Subject<Shift[]> rather than a Subject<any[]>.
+   * What's more is that updateCalendarShifts considers always the first day of the month.
+   * buildUpcoming event considers the current day.
+   */
   buildUpcomingEvents(){
     let startDate = new Date();
     let start = LocalDate.of(startDate.getFullYear(), startDate.getMonth()+1, startDate.getDate());
@@ -162,7 +181,70 @@ export class ShiftService {
     });
   }
 
-  // TODO implement end date.
+  /**
+   * This method is principally needed to handle localization timeouts. For the rest is equal to buildUpcomingEvents.
+   */
+  updateTodaysShifts(){
+    let startDate = new Date();
+    let start = LocalDate.of(startDate.getFullYear(), startDate.getMonth()+1, startDate.getDate());
+    // let start = LocalDateTime.ofEpochSecond(startDate.valueOf()/1000+1, ZoneOffset.of());
+    // backend compliant string
+    let dateString =("0" + start.dayOfMonth()).slice(-2) +
+      ("0" + start.monthValue()).slice(-2) +
+      start.year();
+
+    let uid = this.auth.getCurrentUser().id;
+    this.http.get<any[]>(`${this.shift_url}/by-date/${dateString}`).subscribe((retrieved_shifts)=>{
+      let shifts = [];
+      for(let s of retrieved_shifts){
+        let from = new Stop();
+        from.position = s.from.position;
+        from.time = LocalTime.parse(s.from.time);
+        from.name = s.from.name;
+
+        let to = new Stop();
+        to.position = s.to.position;
+        to.time = LocalTime.parse(s.to.time);
+        to.name = s.to.name;
+
+        // shift has passed, no need to insert it.
+        if(to.time.isBefore(LocalTime.now())) continue;
+
+        let shift = new Shift();
+        let date = LocalDate.parse(s.date, DateTimeFormatter.ofPattern("d-M-yyyy"));
+        shift.id = s.id;
+        shift.date = date;
+        shift.lineName = s.lineName;
+        shift.direction = s.direction;
+        shift.tripIndex = s.tripIndex;
+        shift.open = s.open;
+        shift.from = from;
+        shift.to = to;
+        shift.startsAt = from.time;
+        shift.endsAt = to.time;
+        shift.availabilities = this.auth.getUsersDetails(s.availabilities);
+        shift.companionId = s.companionId;
+        shift.defaultCompanion = s.defaultCompanion;
+
+        let color = this.getBackgroundColor(shift, s.lineName, s.availabilities);
+        shift.color = color === Colors.GREEN?Colors.GREEN : Colors.BLUE;
+
+        shifts.push(shift);
+      }
+      this.todays_shift_subject.next(shifts);
+    });
+  }
+
+  getReservationToShiftMapping(reservationId: string){
+    return this.http.get<string[]>(`${this.shift_url}/by-resid/${reservationId}`);
+  }
+
+  /**
+   * This method retrieves all the shifts appearing in the db and build all the other possible ones from the lines
+   * information. Everything is encapsulated in fullcalendar-compatible events
+   * @param {Date} startDate
+   * @param {Date} endDate
+   */
   buildShifts(startDate: Date=null, endDate: Date=null){
 
     if(startDate === null) startDate = this.currentStartDate;
@@ -312,6 +394,13 @@ export class ShiftService {
     });
   }
 
+  /**
+   * Depending on the shift properties, it returns the event background color.
+   * @param {Shift} shift
+   * @param {string} lineName
+   * @param {any[]} availabilities
+   * @returns {string}
+   */
   private getBackgroundColor(shift: Shift, lineName: string, availabilities = []){
     let color = "";
     if(shift.date.isBefore(LocalDate.now(ZoneId.of("+01:00"))) || shift.date.isEqual(LocalDate.now(ZoneId.of("+01:00")))){
@@ -338,6 +427,24 @@ export class ShiftService {
     return color;
   }
 
+
+  public getShiftsForReservation(resid: string): Observable<Shift[]>{
+    return this.http.get<Shift[]>(`${this.shift_url}/by-resid/${resid}`);
+  }
+
+
+  /**
+   * Uses getShiftForReservation (<- singualar!) and rxjs mapping operators to retrieve the shifts related to a bunch of reservations
+   * @param {string[]} resids
+   * @returns {Observable<Shift[]>}
+   */
+  public getShiftsForReservations(resids: string[]): Observable<any[]>{
+    return from(resids)
+      .pipe(
+        mergeMap((resid) => this.getShiftsForReservation(resid)),
+        toArray()
+      )
+  }
   randomIntFromInterval(min, max) { // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
@@ -352,6 +459,10 @@ export class ShiftService {
 
   getAvailabilities(): Observable<any[]>{
     return this.availabilities$;
+  }
+
+  getTodaysShifts(): Observable<Shift[]>{
+    return this.todays_shifts$;
   }
 
   sendShiftAvailability(s: Shift){

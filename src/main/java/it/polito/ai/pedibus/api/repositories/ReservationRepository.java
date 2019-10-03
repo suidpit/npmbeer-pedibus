@@ -1,6 +1,7 @@
 package it.polito.ai.pedibus.api.repositories;
 
 import it.polito.ai.pedibus.api.models.Reservation;
+import net.bytebuddy.dynamic.loading.ClassInjector;
 import org.apache.tomcat.jni.Local;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -20,6 +21,22 @@ public interface ReservationRepository extends MongoRepository<Reservation, Stri
     List<Reservation> findByLineNameAndDateAndUser(String linename, LocalDate date, ObjectId user);
     List<Reservation> findByUser(ObjectId user);
 
+    Reservation findFirstByLineNameAndDateAndTripIndexAndDirectionAndUser(String lineName,
+                                                                          LocalDate date,
+                                                                          Integer tripIndex,
+                                                                          Reservation.Direction direction,
+                                                                          ObjectId user);
+
+    List<Reservation> findByUserAndDate(ObjectId user, LocalDate date);
+
     void deleteByChildId(ObjectId childId);
+
+    List<Reservation> findAllByDateAndLineNameAndDirectionAndTripIndex(LocalDate date, String lineName,
+                                                                       Reservation.Direction direction, Integer tripIndex);
+
+    List<Reservation> findAllByDateAndLineNameAndDirectionAndTripIndexAndUser(LocalDate date, String lineName,
+                                                                              Reservation.Direction direction,
+                                                                              Integer tripIndex,
+                                                                              ObjectId user);
 }
 

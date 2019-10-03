@@ -15,4 +15,6 @@ public class NewEventDTO {
     private String body;
     @NotNull
     private ObjectId userId;
+
+    private ObjectId objectReferenceId;
 }

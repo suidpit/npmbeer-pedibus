@@ -1,14 +1,15 @@
 package it.polito.ai.pedibus.api.controllers;
 
+import it.polito.ai.pedibus.api.dtos.NewEventDTO;
 import it.polito.ai.pedibus.api.dtos.ShiftRequestDTO;
+import it.polito.ai.pedibus.api.dtos.ShiftResponseDTO;
 import it.polito.ai.pedibus.api.exceptions.*;
 import it.polito.ai.pedibus.api.models.Line;
+import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.models.Shift;
 import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.ShiftRepository;
-import it.polito.ai.pedibus.api.services.LineService;
-import it.polito.ai.pedibus.api.services.ShiftService;
-import it.polito.ai.pedibus.api.services.UserService;
+import it.polito.ai.pedibus.api.services.*;
 import it.polito.ai.pedibus.security.CustomUserDetails;
 import it.polito.ai.pedibus.security.LineGrantedAuthority;
 import org.bson.types.ObjectId;
@@ -20,7 +21,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -35,7 +38,9 @@ public class ShiftController {
     private final LineService lineService;
     private final ShiftService shiftService;
     private final UserService userService;
+    private final EventService eventService;
 
+    private ReservationService reservationService;
     @Qualifier("fmt")
     private final DateTimeFormatter fmt;
 
@@ -44,11 +49,14 @@ public class ShiftController {
     @Autowired
     public ShiftController(ShiftRepository shiftRepository, LineService lineService,
                            ShiftService shiftService, UserService userService,
+                           EventService eventService, ReservationService reservationService,
                            DateTimeFormatter fmt) {
         this.shiftRepository = shiftRepository;
         this.lineService = lineService;
         this.shiftService = shiftService;
         this.userService = userService;
+        this.eventService = eventService;
+        this.reservationService = reservationService;
         this.fmt = fmt;
     }
 
@@ -60,6 +68,17 @@ public class ShiftController {
 
         LocalDate date = LocalDate.parse(dateString, this.fmt);
         List<Shift> shifts = this.shiftService.getAllShiftAfterDate(date);
+
+        return purgeShifts(shifts);
+    }
+
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN') or hasAuthority('COMPANION')")
+    @RequestMapping(value = "/by-date/{date}", method = RequestMethod.GET)
+    public List<Shift> getShiftsOnDate(@PathVariable("date") String dateString){
+
+        LocalDate date = LocalDate.parse(dateString, this.fmt);
+        ObjectId userId = ((CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        List<Shift> shifts = this.shiftService.getShiftsByDateAndCompanionId(date, userId);
 
         return purgeShifts(shifts);
     }
@@ -136,7 +155,7 @@ public class ShiftController {
                 s.setTripIndex(sDTO.getTripIndex());
 
                 // setting starting and ending stops
-                if(s.getDirection() == Shift.Direction.BACK){
+                if(s.getDirection() == Reservation.Direction.BACK){
                     s.setFrom(l.getBack().get(s.getTripIndex()).get(0));
                     // Take last stop
                     s.setTo(l.getBack().get(s.getTripIndex()).get(l.getBack().get(s.getTripIndex()).size()-1));
@@ -146,6 +165,7 @@ public class ShiftController {
                     s.setTo(l.getOutward().get(s.getTripIndex()).get(l.getOutward().get(s.getTripIndex()).size()-1));
                 }
 
+                s.setLastUpdate(s.getFrom().getPosition());
                 ArrayList<ObjectId> availabilities = new ArrayList<>();
                 availabilities.add(userId);
 
@@ -187,6 +207,7 @@ public class ShiftController {
 
 
     @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN')")
+    @Transactional
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/confirm", headers = "Accept=application/json", method = RequestMethod.POST)
     public void postShiftConfirmation(@RequestBody @Valid ShiftRequestDTO shiftRequestDTO){
@@ -200,6 +221,25 @@ public class ShiftController {
                     s.setOpen(true);
                     if(shiftRequestDTO.getTo() == null || shiftRequestDTO.getTo().hasNullFields() || s.getTo().equals(shiftRequestDTO.getTo())){
                         this.shiftService.insertOrUpdateShift(s);
+                        String eventBody = new StringBuilder("Sei stato assegnato al turno del ")
+                                .append(s.getDate().toString())
+                                .append(" delle ore ")
+                                .append(s.getFrom().getTime().toString())
+                                .append(" sulla linea ")
+                                .append(s.getLineName())
+                                .append(" in direzione ")
+                                .append(s.getDirection())
+                                .append(" in partenza dalla fermata: ")
+                                .append(s.getFrom().getName())
+                                .toString();
+                        NewEventDTO event = NewEventDTO.builder()
+                                .type("Shift")
+                                .body(eventBody)
+                                .userId(s.getCompanionId())
+                                .objectReferenceId(s.getId())
+                                .build();
+
+                        this.eventService.pushNewEvent(event);
                     }
                     else{
                         // create complementary shift.
@@ -208,12 +248,32 @@ public class ShiftController {
                             complementary_shift.setId(null);
                             complementary_shift.setCompanionId(null);
                             complementary_shift.setFrom(shiftRequestDTO.getTo());
+                            complementary_shift.setLastUpdate(complementary_shift.getFrom().getPosition());
                             s.setTo(shiftRequestDTO.getTo());
                             this.shiftService.insertOrUpdateShift(s);
                             this.shiftService.insertOrUpdateShift(complementary_shift);
+                            String eventBody = new StringBuilder("Sei stato assegnato al turno del ")
+                                    .append(s.getDate().toString())
+                                    .append(" delle ore ")
+                                    .append(s.getFrom().getTime().toString())
+                                    .append(" sulla linea ")
+                                    .append(s.getLineName())
+                                    .append(" in direzione ")
+                                    .append(s.getDirection())
+                                    .append(" in partenza dalla fermata: ")
+                                    .append(s.getFrom().getName())
+                                    .toString();
+                            NewEventDTO event = NewEventDTO.builder()
+                                    .type("Shift")
+                                    .body(eventBody)
+                                    .userId(s.getCompanionId())
+                                    .objectReferenceId(s.getId())
+                                    .build();
+
+                            this.eventService.pushNewEvent(event);
                         }
                         catch(Exception e){
-                            // TODO create complementary shift anew (no clone).
+                            // TODO create complementary shift anew (if here is because of clone failure so -> no clone).
                         }
                     }
                 }
@@ -258,6 +318,44 @@ public class ShiftController {
         }
     }
 
+    @RequestMapping(value = "by-resid/{resid}", method = RequestMethod.GET)
+    public ArrayList<ShiftResponseDTO> getShiftIdByReservationId(@PathVariable("resid") String resid){
+        Reservation res = reservationService.getReservation(new ObjectId(resid));
+
+        if(res == null) return null;
+
+        // reject request if user is not reservation owner.
+        ObjectId userId = ((CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        if(!res.getUser().equals(userId)){
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+        }
+        List<Shift> shifts = shiftService.getShiftsByAllFields(res.getDate(), res.getLineName(), res.getDirection(), res.getTripIndex());
+
+        ArrayList<ShiftResponseDTO> return_array = new ArrayList<>();
+        if(shifts != null){
+            for(Shift s: shifts){
+                ShiftResponseDTO dto = new ShiftResponseDTO();
+                dto.setDate(s.getDate());
+                dto.setLineName(s.getLineName());
+                dto.setDirection(s.getDirection());
+                dto.setShiftId(s.getId());
+                dto.setFrom(s.getFrom());
+                dto.setTo(s.getTo());
+                dto.setLatestUpdate(s.getLastUpdate());
+                return_array.add(dto);
+            }
+            return return_array;
+        }
+        return null;
+    }
+
+    /**
+     * "Cleans" a list of shifts from the availabilities if the current Principal is not
+     * authoritative on the corresponfing line.
+     * @param shifts: List of shifts to clean.
+     * @return: purged list of shifts;
+     */
+
     private List<Shift> purgeShifts(List<Shift> shifts){
         CustomUserDetails usr = ((CustomUserDetails)SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal());
@@ -280,6 +378,11 @@ public class ShiftController {
         return shifts;
     }
 
+    /**
+     * Returns whether the current Principal is authoritative on the given line.
+     * @param lineName: name of the line the principal needs to be check against
+     * @return: boolean is authoritative or not
+     */
     private boolean canView(String lineName){
         boolean canView = false;
         CustomUserDetails usr = ((CustomUserDetails)SecurityContextHolder.getContext()

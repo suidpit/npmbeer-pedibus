@@ -50,7 +50,8 @@ public class JwtTokenProvider {
         this.signingAlgorithm = Algorithm.HMAC256(this.key);
     }
 
-    public String createToken(String username, HashMap<String,List<String>> authorities, String user_id){
+    public String createToken(String username, HashMap<String,List<String>> authorities,
+                              String user_id){
         Date notBefore = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(notBefore);
@@ -86,8 +87,12 @@ public class JwtTokenProvider {
 
     public String retrieveToken(HttpServletRequest req){
         String authHeader = req.getHeader("Authorization");
-        if(authHeader != null) {
-            String[] split = authHeader.split(" ");
+        return this.getTokenFromStringHeader(authHeader);
+    }
+
+    public String getTokenFromStringHeader(String header){
+        if(header != null){
+            String[] split = header.split(" ");
             if(split[0].toLowerCase().equals("bearer")){
                 return split[1];
             }

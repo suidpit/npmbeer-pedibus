@@ -7,8 +7,11 @@ import it.polito.ai.pedibus.api.dtos.ProfileInfoDTO;
 import it.polito.ai.pedibus.api.models.Child;
 import it.polito.ai.pedibus.api.services.ProfileService;
 import org.bson.types.ObjectId;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
@@ -63,4 +66,21 @@ public class ProfileController {
         profileService.changePassword(cp);
     }
 
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN') or hasAuthority('COMPANION')")
+    @RequestMapping(value = "/children/all", method = RequestMethod.GET)
+    public List<ChildDTO> getAllChildren(){
+        return this.profileService.getAllChildren();
+    }
+
+
+    @RequestMapping(value = "/children/{id}", method = RequestMethod.GET)
+    public ChildDTO getChildById(@PathVariable("id") String id){
+        try{
+
+            return this.profileService.getChildById(new ObjectId(id));
+        }
+        catch (IllegalArgumentException e){
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        }
+    }
 }

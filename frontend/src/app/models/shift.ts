@@ -2,6 +2,7 @@ import {LocalDate, LocalDateTime, LocalTime} from "js-joda";
 import {User} from "./user";
 import {Stop} from "./stop";
 import {Observable} from "rxjs/internal/Observable";
+import {IGeoJsonObject} from "./igeojson-object";
 
 export class Shift {
 
@@ -22,6 +23,7 @@ export class Shift {
   classNames: string[];  // css classes to use in calendar
   disabled: boolean = false;
   subscribed: boolean = false;
+  latestUpdate: IGeoJsonObject = null;
 
   public compareTo(__shift: Shift){
     if(this.id !== undefined && __shift.id !== undefined && this.id === __shift.id) return true;

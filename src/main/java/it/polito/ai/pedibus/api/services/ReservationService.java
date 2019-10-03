@@ -1,9 +1,9 @@
 package it.polito.ai.pedibus.api.services;
 
 import it.polito.ai.pedibus.api.dtos.ReservationDTO;
+import it.polito.ai.pedibus.api.models.Child;
 import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.repositories.ChildRepository;
-import it.polito.ai.pedibus.api.repositories.LineRepository;
 import it.polito.ai.pedibus.api.repositories.ReservationRepository;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
 import it.polito.ai.pedibus.security.CustomUserDetails;
@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReservationService {
@@ -40,44 +41,55 @@ public class ReservationService {
         return reservationRepository.findAll();
     }
 
-    public HashMap<String, ArrayList<HashMap<String, ArrayList<String>>>> getAllReservationStops(String lineName, String dateString) {
+    public HashMap<String, ArrayList<HashMap<String, ArrayList<HashMap<String, Object>>>>> getAllReservationStops(String lineName, String dateString) {
 
         LocalDate date = LocalDate.parse(dateString, fmt);
 
         //ovvero <"Sale o Scende", <"Nome Fermata", [Lista di gente che sale o scende]>>
-        HashMap<String, ArrayList<HashMap<String, ArrayList<String>>>> mappazza = new HashMap<>();
+        HashMap<String, ArrayList<HashMap<String, ArrayList<HashMap<String, Object>>>>> mappazza = new HashMap<>();
 
         //<Fermata,<ListaBambini>>
-        ArrayList<HashMap<String, ArrayList<String>>> o = new ArrayList<>();
-        ArrayList<HashMap<String, ArrayList<String>>> b = new ArrayList<>();
+        ArrayList<HashMap<String, ArrayList<HashMap<String, Object>>>> outward = new ArrayList<>();
+        ArrayList<HashMap<String, ArrayList<HashMap<String, Object>>>> back = new ArrayList<>();
 
         List<Reservation> listReservation = reservationRepository.findByLineNameAndDate(lineName, date);
         for (Reservation res : listReservation) {
+            Child c = childRepository.getById(res.getChildId());
             // Ugly repetition, but that's it for now.
             if (res.getDirection() == Reservation.Direction.OUTWARD) {
-                while (res.getTripIndex() >= o.size()) {
-                    o.add(new HashMap<>());
-                    System.err.println(o.size());
+                while (res.getTripIndex() >= outward.size()) {
+                    outward.add(new HashMap<>());
                 }
-                for (ObjectId child : res.getChildId())
-                    o.get(res.getTripIndex()).computeIfAbsent(res.getStopName(), k -> new ArrayList<>()).add(child.toString());
+                HashMap<String, Object> childReservationInfo = getChildReservationInfo(res.getChildId(), c.getName(), res.getId(), res.isPresent(), res.getCompanionWhoInserted());
+                outward.get(res.getTripIndex()).computeIfAbsent(res.getStopName(), k -> new ArrayList<>()).add(childReservationInfo);
             } else if (res.getDirection() == Reservation.Direction.BACK) {
-                while (res.getTripIndex() >= b.size()) {
-                    b.add(new HashMap<>());
+                while (res.getTripIndex() >= back.size()) {
+                    back.add(new HashMap<>());
                 }
-                for (ObjectId child : res.getChildId())
-                    b.get(res.getTripIndex()).computeIfAbsent(res.getStopName(), k -> new ArrayList<>()).add(child.toString());
+
+                HashMap<String, Object> childReservationInfo = getChildReservationInfo(res.getChildId(), c.getName(), res.getId(), res.isPresent(), res.getCompanionWhoInserted());
+                back.get(res.getTripIndex()).computeIfAbsent(res.getStopName(), k -> new ArrayList<>()).add(childReservationInfo);
             }
         }
 
-        mappazza.put("outward", o);
-        mappazza.put("backward", b);
+        mappazza.put("outward", outward);
+        mappazza.put("backward", back);
 
         // We don't need to cast a JSONObject since we are in a RESTController and the serialization is automagic.
         return mappazza;
     }
 
-    public Reservation insertReservationUser(String lineName, String dateString, ReservationDTO resd) {
+    private HashMap<String, Object> getChildReservationInfo(ObjectId childId, String childName, ObjectId resid, Boolean isPresent, ObjectId companionWhoInserted){
+        HashMap<String, Object> childReservationInfo = new HashMap<>();
+        childReservationInfo.put("id", childId.toString());
+        childReservationInfo.put("name", childName);
+        childReservationInfo.put("resid", resid.toString());
+        childReservationInfo.put("isPresent", isPresent);
+        childReservationInfo.put("companionWhoInserted", companionWhoInserted!=null?companionWhoInserted.toString():null);
+        return childReservationInfo;
+    }
+
+    public List<Reservation> insertReservationUser(String lineName, String dateString, ReservationDTO resd) {
         ObjectId user;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof CustomUserDetails) {
@@ -101,27 +113,35 @@ public class ReservationService {
             if (!check)
                 throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
 
-            for(Reservation res : reservationRepository.findByLineNameAndDateAndUser(lineName, date, user)){
+            /*for(Reservation res : reservationRepository.findByLineNameAndDateAndUser(lineName, date, user)){
                 if(res.getDirection()==resd.getDirection()){
                     for(ObjectId c : res.getChildId()){
                         if(c.equals(child))
                             throw new HttpClientErrorException(HttpStatus.CONFLICT);
                     }
                 }
+            }*/
+            for(Reservation res: this.reservationRepository.findAllByDateAndLineNameAndDirectionAndTripIndex(
+                    date, lineName, resd.getDirection(), resd.getTripIndex()
+            )){
+                if(res.getChildId().equals(child)) throw new HttpClientErrorException(HttpStatus.CONFLICT);
             }
         }
-
-        Reservation res = Reservation.builder()
-                .date(date)
-                .lineName(lineName)
-                .user(user)
-                .stopName(resd.getStopName())
-                .childId(resd.getChild())
-                .direction(resd.getDirection())
-                .tripIndex(resd.getTripIndex())
-                .build();
-        reservationRepository.insert(res);
-        return res;
+        List<Reservation> reservations = new ArrayList<Reservation>();
+        for(ObjectId childId: resd.getChild()){
+            Reservation res = Reservation.builder()
+                    .date(date)
+                    .lineName(lineName)
+                    .user(user)
+                    .stopName(resd.getStopName())
+                    .childId(childId)
+                    .direction(resd.getDirection())
+                    .tripIndex(resd.getTripIndex())
+                    .build();
+            reservationRepository.insert(res);
+            reservations.add(res);
+        }
+        return reservations;
     }
 
     private ObjectId getUserId() {
@@ -132,18 +152,15 @@ public class ReservationService {
 
     public void updateReservation(String line, String dateString, ReservationDTO resd, ObjectId id) {
         LocalDate date = LocalDate.parse(dateString, fmt);
-        if (reservationRepository.findByLineNameAndDateAndId(line, date, id) == null)
+        ObjectId userId = ((CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        Reservation res = reservationRepository.findById(id);
+        if ( res == null ) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
-
-        Reservation res = Reservation.builder()
-                .date(date)
-                .lineName(line)
-                .stopName(resd.getStopName())
-                .childId(resd.getChild())
-                .direction(resd.getDirection())
-                .tripIndex(resd.getTripIndex())
-                .build();
-        res.setId(id);
+        }
+        if(!res.getUser().equals(userId)){
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+        }
+        res.setStopName(resd.getStopName());
         reservationRepository.save(res);
     }
 
@@ -206,5 +223,70 @@ public class ReservationService {
         } else {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    public Reservation getReservationByAllParams(ObjectId userId, String lineName, Integer tripIndex,
+                                                 Reservation.Direction direction, LocalDate date){
+        return this.reservationRepository.findFirstByLineNameAndDateAndTripIndexAndDirectionAndUser(
+                lineName,
+                date,
+                tripIndex,
+                direction,
+                userId);
+    }
+
+    public List<Reservation> getReservationsByDateAndUser(LocalDate date, ObjectId userId){
+        return this.reservationRepository.findByUserAndDate(userId, date);
+    }
+
+    public List<String> notReservedChildrenOnTrip(String dateString, String lineName,
+                                                    Reservation.Direction direction, Integer tripIndex){
+        LocalDate date = LocalDate.parse(dateString, this.fmt);
+        List<Reservation> reservations = this.reservationRepository.findAllByDateAndLineNameAndDirectionAndTripIndex(date, lineName, direction, tripIndex);
+        return this.childRepository.findAll()
+                .stream()
+                .filter(child ->{
+                    boolean filter_in = true;
+                    for(Reservation res: reservations){
+                        if(res.getChildId().equals(child.getId())){
+                            filter_in = false;
+                            break;
+                        }
+                    }
+                    return filter_in;
+                })
+                .map(c -> c.getId().toString())
+                .collect(Collectors.toList());
+    }
+
+    public void togglePresenceOnReservation(ObjectId resid){
+        Reservation res = this.reservationRepository.findById(resid);
+        if(res == null){
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+        }
+        res.setPresent(!res.isPresent());
+        this.reservationRepository.save(res);
+    }
+
+    public Reservation addOnTheFlyChild(String dateString, String lineName,Reservation.Direction direction,
+                                        Integer tripIndex, String stopName, ObjectId childId){
+
+        if(childId == null || dateString == null || direction == null || tripIndex == null || stopName == null){
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        }
+
+        LocalDate date = LocalDate.parse(dateString, this.fmt);
+        ObjectId companion = ((CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        Reservation res = Reservation.builder()
+                .childId(childId)
+                .lineName(lineName)
+                .direction(direction)
+                .stopName(stopName)
+                .tripIndex(tripIndex)
+                .companionWhoInserted(companion)
+                .date(date)
+                .present(true)
+                .build();
+        return this.reservationRepository.insert(res);
     }
 }

@@ -3,17 +3,17 @@ import {Photo} from "./photo";
 
 
 export class Child {
-    public id: String;
-    public name: String;
-    public surname: String;
+    public id: string;
+    public name: string;
+    public surname: string;
 
 
     public birthday: Date;
-    public gender: String;
+    public gender: string;
     public present: boolean;
     public disability: boolean;
-    public other: String;
+    public other: string;
 
-    public photo: String;
+    public photo: string;
     public photoFile: boolean;
 }

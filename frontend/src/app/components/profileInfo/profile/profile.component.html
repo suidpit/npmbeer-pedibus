@@ -17,15 +17,19 @@
 
                     </div>
                 </div>
+                <mat-divider [inset]="true" style="margin: 20px 0;"></mat-divider>
                 <div fxFill fxLayout="row">
                     <div fxFlex="50%">
-                        <p>Email: </p>
-                        <p class="email">{{user.email}}</p>
+                        <mat-form-field>
+                          <input matInput [disabled]="true" placeholder="Email" class="email" value="{{user.email}}">
+                        </mat-form-field>
                     </div>
                     <div fxFlex="50%">
-                        <p>Email alternativa: </p>
-                        <input type="email" placeholder="mario.rossi@example.com" class="form-control"
-                               name="alt_email" [(ngModel)]="user.alt_email" #alt_email="ngModel" email>
+                        <mat-form-field>
+                          <input matInput type="email" placeholder="Email Alternativa" class="form-control"
+                                 name="alt_email" [(ngModel)]="user.alt_email" #alt_email="ngModel" email>
+                        </mat-form-field>
+
                         <div *ngIf="f.submitted && alt_email.invalid " class="invalid-feedback">
                             <div class="error">Email deve essere un indirizzo valido</div>
                         </div>
@@ -33,22 +37,25 @@
                 </div>
                 <div fxFill fxLayout="row">
                     <div fxFlex="50%">
-                        <p>Nome: </p>
-                        <input placeholder="Mario" [(ngModel)]="user.name" name="name">
+                      <mat-form-field>
+                        <input matInput placeholder="Nome" [(ngModel)]="user.name" name="name">
+                      </mat-form-field>
                     </div>
                     <div fxFlex="50%">
-                        <p>Cognome: </p>
-                        <input placeholder="Rossi" [(ngModel)]="user.surname" name="surname">
+                      <mat-form-field>
+                        <input matInput placeholder="Cognome" [(ngModel)]="user.surname" name="surname">
+                      </mat-form-field>
                     </div>
                 </div>
                 <div fxFill fxLayout="row">
                     <div fxFlex="50%">
-                        <p>Indirizzo: </p>
-                        <input [(ngModel)]="user.address" name="address">
+                      <mat-form-field>
+                        <input matInput placeholder="Indirizzo" [(ngModel)]="user.address" name="address">
+                      </mat-form-field>
                     </div>
                     <div fxFlex="50%">
-                        <p>Telefono: </p>
-                        <input [(ngModel)]="user.telephone" placeholder="+39333333333" name="telephone" #tel="ngModel" pattern="(\+[0-9][0-9])?[0-9]+">
+                      <mat-form-field>
+                        <input matInput [(ngModel)]="user.telephone" placeholder="Telefono" name="telephone" #tel="ngModel" pattern="(\+[0-9][0-9])?[0-9]+"></mat-form-field>
                         <div *ngIf="tel.invalid" class="invalid-feedback">
                             <div class="error">Formato numero non valido</div>
                         </div>
@@ -79,6 +86,7 @@
                         </mat-form-field>
                     </div>
                 </div>
+                <mat-divider [inset]="true" style="margin: 5px 0 20px 0"></mat-divider>
                 <button mat-raised-button>SALVA</button>
                 <p class="error">{{error}}</p>
         </form>

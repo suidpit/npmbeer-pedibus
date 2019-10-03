@@ -11,11 +11,16 @@ import java.util.List;
 public class ObjectIdListSerializer extends JsonSerializer<Object> {
     @Override
     public void serialize(Object value, JsonGenerator jsonGen, SerializerProvider provider) throws IOException {
-        List<ObjectId> ids = (List<ObjectId>) value;
-        jsonGen.writeStartArray();
-        for(ObjectId id: ids){
-            jsonGen.writeString(id.toString());
+     try{
+         List<ObjectId> ids = (List<ObjectId>) value;
+         jsonGen.writeStartArray();
+         for(ObjectId id: ids){
+             jsonGen.writeString(id.toString());
+         }
+         jsonGen.writeEndArray();
         }
-        jsonGen.writeEndArray();
+        catch (Exception e){
+         throw new IOException("Cannot deserialize into List<ObjectId>");
+        }
     }
 }

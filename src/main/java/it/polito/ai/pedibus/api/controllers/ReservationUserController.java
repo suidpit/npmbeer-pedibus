@@ -6,11 +6,14 @@ import it.polito.ai.pedibus.api.constraints.ReservationPutFields;
 import it.polito.ai.pedibus.api.dtos.ReservationDTO;
 import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.services.ReservationService;
+import it.polito.ai.pedibus.security.CustomUserDetails;
 import org.bson.types.ObjectId;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @CrossOrigin
@@ -56,7 +59,7 @@ public class ReservationUserController {
     @Transactional
     @ReservationPostFields
     @RequestMapping(value = "{lineName}/{date}", method = RequestMethod.POST)
-    public Reservation insert(@PathVariable("lineName") String lineName,
+    public List<Reservation> insert(@PathVariable("lineName") String lineName,
                          @PathVariable("date") String dateString,
                          @RequestBody ReservationDTO resd) {
         return reservationService.insertReservationUser(lineName, dateString, resd);
@@ -64,7 +67,9 @@ public class ReservationUserController {
 
     /**
      * PUT /reservations/user/{nome_linea}/{data}/{reservation_id} – invia un oggetto JSON che
-     * permette di aggiornare i dati relativi alla prenotazione indicata
+     * permette di aggiornare i dati relativi alla prenotazione indicata.
+     *
+     * NOTA BENE: id è l'identificativo della prenotazione da aggiornare, di fatto, l'unico campo modificabile è la fermata.
      *
      * @param lineName
      * @param dateString
@@ -73,7 +78,7 @@ public class ReservationUserController {
      */
     @Transactional
     @ReservationPutFields
-    @RequestMapping(value = "{lineName}/{date}/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "{lineName}/{date}", method = RequestMethod.PUT)
     public void update(@PathVariable("lineName") String lineName,
                        @PathVariable("date") String dateString,
                        @PathVariable("id") ObjectId id,
@@ -112,5 +117,13 @@ public class ReservationUserController {
                                       @PathVariable("id") ObjectId id) {
 
         return reservationService.getReservationUser(lineName, dateString, id);
+    }
+
+
+    @RequestMapping(value = "today", method = RequestMethod.GET)
+    public List<Reservation> getTodayReservations(){
+        LocalDate today = LocalDate.now();
+        ObjectId userId = ((CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        return this.reservationService.getReservationsByDateAndUser(today, userId);
     }
 }

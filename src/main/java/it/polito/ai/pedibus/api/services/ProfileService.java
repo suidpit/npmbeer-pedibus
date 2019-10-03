@@ -1,5 +1,6 @@
 package it.polito.ai.pedibus.api.services;
 
+import it.polito.ai.pedibus.api.controllers.UserAdministrationController;
 import it.polito.ai.pedibus.api.dtos.ChangePasswordDTO;
 import it.polito.ai.pedibus.api.dtos.ChildDTO;
 import it.polito.ai.pedibus.api.dtos.ProfileInfoDTO;
@@ -15,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import sun.security.util.Password;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -54,18 +58,9 @@ public class ProfileService {
         String email = getUserEmail();
         List<ChildDTO> children = new ArrayList<>();
         for (ObjectId id : userRepository.getByEmail(email).getChildren()) {
-            ChildDTO childDTO = new ChildDTO();
             Child child = childRepository.getById(id);
-            if (child.isPhoto()) {
-                try {
-                    childDTO.of(child, photoService.loadPhoto(child.getId()));
-                } catch (Exception e) {
-                    childDTO.of(child, null);
-                }
-            } else {
-                childDTO.of(child, null);
-            }
-            children.add(childDTO);
+
+            children.add(dtoFromChild(child));
         }
         return children;
     }
@@ -189,5 +184,45 @@ public class ProfileService {
         }else{
             throw new HttpClientErrorException(HttpStatus.PRECONDITION_FAILED);
         }
+    }
+
+    public List<ChildDTO> getAllChildren() {
+        List<ChildDTO> childrenDTOs = new ArrayList<>();
+        List<Child> children = this.childRepository.findAll();
+        for (Child c : children) {
+            childrenDTOs.add(this.dtoFromChild(c));
+        }
+        return childrenDTOs;
+    }
+
+    public ChildDTO getChildById(ObjectId id){
+        Child child = this.childRepository.getById(id);
+        CustomUserDetails user = ((CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        User u = this.userRepository.getById(user.getId());
+        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+
+        // if it is just a normal user and the child isn't in its child list => no AuthZ
+        if(!UserAdministrationController.hasAuthority(authorities, "SYSTEM_ADMIN") &&
+           !UserAdministrationController.hasAuthority(authorities, "ADMIN") &&
+           !UserAdministrationController.hasAuthority(authorities, "COMPANION")){
+
+            if(!u.getChildren().contains(child.getId())) throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+        }
+        return dtoFromChild(child);
+    }
+
+    private ChildDTO dtoFromChild(Child c){
+        ChildDTO childDTO = new ChildDTO();
+        if (c.isPhoto()) {
+            try {
+                childDTO.of(c, photoService.loadPhoto(c.getId()));
+            } catch (Exception e) {
+                childDTO.of(c, null);
+            }
+        }
+        else {
+            childDTO.of(c, null);
+        }
+        return childDTO;
     }
 }

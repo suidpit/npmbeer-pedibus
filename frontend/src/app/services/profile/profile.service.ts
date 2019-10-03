@@ -8,10 +8,11 @@ import {error} from "selenium-webdriver";
 import {stringify} from "querystring";
 import {AuthService} from "../auth/auth.service";
 import {UserProfile} from "../../models/userProfile";
-import {catchError} from "rxjs/operators";
+import {catchError, mergeMap, toArray} from "rxjs/operators";
 import {ChangePassword} from "../../models/changepassword";
 import {Builder} from "builder-pattern";
 import {Form, NgForm} from "@angular/forms";
+import {from} from "rxjs/internal/observable/from";
 
 @Injectable({
     providedIn: 'root'
@@ -34,6 +35,22 @@ export class ProfileService {
         this.http.get<Child[]>(this.baseUrl + "/profile/children").subscribe((children) => {
             this.children$.next(children);
         });
+    }
+
+    public getAllChildren(): Observable<Child[]>{
+      return this.http.get<Child[]>(this.baseUrl + "/profile/children/all");
+    }
+
+    public getChildrenById(ids: string[]):Observable<Child[]>{
+      if(ids === undefined || ids === null) ids = [];
+      return from(ids).pipe(
+          mergeMap((id) => this.http.get<Child>(this.baseUrl + "/profile/children/"+id)),
+          toArray()
+      );
+    }
+
+    public getChildById(id: string):Observable<Child>{
+      return this.http.get<Child>(this.baseUrl + "/profile/children/"+id);
     }
 
     public updateChild(child: Child, file: File) {

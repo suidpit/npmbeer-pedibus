@@ -71,7 +71,6 @@ export class ShiftConfirmationComponent implements OnInit {
     switch(column){
       case "lineName":
         this.dataSource.data.sort((a: DataHolder, b: DataHolder) =>{
-          debugger;
           if(direction === "desc") return a.shift.lineName > b.shift.lineName?+1:-1;
           return a.shift.lineName > b.shift.lineName?-1:+1;
         });
@@ -93,8 +92,8 @@ export class ShiftConfirmationComponent implements OnInit {
 
       case "startsAt":
         this.dataSource.data.sort((a: DataHolder, b: DataHolder) =>{
-          if(direction === "desc") return a.shift.date.isBefore(b.shift.date)?+1:-1;
-          return a.shift.date.isBefore(b.shift.date)?-1:+1;
+          if(direction === "desc") return a.shift.startsAt.isBefore(b.shift.startsAt)?+1:-1;
+          return a.shift.startsAt.isBefore(b.shift.startsAt)?-1:+1;
         });
         break;
 

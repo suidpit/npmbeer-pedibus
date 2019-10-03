@@ -79,7 +79,12 @@ import { ShiftConfirmationComponent } from './components/shifts/shift-confirmati
 import { LateralmenuComponent } from './components/profileInfo/lateralmenu/lateralmenu.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import { ProfileComponent } from './components/profileInfo/profile/profile.component';
+
+import { HomeComponent } from './components/home/home.component';
+import { KidTrackerComponent } from './components/kid-tracker/kid-tracker.component';
+import {AgmCoreModule} from "@agm/core";
 import { SimpleEventLoggerComponent } from './components/simple-event-logger/simple-event-logger.component';
+
 import {
     ChildCardComponent,
     ManageChildrenComponent
@@ -123,6 +128,8 @@ import { ChangePasswordComponent } from './components/profileInfo/change-passwor
     ShiftConfirmationComponent,
     LateralmenuComponent,
     ProfileComponent,
+    HomeComponent,
+    KidTrackerComponent,
     SimpleEventLoggerComponent,
     ManageChildrenComponent,
     ChildCardComponent,
@@ -132,6 +139,8 @@ import { ChangePasswordComponent } from './components/profileInfo/change-passwor
     BrowserModule,
     BrowserAnimationsModule,
     RouterModule.forRoot([
+      { path: "home", component: HomeComponent},
+      { path: "trovaBambino", component: KidTrackerComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
       { path: "login", component: LoginComponent, canActivate: [NoAuthnGuard]},
       { path: "presenze", component: AttendanceComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
       { path: "registrazione", component: RegistrationComponent, canActivate: [NoAuthnGuard] },
@@ -142,8 +151,11 @@ import { ChangePasswordComponent } from './components/profileInfo/change-passwor
       { path: "prenotazione", component: ReservationsComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
       { path: "eventi", component: SimpleEventLoggerComponent},
       { path: "profilo", component: LateralmenuComponent, canActivate: [AuthGuard], data:{roles: [Role.USER]}},
-      { path: "**", redirectTo: "login", pathMatch: "full"}
+      { path: "**", redirectTo: "home", pathMatch: "full"}
     ]),
+    AgmCoreModule.forRoot({
+      apiKey: "AIzaSyBvrioINDkg1n41aEPstcosZp4Tb5QB66o"
+    }),
     HttpClientModule,
     MatBadgeModule,
     MatButtonModule,

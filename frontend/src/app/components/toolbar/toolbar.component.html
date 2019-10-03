@@ -5,7 +5,7 @@
                 (click)="sidenav.toggle()">menu</mat-icon>
     </div>
     <div fxShow="true" fxHide.lt-md="true">
-      <img src="../../../assets/icons/p_logo_blue.png" style="width: 45px; height: 45px;">
+      <img src="../../../assets/icons/p_logo_blue.png" class="pointer" style="width: 45px; height: 45px;" routerLink="/">
 
     </div>
     <span class="pointer site-name side-container" routerLink="/" >Pedibus</span>
@@ -17,10 +17,10 @@
       </span>
     </div>
 
-    <span fxShow="true" fxHide.lt-md="true" fxLayoutAlign="space-evenly center"
+    <span fxShow="true" fxHide.lt-md="true" fxLayoutAlign="space-around center"
           *ngIf="auth.isLoggedIn$ | async" class="side-container">
 
-        <div mat-card-avatar class="avatar"></div>
+        <div class="avatar"></div>
         <div fxLayout="column" fxLayoutAlign="center center">
           <span class="logged-user-style" *ngIf="auth.currentUser$ | async as user">
             <span class="user-email" [matMenuTriggerFor]="userMenu">
@@ -37,9 +37,9 @@
         <mat-icon matBadge="1" matBadgePosition="above after">notifications</mat-icon>
     </span>
 
-    <span fxShow="true" fxHide.lt-md="true" fxLayoutAlign="end center" class="side-container" *ngIf="!(auth.isLoggedIn$ | async)">
+    <span fxShow="true" fxHide.lt-md="true" fxLayoutAlign="center center" class="side-container" *ngIf="!(auth.isLoggedIn$ | async)">
 
-      <a routerLink="/registrazione" mat-button class="menu-element">Registrazione</a>
+      <!--a routerLink="/registrazione" mat-button class="menu-element">Registrazione</a-->
 
       <a routerLink="/login" mat-button class="menu-element">Login</a>
 
@@ -48,20 +48,42 @@
   </mat-toolbar>
 
   <mat-sidenav-container>
-    <mat-sidenav #sidenav fxLayout="column">
+    <mat-sidenav #sidenav id="sidenav" fxLayout="column">
       <div fxLayout="column" fxLayoutAlign="center">
-        <a (click)="sidenav.toggle()" class="pointer" mat-button>Close</a>
-        <span>
-          <a *ngFor="let link of entries" [routerLink]="link.url" mat-button class="menu-element">{{link.displayName}}</a>
+        <span style="width: 100%; margin-top:15px;" fxLayout="row" fxLayoutAlign="space-around center" *ngIf="auth.currentUser$ | async as user">
+          <div class="avatar pointer" routerLink="/profile"></div>
+          <a class="user-email pointer" mat-button routerLink="/profile">
+              {{ (user.email.length>12)? (user.email | slice:0:12)+'..':(user.email) }}
+          </a>
+          <mat-icon matBadge="1" matBadgePosition="above after">notifications</mat-icon>
         </span>
-        <span>
+
+        <mat-divider style="margin: 10px 0;" *ngIf="auth.currentUser$ | async"></mat-divider>
+
+        <a (click)="sidenav.toggle()" id="close" class="pointer" mat-button>Close</a>
+        <span  *ngFor="let link of entries" class="menu-element" style="margin-left: 30px;" fxLayoutAlign="start center" fxLayoutGap="5px">
+          <mat-icon fxFlex="0 0 auto">{{link.icon}}</mat-icon>
+          <a (click)="sidenav.toggle()" mat-button [routerLink]="link.url" fxFlex="2 1 100%" style="text-align: left">{{link.displayName}}</a>
+        </span>
+
+        <mat-divider style="margin: 10px 0;"></mat-divider>
+
+        <span class="menu-element" style="margin-left: 30px;" fxLayoutAlign="start center" fxLayoutGap="5px" *ngIf="auth.currentUser$ | async">
+          <mat-icon fxFlex="0 0 auto">settings_application</mat-icon>
+          <a (click)="sidenav.toggle()" mat-button [routerLink]="'/profilo'" fxFlex="2 1 100%" style="text-align: left">Il mio Profilo</a>
+        </span>
+        <a (click)="logout()" routerLink="/home" mat-button class="pointer" *ngIf="auth.currentUser$ | async; else login">Logout</a>
+        <ng-template #login>
+          <a (click)="sidenav.toggle()" routerLink="/login" mat-button class="menu-element">Login</a>
+        </ng-template>
+        <!--span>
           <a *ngIf="user === null" routerLink="/login" mat-button class="menu-element">Login</a>
           <span *ngIf="user !== null" class="menu-element">
             {{user._email}}<br>
               <a (click)="auth.logout()" routerLink="/login" mat-button class="pointer">Logout</a>
 
           </span>
-        </span>
+        </span-->
       </div>
     </mat-sidenav>
 
@@ -76,6 +98,6 @@
     </mat-sidenav-content>
   </mat-sidenav-container>
   <mat-toolbar style="background-color: #2C3E50; color: white;">
-    <span class="pointer">Powered by NapalmBeer Inc. &copy;</span>
+    <span class="pointer">Powered by NapalmBeer Inc. &copy; </span>
   </mat-toolbar>
 </div>

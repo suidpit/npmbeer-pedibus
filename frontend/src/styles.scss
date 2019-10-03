@@ -100,3 +100,15 @@
 .pointer{
   cursor: pointer;
 }
+
+.attendance-tabs .mat-tab-body-content{
+  display: flex !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  flex-direction: column !important;
+}
+
+.attendance-tabs .mat-tab-body-wrapper{
+  flex: 2 0 100% !important;
+}
+
