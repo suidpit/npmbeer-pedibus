@@ -8,7 +8,7 @@ import {Observable} from "rxjs/internal/Observable";
 import { ReservationsService } from "../reservations/reservations.service";
 import {AuthService} from "../auth/auth.service";
 import {Colors} from "../../utils/colors";
-import {map, toArray} from "rxjs/operators";
+import {map, mergeMap, toArray} from "rxjs/operators";
 import {range} from "rxjs/internal/observable/range";
 import {Line} from "../../models/line";
 import {HttpClient} from "@angular/common/http";
@@ -17,6 +17,7 @@ import {collectExternalReferences} from "@angular/compiler";
 import {AttendanceService} from "../attendance/attendance.service";
 import {Role} from "../../models/authority";
 import {of} from "rxjs/internal/observable/of";
+import {from} from "rxjs/internal/observable/from";
 
 @Injectable({
   providedIn: 'root'
@@ -426,6 +427,24 @@ export class ShiftService {
     return color;
   }
 
+
+  public getShiftsForReservation(resid: string): Observable<Shift[]>{
+    return this.http.get<Shift[]>(`${this.shift_url}/by-resid/${resid}`);
+  }
+
+
+  /**
+   * Uses getShiftForReservation (<- singualar!) and rxjs mapping operators to retrieve the shifts related to a bunch of reservations
+   * @param {string[]} resids
+   * @returns {Observable<Shift[]>}
+   */
+  public getShiftsForReservations(resids: string[]): Observable<any[]>{
+    return from(resids)
+      .pipe(
+        mergeMap((resid) => this.getShiftsForReservation(resid)),
+        toArray()
+      )
+  }
   randomIntFromInterval(min, max) { // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min);
   }

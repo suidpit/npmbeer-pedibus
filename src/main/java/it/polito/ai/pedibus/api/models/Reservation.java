@@ -2,6 +2,7 @@ package it.polito.ai.pedibus.api.models;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.mongodb.lang.Nullable;
 import it.polito.ai.pedibus.api.serializers.ObjectIdSerializer;
@@ -28,7 +29,8 @@ public class Reservation {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="dd-MM-yyyy")
     private LocalDate date;
     private String lineName;
-    // We're not sure an ID is needed here, since every stop name, in the context of a direction and tripIndex number, is unique.
+
+    @JsonSerialize(using = ObjectIdSerializer.class)
     private ObjectId childId;
 
     //TODO:
@@ -43,5 +45,6 @@ public class Reservation {
     private boolean present;
 
     @Nullable
+    @JsonSerialize(using = ObjectIdSerializer.class)
     private ObjectId companionWhoInserted;
 }

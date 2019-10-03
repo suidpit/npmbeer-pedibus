@@ -24,4 +24,5 @@ public class Event {
     private Boolean read;
     private Timestamp created_at;
     private ObjectId userId;
+    private ObjectId objectReferenceId;
 }

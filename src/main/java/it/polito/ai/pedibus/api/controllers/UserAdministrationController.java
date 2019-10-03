@@ -2,6 +2,7 @@ package it.polito.ai.pedibus.api.controllers;
 
 
 import it.polito.ai.pedibus.api.dtos.EmailDTO;
+import it.polito.ai.pedibus.api.dtos.NewEventDTO;
 import it.polito.ai.pedibus.api.dtos.UserDetailDTO;
 import it.polito.ai.pedibus.api.dtos.UserPrivilegesDTO;
 import it.polito.ai.pedibus.api.events.OnRegistrationCompleteEvent;
@@ -9,6 +10,7 @@ import it.polito.ai.pedibus.api.exceptions.EmailExistsException;
 import it.polito.ai.pedibus.api.models.SystemAuthority;
 import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
+import it.polito.ai.pedibus.api.services.EventService;
 import it.polito.ai.pedibus.security.LineGrantedAuthority;
 import it.polito.ai.pedibus.api.services.IUserService;
 import org.bson.types.ObjectId;
@@ -45,6 +47,9 @@ public class UserAdministrationController {
 
     @Autowired
     ApplicationEventPublisher eventPublisher;
+
+    @Autowired
+    EventService eventService;
 
     @Autowired
     IUserService userService;
@@ -154,6 +159,13 @@ public class UserAdministrationController {
             User registered = userService.registerNewUserEmail(emailDTO);
             String appUrl = request.getContextPath();
 
+            NewEventDTO welcomeEvent = NewEventDTO.builder()
+                    .type("Welcome")
+                    .body("Benvenuto su Pedibus!")
+                    .userId(registered.getId())
+                    .build();
+
+            eventService.pushNewEvent(welcomeEvent);
             eventPublisher.publishEvent(new OnRegistrationCompleteEvent
                     (registered, request.getLocale(), appUrl));
 

@@ -27,8 +27,9 @@ public class EventService {
                 .body(newEventDTO.getBody())
                 .type(newEventDTO.getType())
                 .userId(newEventDTO.getUserId())
-                .created_at(new Timestamp(new Date().getTime()))
                 .read(false)
+                .created_at(new Timestamp(new Date().getTime()))
+                .objectReferenceId(newEventDTO.getObjectReferenceId())
                 .build();
 
         return eventRepository.save(e);

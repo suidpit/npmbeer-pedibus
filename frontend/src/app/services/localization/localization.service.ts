@@ -81,7 +81,7 @@ export class LocalizationService {
                 timems = (shift.from.time.toSecondOfDay() - LocalTime.now().toSecondOfDay())*1000;
                 end_timems = (shift.to.time.toSecondOfDay() - shift.from.time.toSecondOfDay())*1000;
               }
-              console.log("Position streaming will start in "+timems/(60*1000) + "minutes");
+              console.log("Position streaming will start in "+Number(timems/(60*1000)).toFixed(2) + " minutes");
 
               // start streaming at shift start time -- stop at shift end
               setTimeout(() => {
@@ -120,8 +120,8 @@ export class LocalizationService {
 
   private togglePositionStreaming(on = true, stompClient, shift: Shift = null){
     if(on && shift){
-      console.log("Position streaming starting  in 60 seconds.");
-      this.position_subscription = interval(60000).subscribe(() =>{
+      console.log("Position streaming starting  in 20 seconds.");
+      this.position_subscription = interval(20000).subscribe(() =>{
 
         //send position info.
         navigator.geolocation.getCurrentPosition(geolocation =>{

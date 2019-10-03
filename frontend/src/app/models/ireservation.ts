@@ -1,9 +1,10 @@
 export interface IReservation {
-    _id:string;
+    id:string;
     date: string;
     lineName:string;
     stopName:string;
     childName:string;
     direction:string;
     tripIndex:number;
+    childId:string;
 }

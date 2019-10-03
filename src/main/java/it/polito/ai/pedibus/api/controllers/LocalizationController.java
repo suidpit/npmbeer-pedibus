@@ -74,7 +74,10 @@ public class LocalizationController implements ApplicationListener<ApplicationEv
 
         // Allow only the companion assigned to the current shift to post the relative position.
         try{
-            if(this.shiftService.getCompanionIdByShiftId(new ObjectId(shiftId)).equals(user.getId())){
+            Shift s = this.shiftService.getShiftById(new ObjectId(shiftId));
+            if(s != null && s.getCompanionId().equals(user.getId())){
+                s.setLastUpdate(localizationMessageDTO.getPosition());
+                this.shiftService.insertOrUpdateShift(s);
                 LocalizationSTOMPMessage message = new LocalizationSTOMPMessage();
                 message.setContent(objectMapper.writeValueAsString(localizationMessageDTO));
                 messagingTemplate.convertAndSend("/topic/localize/"+shiftId, message);
