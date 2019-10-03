@@ -445,6 +445,16 @@ export class ShiftService {
         toArray()
       )
   }
+
+  /**
+   *
+   * @param shiftId
+   * @returns {Observable<any>} observable of the event related to the assigned shift: can check if viewed.
+   */
+  public getEventFromShiftId(shiftId): Observable<boolean>{
+    return this.http.get<boolean>("http://localhost:8080/events/by-shift/"+shiftId);
+  }
+
   randomIntFromInterval(min, max) { // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min);
   }

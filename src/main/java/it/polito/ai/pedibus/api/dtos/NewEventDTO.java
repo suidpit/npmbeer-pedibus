@@ -17,4 +17,6 @@ public class NewEventDTO {
     private ObjectId userId;
 
     private ObjectId objectReferenceId;
+
+    private Boolean read;
 }

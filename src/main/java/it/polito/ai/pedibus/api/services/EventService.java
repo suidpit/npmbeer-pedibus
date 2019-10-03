@@ -3,6 +3,7 @@ package it.polito.ai.pedibus.api.services;
 import it.polito.ai.pedibus.api.dtos.NewEventDTO;
 import it.polito.ai.pedibus.api.models.Event;
 import it.polito.ai.pedibus.api.repositories.EventRepository;
+import it.polito.ai.pedibus.api.serializers.ObjectIdSerializer;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,5 +38,10 @@ public class EventService {
 
     public Flux<Event> getEventsForUser(ObjectId userId) {
         return eventRepository.findWithTailableCursorByUserId(userId);
+    }
+
+    public Event getByReferenceObject(ObjectId objectId){
+        Mono<Event> monoEvent = this.eventRepository.findByObjectReferenceId(objectId);
+        return monoEvent.block();
     }
 }

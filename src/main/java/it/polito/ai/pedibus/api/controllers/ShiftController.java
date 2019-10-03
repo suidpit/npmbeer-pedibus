@@ -4,10 +4,7 @@ import it.polito.ai.pedibus.api.dtos.NewEventDTO;
 import it.polito.ai.pedibus.api.dtos.ShiftRequestDTO;
 import it.polito.ai.pedibus.api.dtos.ShiftResponseDTO;
 import it.polito.ai.pedibus.api.exceptions.*;
-import it.polito.ai.pedibus.api.models.Line;
-import it.polito.ai.pedibus.api.models.Reservation;
-import it.polito.ai.pedibus.api.models.Shift;
-import it.polito.ai.pedibus.api.models.User;
+import it.polito.ai.pedibus.api.models.*;
 import it.polito.ai.pedibus.api.repositories.ShiftRepository;
 import it.polito.ai.pedibus.api.services.*;
 import it.polito.ai.pedibus.security.CustomUserDetails;
@@ -24,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
+import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -239,7 +237,8 @@ public class ShiftController {
                                 .objectReferenceId(s.getId())
                                 .build();
 
-                        this.eventService.pushNewEvent(event);
+                        Mono<Event> e =this.eventService.pushNewEvent(event);
+                        logger.warn(e.toString());
                     }
                     else{
                         // create complementary shift.

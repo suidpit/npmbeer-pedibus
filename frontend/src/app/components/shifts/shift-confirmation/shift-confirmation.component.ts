@@ -48,7 +48,7 @@ export class ShiftConfirmationComponent implements OnInit {
     this.shiftService.getShifts().subscribe((shifts)=>{
       let arr = [];
       for(let s of shifts){
-        arr.push(new DataHolder(s, false, this.auth.getUsersDetails([s.companionId])));
+        arr.push(new DataHolder(s, false, this.auth.getUsersDetails([s.companionId]), this.shiftService.getEventFromShiftId(s.id)));
       }
       this.dataSource = new MatTableDataSource<DataHolder>(arr);
       this.dataSource.sort = this.sort;
@@ -134,9 +134,11 @@ export class DataHolder{
   public shift: Shift;
   public checked: boolean;
   public usersInfo$: Observable<User[]>;
-  constructor(s: Shift, c: boolean, userInfo$: Observable<User[]>){
+  public viewed: Observable<boolean>;
+  constructor(s: Shift, c: boolean, userInfo$: Observable<User[]>, viewed: Observable<boolean>){
     this.shift = s;
     this.checked = c;
     this.usersInfo$ = userInfo$;
+    this.viewed = viewed;
   }
 }

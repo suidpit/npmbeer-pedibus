@@ -47,7 +47,7 @@
 
           <ng-container matColumnDef="visualized">
             <th mat-header-cell mat-sort-header *matHeaderCellDef> Presa Visione </th>
-            <td mat-cell *matCellDef="let elem"> No </td>
+            <td mat-cell *matCellDef="let elem"> {{(elem.viewed | async)?'SI':'NO'}} </td>
           </ng-container>
 
           <ng-container matColumnDef="select">
