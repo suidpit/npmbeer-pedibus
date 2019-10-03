@@ -60,10 +60,11 @@ public class EventController {
 
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/by-shift/{objectId}", method = RequestMethod.GET)
-    public Boolean getEventForObjectId(@PathVariable("objectId") String objectId){
-        try{
-            Event e = this.eventService.getByReferenceObject(new ObjectId(objectId));
-            return e.getRead();
+    @ResponseBody
+    public Mono<Boolean> getEventForObjectId(@PathVariable("objectId") ObjectId objectId){
+        try {
+            Mono<Event> e = this.eventService.getByReferenceObject(objectId);
+            return e.flatMap(s -> Mono.just(s.getRead()));
         }
         catch (Exception e){
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);

@@ -208,7 +208,7 @@ public class ShiftController {
     @Transactional
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/confirm", headers = "Accept=application/json", method = RequestMethod.POST)
-    public void postShiftConfirmation(@RequestBody @Valid ShiftRequestDTO shiftRequestDTO){
+    public Mono<Event> postShiftConfirmation(@RequestBody @Valid ShiftRequestDTO shiftRequestDTO){
         // TODO send notification to user.
         if(canView(shiftRequestDTO.getLineName())){
             if(shiftRequestDTO.getShiftId() != null){
@@ -237,8 +237,7 @@ public class ShiftController {
                                 .objectReferenceId(s.getId())
                                 .build();
 
-                        Mono<Event> e =this.eventService.pushNewEvent(event);
-                        logger.warn(e.toString());
+                        return this.eventService.pushNewEvent(event);
                     }
                     else{
                         // create complementary shift.
@@ -269,7 +268,7 @@ public class ShiftController {
                                     .objectReferenceId(s.getId())
                                     .build();
 
-                            this.eventService.pushNewEvent(event);
+                            return this.eventService.pushNewEvent(event);
                         }
                         catch(Exception e){
                             // TODO create complementary shift anew (if here is because of clone failure so -> no clone).
@@ -287,6 +286,7 @@ public class ShiftController {
         else{
             throw new UnauthorizedLineActionException();
         }
+        return Mono.empty();
     }
 
 
