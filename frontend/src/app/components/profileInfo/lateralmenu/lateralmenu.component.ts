@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
-import {Observable, Subject} from 'rxjs';
-import {map, takeUntil} from 'rxjs/operators';
+import {fromEvent, Observable, Subject} from 'rxjs';
+import {map, startWith, takeUntil, throttleTime} from 'rxjs/operators';
 import {AuthService} from 'src/app/services/auth/auth.service';
 import {User} from 'src/app/models/user';
 import {FormBuilder, ValidatorFn, FormControl, Validators, FormGroup} from '@angular/forms';
@@ -43,7 +43,19 @@ export class LateralmenuComponent implements OnInit, OnDestroy {
         this.unsubscribe$.complete();
     }
 
+    isScreenSmall$ = null;
+
     ngOnInit() {
+        // Checks if screen size is less than 1024 pixels
+        const checkScreenSize = () => document.body.offsetWidth < 600;
+
+        // Create observable from window resize event throttled so only fires every 500ms
+        const screenSizeChanged$ = fromEvent(window, 'resize').pipe(throttleTime(500), map(checkScreenSize));
+
+        // Start off with the initial value use the isScreenSmall$ | async in the
+        // view to get both the original value and the new value after resize.
+        this.isScreenSmall$ = screenSizeChanged$.pipe(startWith(checkScreenSize()));
+
         this.profileService.user$.pipe(
             takeUntil(this.unsubscribe$)
         ).subscribe((user) => {

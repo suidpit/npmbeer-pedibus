@@ -1,4 +1,4 @@
-input{
+.input{
   width: 300px;
   margin: 10px
 }
@@ -8,7 +8,12 @@ input{
   height: 250px;
 }
 
-mat-form-field{
+.field{
+  width: 300px;
+  margin-left: 10px;
+}
+
+.field-small{
   width: 300px;
   margin-left: 10px;
 }

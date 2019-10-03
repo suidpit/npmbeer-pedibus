@@ -1,14 +1,14 @@
-<mat-card>
+<mat-card ngClass.gt-sm="content-big" ngClass.xs="content-small">
     <mat-card-title>Profilo</mat-card-title>
-    <mat-card-content *ngIf="user" fxLayout="column">
+    <mat-card-content  *ngIf="user" fxLayout="column">
         <form role=form name="profileForm" #f="ngForm" (submit)="f.form.valid && saveUser()">
-                <div fxFill fxLayout="row">
-                    <div fxFlex="50%">
+                <div fxLayout.gt-xs="row" fxLayout.xs="column nowrap">
+                    <div fxFlex.gt-xs="50%" >
                         <p>Avatar: </p>
                         <img [src]="(user && user.photo) ? user.photo : '../../../../assets/icons/img_avatar.png'"
                              class="preview">
                     </div>
-                    <div fxFlex="50%" class="btn btn-default">
+                    <div fxFlex.gt-xs="50%" >
                         <input class="input_file" type="file" (change)="selectFile($event)">
                         <p class="error" *ngIf="image_error">{{image_error}}</p>
                         <img *ngIf="previewUrl" [src]="previewUrl" class="preview">
@@ -17,47 +17,47 @@
 
                     </div>
                 </div>
-                <div fxFill fxLayout="row">
-                    <div fxFlex="50%">
+                <div fxFill fxLayout.gt-xs="row" fxLayout.xs="column">
+                    <div fxFlex.gt-xs="50%">
                         <p>Email: </p>
                         <p class="email">{{user.email}}</p>
                     </div>
-                    <div fxFlex="50%">
+                    <div fxFlex.gt-xs="50%">
                         <p>Email alternativa: </p>
-                        <input type="email" placeholder="mario.rossi@example.com" class="form-control"
+                        <input ngClass.gt-xs="input" ngClass.xs="input-small" type="email" placeholder="mario.rossi@example.com" class="form-control"
                                name="alt_email" [(ngModel)]="user.alt_email" #alt_email="ngModel" email>
                         <div *ngIf="f.submitted && alt_email.invalid " class="invalid-feedback">
                             <div class="error">Email deve essere un indirizzo valido</div>
                         </div>
                     </div>
                 </div>
-                <div fxFill fxLayout="row">
+                <div fxFill fxLayout.gt-xs="row" fxLayout.xs="column">
                     <div fxFlex="50%">
                         <p>Nome: </p>
-                        <input placeholder="Mario" [(ngModel)]="user.name" name="name">
+                        <input ngClass.gt-xs="input" ngClass.xs="input-small"  placeholder="Mario" [(ngModel)]="user.name" name="name">
                     </div>
                     <div fxFlex="50%">
                         <p>Cognome: </p>
-                        <input placeholder="Rossi" [(ngModel)]="user.surname" name="surname">
+                        <input ngClass.gt-xs="input" ngClass.xs="input-small" placeholder="Rossi" [(ngModel)]="user.surname" name="surname">
                     </div>
                 </div>
-                <div fxFill fxLayout="row">
+                <div fxFill fxLayout.gt-xs="row" fxLayout.xs="column">
                     <div fxFlex="50%">
                         <p>Indirizzo: </p>
-                        <input [(ngModel)]="user.address" name="address">
+                        <input ngClass.gt-xs="input" ngClass.xs="input-small" [(ngModel)]="user.address" name="address">
                     </div>
                     <div fxFlex="50%">
                         <p>Telefono: </p>
-                        <input [(ngModel)]="user.telephone" placeholder="+39333333333" name="telephone" #tel="ngModel" pattern="(\+[0-9][0-9])?[0-9]+">
+                        <input ngClass.gt-xs="input" ngClass.xs="input-small" [(ngModel)]="user.telephone" placeholder="+39333333333" name="telephone" #tel="ngModel" pattern="(\+[0-9][0-9])?[0-9]+">
                         <div *ngIf="tel.invalid" class="invalid-feedback">
                             <div class="error">Formato numero non valido</div>
                         </div>
                     </div>
                 </div>
-                <div fxFill fxLayout="row">
+                <div fxFill fxLayout.gt-xs="row" fxLayout.xs="column">
                     <div fxFlex="50%">
                         <p>Seleziona una linea di default</p>
-                        <mat-form-field>
+                        <mat-form-field ngClass.gt-xs="field" ngClass.xs="field-small">
                             <mat-select placeholder="Seleziona una linea" name="defaultLine"
                                         [(ngModel)]="user.defaultLine" (valueChange)="user.defaultStop = null">
                                 <mat-option>Nessuna linea selezionata</mat-option>
@@ -69,7 +69,7 @@
                     </div>
                     <div fxFlex="50%">
                         <p>Seleziona una fermata di default</p>
-                        <mat-form-field>
+                        <mat-form-field ngClass.gt-xs="field" ngClass.xs="field-small">
                             <mat-select placeholder="Seleziona una fermata" [(value)]="user.defaultStop">
                                 <mat-option>Nessuna fermata selezionata</mat-option>
                                 <mat-option *ngFor="let stop of findStops()" [value]="stop">

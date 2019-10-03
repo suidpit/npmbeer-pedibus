@@ -1,6 +1,6 @@
 <mat-card>
     <mat-card-title>Gestione bambini</mat-card-title>
-    <mat-card-content *ngIf="children" class="children" fxLayout="row nowrap" fxLayoutAlign="left">
+    <mat-card-content  ngClass.gt-xs="content-big" ngClass.gt-sm="content-small" *ngIf="children" class="children" fxLayout="row nowrap" fxLayoutAlign="left">
         <div *ngFor="let child of children" fxLayout="row nowrap" class="child" fxLayoutAlign="left">
             <app-child-card (click)="task_children(child)"
                             [pic]="child.photo"
@@ -16,25 +16,25 @@
             </mat-card>
         </div>
     </mat-card-content>
-    <mat-card-content>
+    <mat-card-content  ngClass.gt-xs="content-big" ngClass.gt-sm="content-small">
         <mat-card *ngIf="title!=null">
             <mat-card-title>{{title}}</mat-card-title>
-            <mat-card-content>
+            <mat-card-content  ngClass.gt-xs="content-big" ngClass.gt-sm="content-small">
                 <p class="error">{{error}}</p>
                 <form #f="ngForm" (ngSubmit)="f.valid && onSubmit()">
                     <div fxLayout="column">
-                        <div fxFill fxLayout="row">
-                            <div fxFlex="33%">
+                        <div fxFill fxLayout.gt-xs="row" fxLayout.lt-sm="column">
+                            <div fxFlex.gt-xs="33%">
                                 <p>Nome*</p>
                                 <input name="name" placeholder="Nome*" [(ngModel)]="child_to_update.name" ngModel
                                        required #name="ngModel">
                                 <div *ngIf="f.submitted && name.invalid" class="error">Inserire un nome</div>
                             </div>
                             <div fxFlex="33%" class="btn btn-default">
-                                <input type="file" (change)="selectFile($event)">
+                                <input *ngIf="!(isScreenSmall$ | async)" type="file" (change)="selectFile($event)">
                             </div>
                         </div>
-                        <div fxFill fxLayout="row">
+                        <div fxFill fxLayout.gt-xs="row" fxLayout.lt-sm="column">
                             <div fxFlex="33%" fxLayout="column">
                                 <div>
                                     <p>Cognome*</p>
@@ -53,6 +53,7 @@
                                 </div>
                             </div>
                             <div fxFlex="33%">
+                                <input *ngIf="isScreenSmall$ | async" type="file" (change)="selectFile($event)">
                                 <img *ngIf="previewUrl" [src]="previewUrl" class="preview">
                             </div>
                             <div fxFlex="33%">
@@ -60,7 +61,7 @@
                                      class="preview">
                             </div>
                         </div>
-                        <div fxFill fxLayout="row">
+                        <div fxFill fxLayout.gt-xs="row" fxLayout.lt-sm="column">
                             <div fxFlex="33%">
                                 <p>Sesso*</p>
                                 <mat-radio-group name="gender"
@@ -70,17 +71,17 @@
                                 </mat-radio-group>
                                 <div *ngIf="f.submitted && sesso.invalid" class="error">Inserire il sesso</div>
                             </div>
-                            <div fxFlex="33%" fxFlexAlign="center">
+                            <div fxFlex="33%" fxFlexAlign.gt-xs="center" ngClass.xs="small-options">
                                 <mat-checkbox name="disability" [(ngModel)]="child_to_update.disability">
                                     Disabilità
                                 </mat-checkbox>
                             </div>
-                            <div fxFlex="33%" fxFlexAlign="center">
+                            <div fxFlex="33%" fxFlexAlign.gt-xs="center" ngClass.xs="small-options">
                                 <input placeholder="Altro" name="other" [(ngModel)]="child_to_update.other"
                                        ngModel>
                             </div>
                         </div>
-                        <div fxFill fxLayout="row">
+                        <div fxFill fxLayout.gt-xs="row" fxLayout.lt-sm="column">
                             <button mat-raised-button>SALVA</button>
                             <button mat-raised-button type="button" (click)="f.valid && onDelete()" *ngIf="child_to_update.id">ELIMINA
                             </button>
