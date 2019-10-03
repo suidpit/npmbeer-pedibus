@@ -1,15 +1,12 @@
 package it.polito.ai.pedibus.api.controllers;
 
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
-import it.polito.ai.pedibus.api.constraints.ReservationPutFields;
 import it.polito.ai.pedibus.api.dtos.ReservationDTO;
 import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.services.ReservationService;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
