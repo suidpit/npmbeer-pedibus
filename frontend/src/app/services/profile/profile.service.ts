@@ -37,6 +37,23 @@ export class ProfileService {
         });
     }
 
+    /**
+     * returns a list of all the users
+     * @returns {Observable<any>} any is actually an object <userID>: <userEmail>
+     */
+    public getUsers():Observable<any>{
+        return this.http.get<any>("http://localhost:8080/users");
+    }
+
+    public putUserAuthority(userId: string, action:string, lineName: string){
+      let payload = {
+        authority: "ADMIN",
+        action: action,
+        lineName: lineName
+      };
+      return this.http.put("http://localhost:8080/users/"+userId, payload);
+    }
+
     public getAllChildren(): Observable<Child[]>{
       return this.http.get<Child[]>(this.baseUrl + "/profile/children/all");
     }

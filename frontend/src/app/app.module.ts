@@ -90,6 +90,7 @@ import {
     ManageChildrenComponent
 } from './components/profileInfo/manage-children/manage-children.component';
 import { ChangePasswordComponent } from './components/profileInfo/change-password/change-password.component';
+import { ManageUsersComponent } from './components/profileInfo/manage-users/manage-users.component';
 
 
 
@@ -134,6 +135,7 @@ import { ChangePasswordComponent } from './components/profileInfo/change-passwor
     ManageChildrenComponent,
     ChildCardComponent,
     ChangePasswordComponent,
+    ManageUsersComponent,
   ],
   imports: [
     BrowserModule,

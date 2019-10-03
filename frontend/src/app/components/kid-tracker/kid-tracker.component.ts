@@ -145,37 +145,39 @@ export class KidTrackerComponent implements OnInit, OnDestroy {
             return s1Time.isBefore(s2Time)?-1:+1;
           });
 
-          // calculate when the shift should stop to set a timeout and restart the process.
-          let sEndTime = LocalTime.parse(shifts[0].to.time);
-          let secondsToEnd = sEndTime.toSecondOfDay()-now.toSecondOfDay();
+          if(shifts.length > 0){
 
-          this.currentShiftId = shifts[0].shiftId;
-          this.currentLineName = shifts[0].lineName;
-          this.currentDirection = shifts[0].direction;
+            // calculate when the shift should stop to set a timeout and restart the process.
+            let sEndTime = LocalTime.parse(shifts[0].to.time);
+            let secondsToEnd = sEndTime.toSecondOfDay()-now.toSecondOfDay();
 
-          let latestUpdate: IGeoJsonObject = {
-            position: shifts[0].latestUpdate,
-            timestamp: 0
-          };
-          self.geoloc_subject.next(latestUpdate);
+            this.currentShiftId = shifts[0].shiftId;
+            this.currentLineName = shifts[0].lineName;
+            this.currentDirection = shifts[0].direction;
 
-          // start subscription here.
-          if(!this.stompClient.connected){
-            let headers = this.localizationService.getAuthenticationHeaders();
-            this.stompClient.connect(headers, () => {
+            let latestUpdate: IGeoJsonObject = {
+              position: shifts[0].latestUpdate,
+              timestamp: 0
+            };
+            self.geoloc_subject.next(latestUpdate);
+
+            // start subscription here.
+            if(!this.stompClient.connected){
+              let headers = this.localizationService.getAuthenticationHeaders();
+              this.stompClient.connect(headers, () => {
                 self.subscribeToCurrentShift();
-            });
-          }
-          else{
-            self.subscribeToCurrentShift();
-          }
+              });
+            }
+            else{
+              self.subscribeToCurrentShift();
+            }
 
-          // as the shift ends we need to subscribe to the next one given that there is one, but this will be
-          // automagically checked by the first part of this method.
-          self.timeout_handle = setTimeout(() => {
-            self.updateStompSubscription(-1);
-          }, secondsToEnd*1000);
-
+            // as the shift ends we need to subscribe to the next one given that there is one, but this will be
+            // automagically checked by the first part of this method.
+            self.timeout_handle = setTimeout(() => {
+              self.updateStompSubscription(-1);
+            }, secondsToEnd*1000);
+          }
         }
       });
     }

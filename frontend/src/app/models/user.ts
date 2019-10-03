@@ -55,4 +55,12 @@ export class User {
   hasMinAuthority(role: Role){
     return this._authorities.filter((auth) => auth.greaterThanOrEqualToRole(role)).length > 0;
   }
+
+  /**
+   *
+   * @returns list of lines on which user is admin
+   */
+  getAdminLines(){
+    return this._authorities.filter((auth) => auth.role === Role.ADMIN).map((auth) => auth.lineName);
+  }
 }

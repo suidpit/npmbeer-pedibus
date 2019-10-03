@@ -1,0 +1,41 @@
+<mat-card fxLayout="column">
+  <mat-card-header  fxFlex="1 0 50px">
+    <mat-card-title>Gestione Utenti</mat-card-title>
+    <mat-card-subtitle>Promuovi o declassa utenti</mat-card-subtitle>
+  </mat-card-header>
+  <mat-divider [inset]="true"></mat-divider>
+  <mat-card-content  fxFlex="2 0 100%">
+    <form (ngSubmit)="f.valid && onSubmit(f)" #f="ngForm">
+
+      <div fxLayout="column">
+
+        <mat-form-field>
+          <mat-label>Seleziona un utente</mat-label>
+          <mat-select name="user" [(ngModel)]="userId">
+            <mat-option *ngFor="let user of users" [value]="user.id">{{user.email}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Azione</mat-label>
+          <mat-select name="action" [(ngModel)]="action">
+            <mat-option value="add">Promuovi ad Amministratore</mat-option>
+            <mat-option value="remove">Declassa ad Accompagnatore</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Seleziona una linea di cui sei amministratore</mat-label>
+          <mat-select name="lineName" [(ngModel)]="lineName">
+            <mat-option *ngFor="let line of lineNames" [value]="line">{{line}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+          <button mat-raised-button color="primary" (click)="onSubmit()">INVIA</button>
+          <p *ngIf="error" class="error">{{error}}</p>
+      </div>
+
+    </form>
+  </mat-card-content>
+</mat-card>
+<app-spinner *ngIf="task=='loading'"></app-spinner>

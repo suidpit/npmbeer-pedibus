@@ -27,9 +27,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.web.client.HttpClientErrorException;
@@ -57,15 +55,17 @@ public class UserAdministrationController {
 
     @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN')")
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public List<String> getUsers(Model m) {
+    public HashMap<String, String> getUsers() {
         List<User> users = userRepository.findAll();
-        m.addAttribute("users_list", users.stream().map(User::getEmail).collect(Collectors.toList()));
-        return users.stream().map(User::getEmail).collect(Collectors.toList());
+        return users
+                .stream()
+                .collect(Collectors.toMap(
+                            User::getStringId, User::getEmail, (u1, u2) -> u1, HashMap::new));
     }
 
     @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN')")
     @RequestMapping(value = "/{userId}", method = RequestMethod.PUT)
-    public String putUser(@PathVariable("userId")String userId,
+    public void putUser(@PathVariable("userId")String userId,
                           @RequestBody @Valid UserPrivilegesDTO privilegesDTO){
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String line = privilegesDTO.getLineName();
@@ -130,7 +130,6 @@ public class UserAdministrationController {
         else{
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "Forbidden");
         }
-        return "success";
     }
 
     /*Admin adds an e-mail for the new user*/
