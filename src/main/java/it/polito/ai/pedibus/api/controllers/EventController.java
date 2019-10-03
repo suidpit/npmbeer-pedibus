@@ -6,11 +6,13 @@ import it.polito.ai.pedibus.api.services.EventService;
 import it.polito.ai.pedibus.security.CustomUserDetails;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -54,5 +56,18 @@ public class EventController {
                 .userId(userId)
                 .build();
         return eventService.pushNewEvent(ne);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/by-shift/{objectId}", method = RequestMethod.GET)
+    @ResponseBody
+    public Mono<Boolean> getEventForObjectId(@PathVariable("objectId") ObjectId objectId){
+        try {
+            Mono<Event> e = this.eventService.getByReferenceObject(objectId);
+            return e.flatMap(s -> Mono.just(s.getRead()));
+        }
+        catch (Exception e){
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        }
     }
 }

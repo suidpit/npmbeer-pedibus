@@ -88,7 +88,7 @@ export class ManageChildrenComponent implements OnInit, OnDestroy {
         this.selectedFile = null;
         if (child == null) {
             this.child_to_update = new Child();
-            this.title = "Inserisci un nuovo bambino";
+            this.title = "Aggiungi Nuovo Bambino";
         } else {
             this.child_to_update = Object.assign({}, child);
             let day = this.child_to_update.birthday.split("-");
@@ -97,7 +97,7 @@ export class ManageChildrenComponent implements OnInit, OnDestroy {
             bday.setDate(day[0]);
             bday.setFullYear(day[2]);
             this.child_to_update.birthday = bday;
-            this.title = "Aggiorna un bambino";
+            this.title = "Modifica Dati Bambino";
         }
     }
 

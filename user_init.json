@@ -64,7 +64,10 @@
     "children": [
       {
         "name": "Rosita",
-        "gender": "F"
+        "surname": "Whatever",
+        "birthday": "11-11-1993",
+        "gender": "M",
+        "disability": true
       }
     ],
     "enabled": true

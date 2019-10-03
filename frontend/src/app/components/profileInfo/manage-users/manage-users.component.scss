@@ -1,0 +1,29 @@
+.error{
+  border: 1px solid red;
+  padding: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+
+input{
+  margin: 10px 12px;
+}
+
+p{
+  margin: 10px;
+}
+
+mat-card-content{
+  width: 750px;
+  height: 100%;
+  padding: 15px;
+}
+
+button{
+  margin: 10px 0;
+}
+
+form{
+  max-width: 350px;
+}

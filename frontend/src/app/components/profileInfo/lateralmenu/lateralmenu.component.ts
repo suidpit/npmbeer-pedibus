@@ -4,6 +4,7 @@ import {Observable, Subject} from 'rxjs';
 import {map, takeUntil} from 'rxjs/operators';
 import {AuthService} from 'src/app/services/auth/auth.service';
 import {User} from 'src/app/models/user';
+import {Role} from "../../../models/authority";
 import {FormBuilder, ValidatorFn, FormControl, Validators, FormGroup} from '@angular/forms';
 import {ProfileService} from "../../../services/profile/profile.service";
 
@@ -25,45 +26,47 @@ export class LateralmenuComponent implements OnInit, OnDestroy {
     telephone;
     form: FormGroup;
     pic: any;
+    isAdmin = false;
     private unsubscribe$ = new Subject<void>();
 
-    onSubmit() {
-        this.auth.editProfileInformation(this.user['_email'], this.form.controls.nameDopo.value,
-            this.form.controls.surnameDopo.value,
-            this.form.controls.addressDopo.value,
-            this.form.controls.telephoneDopo.value).subscribe(
-            (res) => {
-                console.log(res);
-            }
-        )
-    }
+  constructor(private breakpointObserver: BreakpointObserver, public auth: AuthService, private fb: FormBuilder, private profileService: ProfileService) {
+    this.form = this.fb.group({
+      nameDopo: [],
+      surnameDopo: [],
+      addressDopo: [],
+      telephoneDopo: []
+    })
+  }
+
+  ngOnInit() {
+    this.profileService.user$.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((user) => {
+      this.user = user;
+    });
+    this.isAdmin = this.auth.getCurrentUser().hasMinAuthority(Role.ADMIN);
+  }
+
+  onSubmit() {
+      this.auth.editProfileInformation(this.user['_email'], this.form.controls.nameDopo.value,
+          this.form.controls.surnameDopo.value,
+          this.form.controls.addressDopo.value,
+          this.form.controls.telephoneDopo.value).subscribe(
+          (res) => {
+              console.log(res);
+          }
+      )
+  }
+
 
     ngOnDestroy(): void {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
     }
-
-    ngOnInit() {
-        this.profileService.user$.pipe(
-            takeUntil(this.unsubscribe$)
-        ).subscribe((user) => {
-            this.user = user;
-        })
-    }
-
     isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
         .pipe(
             map(result => result.matches)
         );
-
-    constructor(private breakpointObserver: BreakpointObserver, public auth: AuthService, private fb: FormBuilder, private profileService: ProfileService) {
-        this.form = this.fb.group({
-            nameDopo: [],
-            surnameDopo: [],
-            addressDopo: [],
-            telephoneDopo: []
-        })
-    }
 
     selectTaskBambini() {
         this.task = "bambini";
@@ -75,6 +78,10 @@ export class LateralmenuComponent implements OnInit, OnDestroy {
 
     selectTaskCambioPassword() {
         this.task = "cambioPwd";
+    }
+
+    selectTaskGestioneUtenti(){
+      this.task = "manageUsers";
     }
 
 }
