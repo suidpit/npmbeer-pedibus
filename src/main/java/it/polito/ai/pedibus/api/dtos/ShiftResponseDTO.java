@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Data
 public class ShiftResponseDTO {
@@ -31,8 +32,12 @@ public class ShiftResponseDTO {
 
     private GeoJsonPoint latestUpdate;
 
-    private Stop from;
+    private String from;
 
-    private Stop to;
+    private String to;
+
+    private LocalTime startsAt;
+
+    private LocalTime endsAt;
 
 }

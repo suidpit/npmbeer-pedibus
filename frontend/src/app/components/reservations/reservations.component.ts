@@ -11,7 +11,7 @@ import {StopService} from "../../services/stop/stop.service";
 import {ResizedEvent} from "angular-resize-event";
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material";
 import {DialogAddKidData, Kid} from "../stop-row/stop-row.component";
-import {Subject} from "rxjs";
+import {BehaviorSubject, Subject} from "rxjs";
 import {take, takeUntil} from "rxjs/operators";
 import {Stop} from "../../models/stop";
 import {Child} from "../../models/child";
@@ -35,6 +35,7 @@ export class ReservationsComponent implements OnInit, OnDestroy {
     selectedDate = null;
     selectedDirection = "outward";
 
+    times = [];
     stopRows = undefined;
     allowedDaysFilter = (d: Date): boolean => {
         let dayNum = d.getDay();
@@ -64,6 +65,42 @@ export class ReservationsComponent implements OnInit, OnDestroy {
         this.stopService.stopsObserver$
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe((data) => {
+                if(data!=undefined) {
+                    this.times = [];
+                    this.times.push([]);
+                    this.times.push([]);
+
+                    for (let j = 0; j < this.selectedLine.stops.stops[0].outward.length; j++) {
+                        //outward
+                        let temp = [];
+                        for (let i = 0; i < data[0].length; i++) {
+                            temp.push([]);
+                        }
+                        for (let i = 0; i < data[0].length; i++) {
+                            for(let k=0; k < data[0][i].length; k++) {
+                                //stops
+                                temp[i].push(data[0][i][k].outward[j]);
+                            }
+
+                        }
+                        this.times[0].push(temp);
+                    }
+
+                    for (let j = 0; j < this.selectedLine.stops.stops[0].back.length; j++) {
+                        //back
+                        let temp = [];
+                        for (let i = 0; i < data[1].length; i++) {
+                            temp.push([]);
+                        }
+                        for (let i = 0; i < data[1].length; i++) {
+                            for(let k=0; k < data[1][i].length; k++) {
+                                //stops
+                                temp[i].push(data[1][i][k].back[j]);
+                            }
+                        }
+                        this.times[1].push(temp);
+                    }
+                }
                 this.stopRows = data;
             });
 
@@ -77,7 +114,7 @@ export class ReservationsComponent implements OnInit, OnDestroy {
                         if (this.selectedDirection == 'outward') {
                             index = this.selectedRun
                         } else {
-                            index = this.selectedRun - this.selectedLine.outward.length;
+                            index = this.selectedRun - this.selectedLine.stops.stops[0].outward.length;
                         }
 
                         //get date
@@ -117,20 +154,28 @@ export class ReservationsComponent implements OnInit, OnDestroy {
 
     updateData() {
         if (this.selectedLine != null) {
-            if (this.selectedLine.outward[0].endsAt.isAfter(LocalTime.now()) || this.selectedDirection === 'outward') {
-                this.selectedRun = 0;
-            } else if (this.selectedLine.back[0].endsAt.isAfter(LocalTime.now())) {
-                this.selectedRun = 1;
-            } else if (this.selectedLine.back[1].endsAt.isAfter(LocalTime.now())) {
-                this.selectedRun = 2;
-            } else if (this.selectedDirection === 'back') {
-                this.selectedRun = 1;
-            } else {
+            let outs = this.selectedLine.stops.stops[0].outward.length;
+            this.selectedRun = -1;
+            for (let i = 0; i < outs; i++) {
+                if (this.selectedLine.stops.endsAt[0][i].isAfter(LocalTime.now())) {
+                    this.selectedRun = i;
+                }
+            }
+            let backs = this.selectedLine.stops.stops[0].back.length;
+            if (this.selectedRun == -1 || this.selectedDirection == 'back') {
+                for (let i = 0; i < backs; i++) {
+                    if (this.selectedLine.stops.endsAt[1][i].isAfter(LocalTime.now())) {
+                        this.selectedRun = i + outs;
+                    }
+                }
+            }
+            if (this.selectedRun == -1) {
                 this.selectedRun = 0;
                 let today = new Date();
                 today.setDate(today.getDate() + 1);
                 this.selectedDate.setValue(today);
             }
+
             if (this.oldSelectedLine != this.selectedLine) {
                 this.stopRows = undefined;
                 this.oldSelectedLine = this.selectedLine;
@@ -154,12 +199,8 @@ export class ReservationsComponent implements OnInit, OnDestroy {
     setStops(width) {
         let temp_stops = [];
 
-        for (let r of this.selectedLine.outward) {
-            temp_stops.push(r.stops);
-        }
-        for (let r of this.selectedLine.back) {
-            temp_stops.push(r.stops);
-        }
+        temp_stops.push(this.selectedLine.stops.stops);
+        temp_stops.push(this.selectedLine.stops.stops.slice().reverse());
 
         this.stopService.initialize(temp_stops, width, window.innerWidth <= 600);
     }
@@ -167,10 +208,12 @@ export class ReservationsComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
+        this.stopService.unsubscribe();
+        this.reservationsService.unsubscribe();
     }
 
     changeTab() {
-        let size = this.selectedLine.outward.length;
+        let size = this.selectedLine.stops.stops[0].outward.length;
         if (this.selectedRun < size) {
             this.selectedDirection = 'outward';
         } else {

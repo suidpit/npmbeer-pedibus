@@ -15,7 +15,7 @@
         <mat-icon class="red" *ngIf="type==='start'" svgIcon="start_line"></mat-icon>
         <mat-icon *ngIf="type==='intermediate_icon'" svgIcon="intermediate_line"></mat-icon>
         <div *ngIf="type==='intermediate_icon'" ngClass.gt-xs="time" ngClass.lt-sm="small_time">
-            {{stop.time}}
+            {{time}}
         </div>
         <mat-icon class="red" *ngIf="type==='end_left'" svgIcon="end_left"></mat-icon>
         <mat-icon class="red" *ngIf="type==='end_right'" svgIcon="end_right"></mat-icon>

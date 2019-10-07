@@ -24,40 +24,10 @@ export class AttendanceService {
   }
 
   lines(): Observable<Line[]> {
-    //TODO:  This will go in a config file
     let api_url = this.base_url + "/lines";
     return this.http.get<Line[]>(api_url).pipe(map((data) => {
       return data.map((line) => {
-        let l = new Line(line);
-        for (let i = 0; i < l.outward.length; i++) {
-          let sl: any = l.outward[i];
-          let stops: Stop[] = [];
-          sl.forEach((s) => {
-            stops.push(
-                Builder(Stop)
-                    .name(s.name)
-                    .position(s.position)
-                    .time(LocalTime.parse(s.time))
-                    .build());
-          });
-          l.outward[i] = new StopList();
-          l.outward[i].stops = stops;
-        }
-        for (let i = 0; i < l.back.length; i++) {
-          let sl: any = l.back[i];
-          let stops: Stop[] = [];
-          sl.forEach((s) => {
-            stops.push(
-                Builder(Stop)
-                    .name(s.name)
-                    .position(s.position)
-                    .time(LocalTime.parse(s.time))
-                    .build());
-          });
-          l.back[i] = new StopList();
-          l.back[i].stops = stops;
-        }
-        return l;
+        return new Line(line);
       });
     }));
   }

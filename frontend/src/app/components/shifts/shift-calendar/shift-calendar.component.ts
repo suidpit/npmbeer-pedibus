@@ -4,12 +4,14 @@ import Tooltip from "tooltip.js";
 import {ShiftService} from "../../../services/shift/shift.service";
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material";
 import {FullCalendarComponent} from "@fullcalendar/angular";
+import {LocalTime} from "js-joda";
 
 
 export  interface DialogEventData {
   date: Date;
-  time: string;
   from: string;
+  startsAt: LocalTime;
+  endsAt: LocalTime;
   to: string;
   line: string;
   direction: string;

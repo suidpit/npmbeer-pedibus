@@ -37,12 +37,15 @@ public class ReservationPostFieldsValidator implements ConstraintValidator<Reser
         String stopName = res.getStopName();
         Integer tripIndex = res.getTripIndex();
         Reservation.Direction direction = res.getDirection();
+        if (line.getStops().stream().noneMatch(s -> s.getName().equals(stopName))) {
+            return false;
+        }
+
         if (direction == Reservation.Direction.OUTWARD) {
-            if ((line.getOutward().get(tripIndex).stream().noneMatch(s -> s.getName().equals(stopName)))) {
+            if (line.getStops().get(0).getOutward().size() <= tripIndex) {
                 return false;
             }
-        }
-        else if ((line.getBack().get(tripIndex).stream().noneMatch(s -> s.getName().equals(stopName)))) {
+        } else if (line.getStops().get(0).getBack().size() <= tripIndex) {
             return false;
         }
         return true;

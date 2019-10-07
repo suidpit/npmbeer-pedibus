@@ -5,6 +5,7 @@ import it.polito.ai.pedibus.api.models.Reservation;
 import lombok.Data;
 import org.bson.types.ObjectId;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
@@ -19,5 +20,7 @@ public class ReservationDTO {
     @NotNull
     private Reservation.Direction direction;
     @NotNull
+    @Min(0)
     private Integer tripIndex;
+
 }

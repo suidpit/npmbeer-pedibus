@@ -15,6 +15,7 @@ import {
 export class StopListComponent{
 
     @Input("stops") stops;
+    @Input("times") times;
 
     direction(i) {
         if (i % 2 == 0)

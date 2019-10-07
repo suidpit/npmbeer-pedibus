@@ -9,8 +9,9 @@
                       [type]="'down'"></app-stop-element>
     <app-stop-element ngClass="down_right" *ngIf="!no_bottom && direction=='end' && stops.length>0"
                       [type]="'down'"></app-stop-element>
-    <app-stop-element *ngFor="let stop of stops"
+    <app-stop-element *ngFor="let stop of stops; let i=index"
                       [type]="'intermediate'"
+                      [time]="times[i]"
                       [stop]="stop"></app-stop-element>
 
 </div>
@@ -30,8 +31,9 @@
 
     <!--intermediate-->
 
-    <app-stop-element *ngFor="let stop of stops"
+    <app-stop-element *ngFor="let stop of stops; let i=index"
                       [type]="'intermediate_icon'"
+                      [time]="times[i]"
                       [stop]="stop"></app-stop-element>
 
     <!--wrap-->

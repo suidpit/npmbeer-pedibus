@@ -18,6 +18,7 @@ export class StopElementComponent{
     @ViewChild("container", {static: false}) container: ElementRef;
     @Input("selected") selected;
     @Input("type") type;
+    @Input("time") time;
 
     constructor(private stopService: StopService, private reservationService: ReservationsService) {
     }
