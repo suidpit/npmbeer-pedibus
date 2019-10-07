@@ -3,6 +3,7 @@ import {User} from "./user";
 import {Stop} from "./stop";
 import {Observable} from "rxjs/internal/Observable";
 import {IGeoJsonObject} from "./igeojson-object";
+import {Local} from "protractor/built/driverProviders";
 
 export class Shift {
 
@@ -17,8 +18,8 @@ export class Shift {
   companionId: string;
   startsAt: LocalTime;
   endsAt: LocalTime;
-  from: Stop;
-  to: Stop;
+  from: String;
+  to: String;
   color: string;  // color to use in calendar
   classNames: string[];  // css classes to use in calendar
   disabled: boolean = false;

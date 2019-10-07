@@ -64,7 +64,7 @@ export class LocalizationService {
         .pipe(
           map((shifts) =>{
             if(shifts.length > 0) {
-              shifts.sort((a, b) => a.from.time.isBefore(b.from.time) ? -1 : +1);
+              shifts.sort((a, b) => a.startsAt.isBefore(b.startsAt) ? -1 : +1);
               return shifts[0];
             }
             return null;
@@ -74,12 +74,12 @@ export class LocalizationService {
             if(shift && shift){
               let timems;
               let end_timems;
-              if(LocalTime.now().isAfter(shift.from.time)){
+              if(LocalTime.now().isAfter(shift.startsAt)){
                 timems = 0;
               }
               else{
-                timems = (shift.from.time.toSecondOfDay() - LocalTime.now().toSecondOfDay())*1000;
-                end_timems = (shift.to.time.toSecondOfDay() - shift.from.time.toSecondOfDay())*1000;
+                timems = (shift.startsAt.toSecondOfDay() - LocalTime.now().toSecondOfDay())*1000;
+                end_timems = (shift.endsAt.toSecondOfDay() - shift.startsAt.toSecondOfDay())*1000;
               }
               console.log("Position streaming will start in "+Number(timems/(60*1000)).toFixed(2) + " minutes");
 

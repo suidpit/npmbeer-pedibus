@@ -6,10 +6,7 @@ import it.polito.ai.pedibus.api.dtos.ChildDTO;
 import it.polito.ai.pedibus.api.dtos.ProfileInfoDTO;
 import it.polito.ai.pedibus.api.models.Child;
 import it.polito.ai.pedibus.api.models.User;
-import it.polito.ai.pedibus.api.repositories.ChildRepository;
-import it.polito.ai.pedibus.api.repositories.PhotoRepository;
-import it.polito.ai.pedibus.api.repositories.ReservationRepository;
-import it.polito.ai.pedibus.api.repositories.UserRepository;
+import it.polito.ai.pedibus.api.repositories.*;
 import it.polito.ai.pedibus.security.CustomUserDetails;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +14,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
-import sun.security.util.Password;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,13 +29,15 @@ public class ProfileService {
     private UserRepository userRepository;
     private ChildRepository childRepository;
     private PhotoService photoService;
+    private LineRepository lineRepository;
     private PhotoRepository photoRepository;
     private ReservationRepository reservationsRepository;
 
-    public ProfileService(UserRepository userRepository, ChildRepository childRepository, PhotoService photoService, PhotoService photoRepository, PhotoRepository photoRepository1, ReservationRepository reservationsRepository, AuthenticationProvider authenticationProvider) {
+    public ProfileService(UserRepository userRepository, ChildRepository childRepository, PhotoService photoService, PhotoService photoRepository, LineRepository lineRepository, PhotoRepository photoRepository1, ReservationRepository reservationsRepository, AuthenticationProvider authenticationProvider) {
         this.userRepository = userRepository;
         this.childRepository = childRepository;
         this.photoService = photoService;
+        this.lineRepository = lineRepository;
         this.photoRepository = photoRepository1;
         this.reservationsRepository = reservationsRepository;
         this.authenticationProvider = authenticationProvider;
@@ -128,6 +125,10 @@ public class ProfileService {
         user.setSurname(profileInfoDTO.getSurname());
         user.setAddress(profileInfoDTO.getAddress());
         user.setTelNumber(profileInfoDTO.getTelephone());
+        if(lineRepository.findByName(profileInfoDTO.getDefaultLine())==null)
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        if(lineRepository.findByName(profileInfoDTO.getDefaultLine()).getStops().stream().noneMatch(stop->stop.getName().equals(profileInfoDTO.getDefaultStop())))
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         user.setDefaultLine(profileInfoDTO.getDefaultLine());
         user.setDefaultStop(profileInfoDTO.getDefaultStop());
         userRepository.save(user);

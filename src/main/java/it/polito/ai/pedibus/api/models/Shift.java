@@ -20,6 +20,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 
@@ -40,9 +41,14 @@ public class Shift implements Cloneable{
 
     @Valid
     @Indexed()
-    private Stop from;
+    private String from;
     @Valid
-    private Stop to;
+    private String to;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="HH:mm")
+    private LocalTime startsAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="HH:mm")
+    private LocalTime endsAt;
 
     @JsonSerialize(using = ObjectIdSerializer.class)
     private ObjectId companionId;

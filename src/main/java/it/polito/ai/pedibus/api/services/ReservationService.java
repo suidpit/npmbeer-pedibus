@@ -121,11 +121,9 @@ public class ReservationService {
                     }
                 }
             }*/
-            for(Reservation res: this.reservationRepository.findAllByDateAndLineNameAndDirectionAndTripIndex(
-                    date, lineName, resd.getDirection(), resd.getTripIndex()
-            )){
-                if(res.getChildId().equals(child)) throw new HttpClientErrorException(HttpStatus.CONFLICT);
-            }
+            if(this.reservationRepository.findAllByDateAndLineNameAndDirectionAndChildId(
+                    date, lineName, resd.getDirection(), resd.getTripIndex(), child).size()>0)
+                throw new HttpClientErrorException(HttpStatus.CONFLICT);
         }
         List<Reservation> reservations = new ArrayList<Reservation>();
         for(ObjectId childId: resd.getChild()){
@@ -153,7 +151,7 @@ public class ReservationService {
     public void updateReservation(String line, String dateString, ReservationDTO resd, ObjectId id) {
         LocalDate date = LocalDate.parse(dateString, fmt);
         ObjectId userId = ((CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
-        Reservation res = reservationRepository.findById(id);
+        Reservation res = reservationRepository.findByDateAndDirectionAndUser(date, resd.getDirection(), id);
         if ( res == null ) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
         }
@@ -161,6 +159,8 @@ public class ReservationService {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
         }
         res.setStopName(resd.getStopName());
+        res.setTripIndex(resd.getTripIndex());
+        res.setLineName(line);
         reservationRepository.save(res);
     }
 
@@ -191,6 +191,16 @@ public class ReservationService {
         if (principal instanceof CustomUserDetails) {
             LocalDate date = LocalDate.parse(dateString, fmt);
             return reservationRepository.findByLineNameAndDateAndUser(lineName, date, getUserId());
+        } else {
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    public List<Reservation> getUserReservationsByDate(String dateString) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof CustomUserDetails) {
+            LocalDate date = LocalDate.parse(dateString, fmt);
+            return reservationRepository.findByDateAndUser(date, getUserId());
         } else {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
         }

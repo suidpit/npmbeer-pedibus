@@ -51,4 +51,8 @@ export class StopService {
             this.stopsObserver$.next(stopsRowsTemp);
         }
     }
+
+    unsubscribe() {
+        this.stopsObserver$.next(undefined);
+    }
 }

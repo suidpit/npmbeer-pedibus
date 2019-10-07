@@ -40,18 +40,20 @@
                     <mat-tab-group dynamicHeight class="tabs" (resized)="onResize($event)" mat-stretch-tabs
                                    [(selectedIndex)]="selectedRun" (selectedIndexChange)="changeTab()">
                         <div>
-                            <mat-tab *ngFor="let run of selectedLine.outward; let i = index" label="Andata {{i+1}}">
+                            <mat-tab *ngFor="let run of selectedLine.stops.stops[0].outward; let i = index" label="Andata {{i+1}}">
                                 <div class="stops">
                                     <app-stop-list (window:resize)="onResize($event)"
                                                    *ngIf="stopRows; else spinner"
-                                                   [stops]="stopRows[i]"></app-stop-list>
+                                                   [times]="times[0][i]"
+                                                   [stops]="stopRows[0]"></app-stop-list>
                                 </div>
 
                             </mat-tab>
-                            <mat-tab *ngFor="let run of selectedLine.back; let i = index" label="Ritorno {{i+1}}">
+                            <mat-tab *ngFor="let run of selectedLine.stops.stops[0].back; let i = index" label="Ritorno {{i+1}}">
                                 <div class="stops">
                                     <app-stop-list *ngIf="stopRows; else spinner"
-                                                   [stops]="stopRows[selectedLine.outward.length+i]"></app-stop-list>
+                                                   [times]="times[1][i]"
+                                                   [stops]="stopRows[1]"></app-stop-list>
 
                                 </div>
                             </mat-tab>

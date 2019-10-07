@@ -1,56 +1,84 @@
 import {LocalTime} from "js-joda";
 import * as deepEqual from "deep-equal";
-import { Child } from "../models/child"
+import {Child} from "../models/child"
+import {Builder} from "builder-pattern";
 
-export class Stop{
-  private _name: string;
-  private _time: LocalTime;
-  private _position: {};
-  private _childs: Child[];
+export class Stop {
+    private _name: string;
+    private _outward: LocalTime[];
+    private _back: LocalTime[];
+    private _position: {};
+    private _childs: Child[];
 
-  get position(): {} {
-    return this._position;
-  }
+    get position(): {} {
+        return this._position;
+    }
 
-  set position(value: {}) {
-    this._position = value;
+    set position(value: {}) {
+        this._position = value;
 
-  }
-  set time(value: LocalTime) {
-    this._time = value;
-  }
-  get time(): LocalTime {
-    return this._time;
-  }
-  get name(): string {
-    return this._name;
-  }
+    }
 
-  set name(value: string) {
-    this._name = value;
-  }
+    set outward(value: LocalTime[]) {
+        this._outward = value;
+    }
 
-  // Temporary mockup
-  set childs(value: Child[]) {
-    this._childs = value;
-  }
+    get outward(): LocalTime[] {
+        return this._outward;
+    }
 
-  get childs() {
-    return this._childs;
-  }
+    set back(value: LocalTime[]) {
+        this._back = value;
+    }
 
-  public compareTo(stop: Stop){
-    if(!(this._name === stop.name)) return false;
-    if(this._time.compareTo(stop.time) !== 0) return false;
-    if(!deepEqual(this._position, stop.position)) return false;
-    return true;
-  }
+    get back(): LocalTime[] {
+        return this._back;
+    }
 
-  public compareByToString(s: string){
-    return this.toString() === s;
-  }
+    get name(): string {
+        return this._name;
+    }
 
-  public toString(){
-    return "[" + (this._time?this._time.toString():"--:--") + "] " + (this.name?this.name:"no-name");
-  }
+    set name(value: string) {
+        this._name = value;
+    }
+
+    // Temporary mockup
+    set childs(value: Child[]) {
+        this._childs = value;
+    }
+
+    get childs() {
+        return this._childs;
+    }
+
+    public compareTo(stop: Stop) {
+        if (!(this._name === stop.name)) return false;
+        if (!(this._outward === stop.outward)) return false;
+        if (!(this._back === stop.back)) return false;
+        return deepEqual(this._position, stop.position);
+    }
+
+    public compareByToString(s: string) {
+        return this.toString() === s;
+    }
+
+    public toString() {
+        return "[ outward: " + (this.outward ? this.outward.toString() : "--:--") + ", back: " + (this.outward ? this.outward.toString() : "--:--") + "] " + (this.name ? this.name : "no-name");
+    }
+
+    constructor(values: any = {}) {
+        this.outward = [];
+        this.back = [];
+        if(values.outward!=null){
+            for (let time of values.outward) {
+                this.outward.push(LocalTime.parse(time))
+            }
+            for (let time of values.back) {
+                this.back.push(LocalTime.parse(time))
+            }
+            this.name = values.name;
+            this.position = values.position;
+        }
+    }
 }

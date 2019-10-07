@@ -23,14 +23,19 @@
         <div style="margin-top: 15px; margin-bottom: 15px;">
           <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-between start" style="margin-bottom: 15px;">
             <span fxFlex="30">Partenza:</span>
-            <span fxFlex="70">{{data.extendedProps.obj.from.toString()}}</span>
+            <span fxFlex="70">{{data.from}}</span>
           </div>
           <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-between center" fxLayoutAlign.xs="space-between start">
             <span fxFlex="30">Arrivo:</span>
             <span fxFlex="70">
-              <mat-form-field class="companion_select" style="max-width: 130px;">
+              <mat-form-field *ngIf="shift.direction=='BACKWARD'" class="companion_select" style="max-width: 130px;">
                 <mat-select formControlName="stop">
-                  <mat-option *ngFor="let stop of stops$ | async" [value]="stop">{{stop}}</mat-option>
+                    <mat-option *ngFor="let stop of stops$ | async" [value]="stop">[{{stop.back[shift.tripIndex]}}] {{stop.name}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field *ngIf="shift.direction=='OUTWARD'" class="companion_select" style="max-width: 130px;">
+                <mat-select formControlName="stop">
+                    <mat-option *ngFor="let stop of stops$ | async" [value]="stop">[{{stop.outward[shift.tripIndex]}}] {{stop.name}}</mat-option>
                 </mat-select>
               </mat-form-field>
               <div [hidden]="!warning" class="stop-warning" style="max-width: 130px;font-weight: bold;text-align: center; cursor: help;"
