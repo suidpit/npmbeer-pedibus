@@ -72,8 +72,8 @@ export class AuthService {
           //.pipe(catchError(this.handleError));
   }
 
-  registerEmail(email:string){
-    return this.http.post<any>(this.register_email_url, {"email" : email});
+  registerEmail(email:string,checkboxCompanion:boolean){
+    return this.http.post<any>(this.register_email_url, {"email" : email,"checkboxCompanion":checkboxCompanion});
   }
 
   sendPassword(pass:string, repass:string,token:string){
