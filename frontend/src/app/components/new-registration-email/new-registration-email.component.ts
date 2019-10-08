@@ -19,7 +19,8 @@ export class NewRegistrationEmailComponent implements OnInit {
       Validators.email,
       Validators.required,
       Validators.pattern("")]
-    ]
+    ],
+    checkbox:[""]
   });
 
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router,private dialog: MatDialog) { }
@@ -30,7 +31,8 @@ export class NewRegistrationEmailComponent implements OnInit {
         Validators.email,
         Validators.required,
         this.emailValidator]
-      ]
+      ],
+      checkbox:[""]
     });
   }
   emailValidator(): ValidatorFn {  
@@ -55,8 +57,9 @@ onSubmit(){
 // err: (err) => /*callback per errore*/,
 // final: (res) => /*callback da eseguire per ultima come nel blocco finally*/
     let self = this;
-    this.auth.registerEmail(this.emailFormGroup.controls.email.value)
+    this.auth.registerEmail(this.emailFormGroup.controls.email.value,this.emailFormGroup.controls.checkbox.value)
       .subscribe( (res) => {
+                          console.log("Email inviata");
                           self.showPopupEmailSended();
                           self.router.navigate(["/login"]);
                         },
@@ -72,13 +75,14 @@ onSubmit(){
                           self.error = true;
 
                           //self.emailField.nativeElement.focus();
-                        },
+                        }
                   // () => {
                   //      console.log("finally")
                   // }
 
      );
      console.log(this.emailFormGroup.controls.email.value);
+     console.log(this.emailFormGroup.controls.checkbox.value);
 
 
 }

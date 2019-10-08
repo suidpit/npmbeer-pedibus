@@ -177,7 +177,7 @@ export class AttendanceComponent implements OnInit, OnDestroy {
               i++;
             }
 
-            debugger;
+            //debugger;
             this.reservedStopsSubject.next(this.reservedStops);
             this.buildDownloadFile();
           }
