@@ -32,6 +32,7 @@ public class ReservationPostFieldsValidator implements ConstraintValidator<Reser
             return false;
         }
 
+
         // Ensure that for the given line we have a valid direction/trip/name Stop record.
         ReservationDTO res = (ReservationDTO) value[2];
         String stopName = res.getStopName();

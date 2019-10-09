@@ -1,20 +1,21 @@
 import {
     ChangeDetectionStrategy, ChangeDetectorRef,
     Component,
-    EventEmitter, Inject, OnDestroy,
-    OnInit, Output,
+    Inject, OnDestroy,
+    OnInit
 } from '@angular/core';
 import {LocalTime} from "js-joda";
 import {ReservationsService} from "../../services/reservations/reservations.service";
 import {FormControl} from "@angular/forms";
 import {StopService} from "../../services/stop/stop.service";
 import {ResizedEvent} from "angular-resize-event";
-import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material";
-import {DialogAddKidData, Kid} from "../stop-row/stop-row.component";
-import {BehaviorSubject, Subject} from "rxjs";
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar} from "@angular/material";
+import {Subject} from "rxjs";
 import {take, takeUntil} from "rxjs/operators";
-import {Stop} from "../../models/stop";
-import {Child} from "../../models/child";
+import {CalendarView} from "angular-calendar";
+import {Reservation} from "../../models/reservation";
+import {registerLocaleData} from "@angular/common";
+import localeIt from '@angular/common/locales/it';
 
 @Component({
     selector: 'app-reservations',
@@ -23,32 +24,53 @@ import {Child} from "../../models/child";
 })
 export class ReservationsComponent implements OnInit, OnDestroy {
 
-
     private unsubscribe$ = new Subject<void>();
+    view: CalendarView = CalendarView.Week;
+    viewDate: Date = this.getMonday(new Date());
 
     stops = [];
     lines = [];
     selectedLine = null;
-    oldSelectedLine = null;
-
     selectedRun = 0;
     selectedDate = null;
-    selectedDirection = "outward";
-
     times = [];
+    timestamp = 0;
+    selectedChild = null;
+    opening: boolean = false;
+    locale: string = 'it';
+    selectedReservation: Reservation = undefined;
+
+
     stopRows = undefined;
-    allowedDaysFilter = (d: Date): boolean => {
-        let dayNum = d.getDay();
-        return !(dayNum === 0);
-    };
+
     private previousWidth = 0;
 
-    constructor(private dialog: MatDialog, private reservationsService: ReservationsService, private stopService: StopService) {
+    constructor(private dialog: MatDialog, private reservationsService: ReservationsService, private stopService: StopService, private _snackBar: MatSnackBar) {
         this.selectedDate = new FormControl(new Date());
+        registerLocaleData(localeIt, 'it');
     }
 
 
+    updateChild() {
+        this.selectedReservation = undefined;
+        this.selectedLine = this.selectedLine[0];
+        this.selectedRun = 0;
+        if (this.selectedChild != null)
+            this.reservationsService.buildReservations(this.getMonday(new Date()), this.selectedChild.id);
+    }
+
+    children = [];
+
     ngOnInit() {
+        this.reservationsService.children()
+            .pipe(
+                take(1),
+                takeUntil(this.unsubscribe$)
+            )
+            .subscribe((children) => {
+                this.children = children;
+            });
+
         this.reservationsService.getLines()
             .pipe(
                 take(1),
@@ -58,14 +80,13 @@ export class ReservationsComponent implements OnInit, OnDestroy {
                 (lines) => {
                     this.lines = lines;
                     this.selectedLine = this.lines[0];
-                    this.updateData()
                 }
             );
 
         this.stopService.stopsObserver$
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe((data) => {
-                if(data!=undefined) {
+                if (data != undefined) {
                     this.times = [];
                     this.times.push([]);
                     this.times.push([]);
@@ -77,7 +98,7 @@ export class ReservationsComponent implements OnInit, OnDestroy {
                             temp.push([]);
                         }
                         for (let i = 0; i < data[0].length; i++) {
-                            for(let k=0; k < data[0][i].length; k++) {
+                            for (let k = 0; k < data[0][i].length; k++) {
                                 //stops
                                 temp[i].push(data[0][i][k].outward[j]);
                             }
@@ -93,7 +114,7 @@ export class ReservationsComponent implements OnInit, OnDestroy {
                             temp.push([]);
                         }
                         for (let i = 0; i < data[1].length; i++) {
-                            for(let k=0; k < data[1][i].length; k++) {
+                            for (let k = 0; k < data[1][i].length; k++) {
                                 //stops
                                 temp[i].push(data[1][i][k].back[j]);
                             }
@@ -109,81 +130,49 @@ export class ReservationsComponent implements OnInit, OnDestroy {
             .subscribe(
                 (stop) => {
                     if (stop != undefined) {
-                        let index;
-
-                        if (this.selectedDirection == 'outward') {
-                            index = this.selectedRun
+                        //get date
+                        let date = this.selectedReservation.date;
+                        let dateString = ("0" + date.dayOfMonth()).slice(-2) +
+                            ("0" + date.monthValue()).slice(-2) +
+                            date.year();
+                        let lt: LocalTime = null;
+                        console.log(stop);
+                        if (this.selectedReservation.direction == 'OUTWARD') {
+                            lt = stop.outward[this.selectedReservation.tripIndex];
                         } else {
-                            index = this.selectedRun - this.selectedLine.stops.stops[0].outward.length;
+                            lt = stop.back[this.selectedReservation.tripIndex];
                         }
 
-                        //get date
-                        let date = this.selectedDate.value;
-                        let darray = date.toLocaleDateString().split("/");
-                        date = "";
-
-                        darray.forEach((value) => {
-                                if (value < 10) {
-                                    date += "0" + value;
-                                } else {
-                                    date += value;
-                                }
-                            }
-                        );
-
+                        let time = "[" + ("0" + lt.hour()).slice(-2) + ":" + ("0" + lt.minute()).slice(-2) + "]";
                         let dialogRef = this.dialog.open(BookingDialog, {
                             panelClass: "reservation-dialog",
                             data: {
                                 line: this.selectedLine.name,
-                                stop: stop,
-                                date: date,
-                                direction: this.selectedDirection,
-                                index: index
+                                stop: stop.name,
+                                index: this.selectedRun,
+                                reservation: this.selectedReservation,
+                                time: time,
+                                date: dateString
                             }
                         });
 
                         dialogRef.afterClosed().subscribe(result => {
                             this.reservationsService.closePopup();
-                            //ACTION AFTER CLOSE
+                            if (result != undefined) {
+                                if(result) {
+                                    this.openSnackbar("Operazione completata con successo");
+                                    this.reservationsService.buildReservations(this.viewDate, this.selectedChild.id);
+                                    this.selectedReservation = undefined;
+                                    this.selectedLine = this.lines[0];
+                                    this.selectedRun = 0;
+                                }else{
+                                    this.openSnackbar("Qualcosa è andato storto, riprovare più tardi")
+                                }
+                            }
                         })
                     }
                 }
             )
-    }
-
-
-    updateData() {
-        if (this.selectedLine != null) {
-            let outs = this.selectedLine.stops.stops[0].outward.length;
-            this.selectedRun = -1;
-            for (let i = 0; i < outs; i++) {
-                if (this.selectedLine.stops.endsAt[0][i].isAfter(LocalTime.now())) {
-                    this.selectedRun = i;
-                }
-            }
-            let backs = this.selectedLine.stops.stops[0].back.length;
-            if (this.selectedRun == -1 || this.selectedDirection == 'back') {
-                for (let i = 0; i < backs; i++) {
-                    if (this.selectedLine.stops.endsAt[1][i].isAfter(LocalTime.now())) {
-                        this.selectedRun = i + outs;
-                    }
-                }
-            }
-            if (this.selectedRun == -1) {
-                this.selectedRun = 0;
-                let today = new Date();
-                today.setDate(today.getDate() + 1);
-                this.selectedDate.setValue(today);
-            }
-
-            if (this.oldSelectedLine != this.selectedLine) {
-                this.stopRows = undefined;
-                this.oldSelectedLine = this.selectedLine;
-                if (!isNaN(this.previousWidth)) {
-                    this.setStops(this.previousWidth);
-                }
-            }
-        }
     }
 
     onResize(event: ResizedEvent) {
@@ -212,22 +201,113 @@ export class ReservationsComponent implements OnInit, OnDestroy {
         this.reservationsService.unsubscribe();
     }
 
-    changeTab() {
-        let size = this.selectedLine.stops.stops[0].outward.length;
-        if (this.selectedRun < size) {
-            this.selectedDirection = 'outward';
-        } else {
-            this.selectedDirection = 'back';
+    start = 0;
+    refresh: Subject<any> = new Subject();
+    isMobile: boolean = false;
+
+    changedDate() {
+        let temp = this.getMonday(this.viewDate);
+        if (temp != this.viewDate) {
+            this.viewDate = temp;
         }
+        this.reservationsService.buildReservations(this.viewDate, this.selectedChild.id);
+        this.selectedReservation = undefined;
+        this.selectedLine = this.lines[0];
+        this.selectedRun = 0;
+    }
+
+
+    getMonday(d: Date) {
+        d = new Date(d);
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day == 0 ? -6 : 1);
+        return new Date(d.setDate(diff));
+    }
+
+
+    mouseDown($event, element: Reservation) {
+        if (element.color == 'GRAY')
+            return;
+        this.opening = true;
+        this.timestamp = $event.timeStamp;
+    }
+
+    mouseMove($event, element: Reservation) {
+        if (!this.opening || element.color == 'GRAY')
+            return;
+        if ($event.timeStamp - this.timestamp >= 1000 && element.booked) {
+            //long tap
+            this.opening = false;
+            this.selectedReservation = element;
+            console.log(this.lines);
+            this.selectedLine = this.lines.filter((value) => value.name == this.selectedReservation.lineName)[0];
+            this.selectedRun = this.selectedReservation.tripIndex;
+            return;
+        }
+    }
+
+    mouseUp($event, element: Reservation) {
+        if (!this.opening || element.color == 'GRAY')
+            return;
+        this.opening = false;
+
+        if ($event.timeStamp - this.timestamp >= 1000 && element.booked) {
+            //long tap
+            this.selectedReservation = element;
+            this.selectedLine = this.lines.filter((value) => value.name == this.selectedReservation.lineName)[0];
+            this.selectedRun = this.selectedReservation.tripIndex;
+        } else {
+            //click
+            if (!element.booked) {
+                let dateString = ("0" + element.date.dayOfMonth()).slice(-2) +
+                    ("0" + element.date.monthValue()).slice(-2) +
+                    element.date.year();
+                if (this.reservationsService.defaultStop == undefined) {
+                    this.openSnackbar("Nessuna fermata di default trovata. Selezionare la fermata manualmente");
+                    this.selectedReservation = element;
+                    this.selectedLine = this.lines[0];
+                    this.selectedRun = 0;
+                } else {
+                    this.reservationsService.reserveDefault(dateString, this.selectedChild.id, element.direction)
+                        .subscribe(() => {
+                            //success
+                            this.reservationsService.buildReservations(this.viewDate, this.selectedChild.id);
+                            this.openSnackbar("Prenotazione inserita con successo");
+                        }, () => {
+                            this.openSnackbar("Qualcosa è andato storto. Per favore riprovare più tardi.");
+                        });
+                }
+            } else {
+                this.reservationsService.removeReservation(element).subscribe(() => {
+                    this.reservationsService.buildReservations(this.viewDate, this.selectedChild.id);
+                    this.reservationsService.buildReservations(this.viewDate, this.selectedChild.id);
+                    this.openSnackbar("Prenotazione rimossa con successo");
+                }, () => {
+                    this.openSnackbar("Qualcosa è andato storto. Per favore riprovare più tardi.");
+                });
+            }
+        }
+    }
+
+    openSnackbar(message: string, duration = 3000) {
+        this._snackBar.open(message, "OK", {
+            duration: duration
+        });
+    }
+
+    updateLine() {
+        this.selectedRun = 0;
+        this.setStops(this.previousWidth);
     }
 }
 
 export interface BookingData {
     line: string;
-    stop: Stop;
     date: string;
-    direction: string;
+    stop: string;
     index: number;
+    time: string;
+    reservation: Reservation;
 }
 
 @Component({
@@ -238,32 +318,14 @@ export interface BookingData {
 )
 
 export class BookingDialog implements OnInit, OnDestroy {
-    private unsubscribe$ = new Subject<void>();
-    children = new Map<Child, boolean>();
-    status = "request";
+    status = "dialog";
 
     errorMsg = null;
 
-    @Output("child-presence") change: EventEmitter<Kid> = new EventEmitter<Kid>();
-
     ngOnDestroy(): void {
-        this.unsubscribe$.next();
-        this.unsubscribe$.complete();
     }
 
     ngOnInit(): void {
-        this.reservationsService.children()
-            .pipe(takeUntil(this.unsubscribe$))
-            .subscribe(
-                (children) => {
-                    this.children = new Map<Child, boolean>();
-                    for (let c of children) {
-                        this.children.set(c, false);
-                    }
-                    this.status = "dialog";
-                    this.cd.detectChanges();
-                }
-            );
     }
 
     constructor(
@@ -273,52 +335,35 @@ export class BookingDialog implements OnInit, OnDestroy {
         public dialogRef: MatDialogRef<BookingDialog>) {
     }
 
-    closeDialog() {
-        this.dialogRef.close();
-    }
-
-    selectChild(child) {
-        this.children.set(child, !this.children.get(child))
+    closeDialog(result) {
+        return this.dialogRef.close(result);
     }
 
     book() {
-        let check = false;
-        for (let v of this.children.values()) {
-            if (v) {
-                check = true;
-                break;
-            }
-        }
-
-        if (!check) {
-            this.errorMsg = "Per favore seleziona almeno un bambino";
-            return;
-        } else {
-            this.errorMsg = null;
-            let children = [];
-            this.children.forEach((value, child) => {
-                if (value)
-                    children.push(child.id);
-            });
-            this.status = "request";
-            this.reservationsService.reserve(this.data.line, this.data.date, children, this.data.stop.name, this.data.direction, this.data.index)
-                .subscribe((resp) => {
+        this.status = "request";
+        this.reservationsService.reserve(this.data.line, this.data.date, this.data.reservation.childId, this.data.stop, this.data.reservation.direction, this.data.index)
+            .subscribe(() => {
                     //success
                     this.status = "completed";
-                    this.errorMsg = "Operazione completata con successo.";
-                    this.cd.markForCheck();
-                    setTimeout(() => this.closeDialog(), 3000);
-                }, (resp) => {
-                    if (resp.status == 409) {
-                        this.status = "completed";
-                        this.errorMsg = "Uno dei bambini è già prenotato per questa tratta.";
-                    } else {
-                        this.status = "completed";
-                        this.errorMsg = "Qualcosa è andato storto. Per favore riprovare più tardi.";
-                    }
-                    this.cd.markForCheck();
-                    setTimeout(() => this.closeDialog(), 3000);
-                })
-        }
+                    this.closeDialog(true);
+                }, () => {
+                    this.status = "completed";
+                    this.closeDialog(false);
+                }
+            );
+    }
+
+    update() {
+        this.status = "request";
+        this.reservationsService.updateReservation(this.data.line, this.data.date, this.data.stop, this.data.index, this.data.reservation)
+            .subscribe(() => {
+                    //success
+                    this.status = "completed";
+                    this.closeDialog(true);
+                }, () => {
+                    this.status = "completed";
+                    this.closeDialog(false);
+                }
+            );
     }
 }

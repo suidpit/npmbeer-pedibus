@@ -16,6 +16,7 @@ export class StopListComponent{
 
     @Input("stops") stops;
     @Input("times") times;
+    @Input("selected_stop") selected_stop;
 
     direction(i) {
         if (i % 2 == 0)

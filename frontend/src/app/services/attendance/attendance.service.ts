@@ -151,7 +151,7 @@ export class AttendanceService {
   addOnTheFlyChild(childId: string, stopName: string, lineName: string, direction: string, tripIndex: number, dateString: string){
     const reservation = Builder(ReservationReq)
       .stopName(stopName)
-      .child([childId])
+      .child(childId)
       .direction(direction.toUpperCase())
       .tripIndex(tripIndex)
       .build();

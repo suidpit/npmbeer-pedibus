@@ -7,6 +7,7 @@
 // full-calendar styles need to be here (see docs)
 @import '~@fullcalendar/core/main.css';
 @import '~@fullcalendar/daygrid/main.css';
+@import "../node_modules/angular-calendar/css/angular-calendar.css";
 
 
 
@@ -108,7 +109,29 @@
   flex-direction: column !important;
 }
 
-.attendance-tabs .mat-tab-body-wrapper{
-  flex: 2 0 100% !important;
+.cal-event-container {
+  position: relative !important;
+  margin-left: 0px !important;
+  align-items: center !important;
+  height: inherit!important;
+  width: inherit!important;
 }
 
+.cal-events-row{
+  height: auto !important;
+  width: 100%!important;
+  min-width: 100%!important;
+  margin-right: 0!important;
+  margin-left: 0!important;
+  display: flex!important;
+}
+
+.cal-time-label-column,
+.cal-hour-segment,
+.cal-time-events{
+  display: none !important;
+}
+
+.cal-day-headers{
+  padding-left: 0!important;
+}

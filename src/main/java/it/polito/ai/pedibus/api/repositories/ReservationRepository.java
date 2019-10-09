@@ -36,13 +36,12 @@ public interface ReservationRepository extends MongoRepository<Reservation, Stri
 
     List<Reservation> findAllByDateAndLineNameAndDirectionAndChildId(LocalDate date, String lineName,
                                                                               Reservation.Direction direction,
-                                                                              Integer tripIndex,
                                                                               ObjectId childId);
-
-    Reservation findByDateAndDirectionAndUser(LocalDate date, Reservation.Direction direction, ObjectId id);
 
     List<Reservation> findByDateAndUser(LocalDate date, ObjectId userId);
 
-    Reservation findFirstByDateAfterAndUser(LocalDate date, ObjectId userId);
+    List<Reservation> findByDateGreaterThanEqualAndChildId(LocalDate date, ObjectId childId);
+
+    Reservation findByDateAndDirectionAndId(LocalDate date, Reservation.Direction direction, ObjectId id);
 }
 

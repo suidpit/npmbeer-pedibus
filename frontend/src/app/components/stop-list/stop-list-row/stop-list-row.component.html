@@ -12,6 +12,7 @@
     <app-stop-element *ngFor="let stop of stops; let i=index"
                       [type]="'intermediate'"
                       [time]="times[i]"
+                      [selected_stop]="selected_stop"
                       [stop]="stop"></app-stop-element>
 
 </div>
@@ -33,6 +34,7 @@
 
     <app-stop-element *ngFor="let stop of stops; let i=index"
                       [type]="'intermediate_icon'"
+                      [selected_stop]="selected_stop"
                       [time]="times[i]"
                       [stop]="stop"></app-stop-element>
 
