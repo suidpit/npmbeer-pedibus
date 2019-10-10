@@ -170,8 +170,11 @@ export class AttendanceComponent implements OnInit, OnDestroy {
                 }else{
                   this.reservedStops["back"][i].push([]);
                 }
-                this.reservedStops["back"][i] = this.reservedStops["back"][i].slice().reverse();
               }
+
+            }
+            for(let i=0; i<this.selectedLine.stops.stops[0].back.length; i++) {
+              this.reservedStops["back"][i] = this.reservedStops["back"][i].slice().reverse();
             }
 
             this.reservedStopsSubject.next(this.reservedStops);
@@ -283,7 +286,7 @@ export class AttendanceComponent implements OnInit, OnDestroy {
       }
       else{
         stop = {
-          nomeFermata: this.selectedLine.stops.stops[this.selectedLine.stops.stops.length-1-i].name,
+          nomeFermata: this.selectedLine.stops.stops[i].name,
           presenze: this.reservedStops[this.selectedDirection][this.tripIndex][i]
         }
       }

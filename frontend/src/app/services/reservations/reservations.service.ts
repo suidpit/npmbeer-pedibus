@@ -106,11 +106,6 @@ export class ReservationsService {
                 reservation.id = s.id;
                 reservation.childId = selectedChild;
 
-                if (reservation.date.isBefore(LocalDate.now(ZoneId.of("+01:00"))))
-                    reservation.color = 'GRAY';
-                else
-                    reservation.color = 'BLUE';
-
                 reservation.booked = true;
                 let dateString = reservation.date.year() +
                     "-" + ("0" + reservation.date.monthValue()).slice(-2) +
@@ -118,12 +113,18 @@ export class ReservationsService {
 
                 let temp_stop = this.lines.filter((value)=>value.name === reservation.lineName)[0]
                     .stops.stops.filter((value => value.name==reservation.stopName))[0];
-                let time = null;
+                let time: LocalTime = null;
                 if(reservation.direction=='OUTWARD'){
                     time = temp_stop.outward[reservation.tripIndex];
                 }else{
                     time = temp_stop.back[reservation.tripIndex];
                 }
+
+                if (reservation.date.isBefore(LocalDate.now(ZoneId.of("+01:00"))) ||
+                    (reservation.date.isEqual(LocalDate.now(ZoneId.of("+01:00"))) && time.isBefore(LocalTime.now(ZoneId.of("+01:00")))))
+                        reservation.color = 'GRAY';
+                else
+                    reservation.color = 'BLUE';
 
                 let event = {
                     start: new Date(reservation.date.year(), reservation.date.monthValue()-1, reservation.date.dayOfMonth(), 0, 0),
@@ -153,7 +154,6 @@ export class ReservationsService {
                 }
 
             }
-            console.log(events);
             this.reservations_subject.next(events);
         })
     }
