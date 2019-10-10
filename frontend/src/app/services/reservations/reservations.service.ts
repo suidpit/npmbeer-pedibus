@@ -11,6 +11,8 @@ import {Reservation} from "../../models/reservation";
 import {ProfileService} from "../profile/profile.service";
 import {AuthService} from "../auth/auth.service";
 import {IChildReservationInfo} from "../../models/ichild-reservation-info";
+import {max} from "moment";
+import {Local} from "protractor/built/driverProviders";
 
 @Injectable({
     providedIn: 'root'
@@ -28,14 +30,14 @@ export class ReservationsService {
     lines: Line[] = [];
 
     constructor(private http: HttpClient, private profileService: ProfileService, private auth: AuthService) {
-        profileService.user$.subscribe((user)=>{
-            if(user!=null){
+        profileService.user$.subscribe((user) => {
+            if (user != null) {
                 this.defaultLine = user.defaultLine;
                 this.defaultStop = user.defaultStop;
             }
         });
 
-        this.getLines().pipe(take(1)).subscribe((lines)=>{
+        this.getLines().pipe(take(1)).subscribe((lines) => {
             this.lines = lines;
         })
     } // using Angular Dependency Injection
@@ -52,10 +54,28 @@ export class ReservationsService {
         return this.http.get<Child[]>(this.baseUrl + "/profile/children");
     }
 
-    reserveDefault(date: string, child: string, direction: string): Observable<any>{
+    reserveDefault(date: string, child: string, direction: string, today: boolean): Observable<any> {
         let stop = this.defaultStop;
         let line = this.defaultLine;
         let tripIndex = 0;
+        let times: LocalTime[] = [];
+        console.log(today);
+        if(today) {
+            if (direction == 'OUTWARD')
+                times = this.lines.filter(value => value.name === line)[0].stops.stops
+                    .filter(value => value.name === stop)[0].outward;
+            else
+                times = this.lines.filter(value => value.name === line)[0].stops.stops
+                    .filter(value => value.name === stop)[0].back;
+
+            for (let i = 0; i < times.length; i++) {
+                if (times[i].isAfter(LocalTime.now())) {
+                    tripIndex = i;
+                    break;
+                }
+            }
+        }
+
         const reservation = Builder(ReservationReq)
             .stopName(stop)
             .child(child)
@@ -111,27 +131,27 @@ export class ReservationsService {
                     "-" + ("0" + reservation.date.monthValue()).slice(-2) +
                     "-" + ("0" + reservation.date.dayOfMonth()).slice(-2);
 
-                let temp_stop = this.lines.filter((value)=>value.name === reservation.lineName)[0]
-                    .stops.stops.filter((value => value.name==reservation.stopName))[0];
+                let temp_stop = this.lines.filter((value) => value.name === reservation.lineName)[0]
+                    .stops.stops.filter((value => value.name == reservation.stopName))[0];
                 let time: LocalTime = null;
-                if(reservation.direction=='OUTWARD'){
+                if (reservation.direction == 'OUTWARD') {
                     time = temp_stop.outward[reservation.tripIndex];
-                }else{
+                } else {
                     time = temp_stop.back[reservation.tripIndex];
                 }
 
-                if (reservation.date.isBefore(LocalDate.now(ZoneId.of("+01:00"))) ||
-                    (reservation.date.isEqual(LocalDate.now(ZoneId.of("+01:00"))) && time.isBefore(LocalTime.now(ZoneId.of("+01:00")))))
-                        reservation.color = 'GRAY';
+                if (reservation.date.isBefore(LocalDate.now()) ||
+                    (reservation.date.isEqual(LocalDate.now()) && time.isBefore(LocalTime.now())))
+                    reservation.color = 'GRAY';
                 else
                     reservation.color = 'BLUE';
 
                 let event = {
-                    start: new Date(reservation.date.year(), reservation.date.monthValue()-1, reservation.date.dayOfMonth(), 0, 0),
-                    end: new Date(reservation.date.year(), reservation.date.monthValue()-1, reservation.date.dayOfMonth(), 12, 0),
+                    start: new Date(reservation.date.year(), reservation.date.monthValue() - 1, reservation.date.dayOfMonth(), 0, 0),
+                    end: new Date(reservation.date.year(), reservation.date.monthValue() - 1, reservation.date.dayOfMonth(), 12, 0),
                     allDay: true,
                     time: time,
-                    meta:{
+                    meta: {
                         reservation: reservation,
                     },
                     color: reservation.color,
@@ -144,12 +164,12 @@ export class ReservationsService {
                 // create a reservation for each missing day and back/out
                 let event1 = this.createReservation(date, 'OUTWARD', events, selectedChild)
 
-                if(event1!=null){
+                if (event1 != null) {
                     events.push(event1)
                 }
                 let event2 = this.createReservation(date, 'BACK', events, selectedChild);
 
-                if(event2!=null){
+                if (event2 != null) {
                     events.push(event2)
                 }
 
@@ -158,7 +178,7 @@ export class ReservationsService {
         })
     }
 
-    private createReservation(date, direction, events, selected_child){
+    private createReservation(date, direction, events, selected_child) {
         let dateString = date.year() +
             "-" + ("0" + date.monthValue()).slice(-2) +
             "-" + ("0" + date.dayOfMonth()).slice(-2);
@@ -176,18 +196,60 @@ export class ReservationsService {
         if (events.filter(elem => (elem.meta.reservation.date.monthValue() == new_reservation.date.monthValue() &&
             elem.meta.reservation.date.dayOfMonth() == new_reservation.date.dayOfMonth() &&
             elem.meta.reservation.date.year() == new_reservation.date.year() &&
-            elem.meta.reservation.direction == new_reservation.direction)).length==0) {
-            if (new_reservation.date.isBefore(LocalDate.now(ZoneId.of("+01:00"))))
+            elem.meta.reservation.direction == new_reservation.direction)).length == 0) {
+
+            if (new_reservation.date.isBefore(LocalDate.now()))
                 new_reservation.color = 'GRAY';
-            else
-                new_reservation.color = 'RED';
+            else {
+                let time_stop_default = LocalTime.of(0, 0, 0);
+                if(this.defaultStop!=null) {
+                    let stop = this.lines.filter((value) => value.name === this.defaultLine)[0]
+                        .stops.stops.filter((value => value.name == this.defaultStop))[0];
+                    if (direction == "OUTWARD")
+                        for (let time of stop.outward) {
+                            if (time_stop_default.isBefore(time)) {
+                                time_stop_default = time;
+                            }
+                        }
+                    else
+                        for (let time of stop.back) {
+                            if (time_stop_default.isBefore(time)) {
+                                time_stop_default = time;
+                            }
+                        }
+                }
+                let time_stop_final: LocalTime = null;
+                if (direction == "OUTWARD") {
+                    time_stop_final = LocalTime.of(0, 0, 0);
+                    for (let line of this.lines) {
+                        for (let time of line.stops.stops[line.stops.stops.length - 1].outward) {
+                            if (time_stop_final.isBefore(time))
+                                time_stop_final = time;
+                        }
+                    }
+                } else {
+                    time_stop_final = LocalTime.of(0, 0, 0);
+                    for (let line of this.lines) {
+                        for (let time of line.stops.stops[0].back) {
+                            if (time_stop_final.isBefore(time))
+                                time_stop_final = time;
+                        }
+                    }
+                }
+                if (new_reservation.date.isEqual(LocalDate.now()) && time_stop_final.isBefore(LocalTime.now()))
+                    new_reservation.color = 'GRAY';
+                else {
+                    new_reservation.color = 'RED';
+                    new_reservation.default_stop_time = time_stop_default;
+                }
+            }
 
 
             event = {
-                start: new Date(date.year(), date.monthValue()-1, date.dayOfMonth(), 0, 0),
-                end: new Date(date.year(), date.monthValue()-1, date.dayOfMonth(), 12, 0),
+                start: new Date(date.year(), date.monthValue() - 1, date.dayOfMonth(), 0, 0),
+                end: new Date(date.year(), date.monthValue() - 1, date.dayOfMonth(), 12, 0),
                 allDay: true,
-                meta:{
+                meta: {
                     reservation: new_reservation,
                 },
                 color: new_reservation.color,
@@ -209,12 +271,12 @@ export class ReservationsService {
         return this.http.delete(this.baseUrl + "/reservations/user/" + reservation.lineName + "/" + dateString + "/" + reservation.id);
     }
 
-    updateReservation(line: string, date:string, stop: string, index: number, reservation: Reservation) {
+    updateReservation(line: string, date: string, stop: string, index: number, reservation: Reservation) {
         let req = Builder(ReservationReq)
             .tripIndex(index)
             .stopName(stop)
             .lineName(line)
             .build();
-        return this.http.put(this.baseUrl+"/reservations/user/"+reservation.lineName+"/"+date+"/"+reservation.id, req);
+        return this.http.put(this.baseUrl + "/reservations/user/" + reservation.lineName + "/" + date + "/" + reservation.id, req);
     }
 }

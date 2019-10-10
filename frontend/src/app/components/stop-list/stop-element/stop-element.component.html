@@ -1,12 +1,25 @@
 <div #container ngClass.lt-sm="small_container" ngClass.gt-xs="container">
-    <div (click)="selectStop()"
-         *ngIf="type==='intermediate'; else others" class="clickable">
-        <mat-icon *ngIf="selected_stop==undefined || stop.name!=selected_stop" svgIcon="flag"></mat-icon>
-        <mat-icon *ngIf="selected_stop!=undefined && stop.name==selected_stop" svgIcon="selected_flag"></mat-icon>
-        <div [ngClass.xs]="stop.name==selected_stop ? 'selected_small_text' :'small_text'" [ngClass.gt-xs]="stop.name==selected_stop ? 'selected_text' :'text'" [ngClass]="selected_stop!=undefined && stop.name==selected_stop ? 'selected-text-container' : 'text-container'">
-            <p>
-                {{stop.name}}
-            </p>
+    <div *ngIf="type==='intermediate'; else others">
+        <div *ngIf="!today || time.isAfter(now)" (click)="selectStop()" class="clickable">
+            <mat-icon *ngIf="selected_stop==undefined || stop.name!=selected_stop" svgIcon="flag"></mat-icon>
+            <mat-icon *ngIf="selected_stop!=undefined && stop.name==selected_stop" svgIcon="selected_flag"></mat-icon>
+            <div [ngClass.xs]="stop.name==selected_stop ? 'selected_small_text' :'small_text'"
+                 [ngClass.gt-xs]="stop.name==selected_stop ? 'selected_text' :'text'"
+                 [ngClass]="selected_stop!=undefined && stop.name==selected_stop ? 'selected-text-container' : 'text-container'">
+                <p>
+                    {{stop.name}}
+                </p>
+            </div>
+        </div>
+        <div *ngIf="time.isBefore(now) && today">
+            <mat-icon svgIcon="disabled_flag"></mat-icon>
+            <div [ngClass.xs]="'disabled_small_text'"
+                 [ngClass.gt-xs]="'disabled_text'"
+                 [ngClass]="selected_stop!=undefined && stop.name==selected_stop ? 'selected-text-container' : 'text-container'">
+                <p>
+                    {{stop.name}}
+                </p>
+            </div>
         </div>
     </div>
 </div>

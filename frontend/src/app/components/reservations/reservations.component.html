@@ -17,7 +17,7 @@
                 {{dayEvent.event.time}} - {{dayEvent.event.meta.reservation.stopName}}
             </div>
         </div>
-        <div fxFlexFill [ngClass]="selectedReservation!=undefined ? ((dayEvent.event.meta.reservation.date==selectedReservation.date && dayEvent.event.meta.reservation.direction == selectedReservation.direction) ? 'YELLOW' : dayEvent.event.color) : dayEvent.event.color" *ngIf="!dayEvent.event.meta.reservation.booked"
+        <div fxFlexFill [ngClass]="selectedReservation!=undefined ? ((dayEvent.event.meta.reservation.date.isEqual(selectedReservation.date) && dayEvent.event.meta.reservation.direction == selectedReservation.direction) ? 'YELLOW' : dayEvent.event.color) : dayEvent.event.color" *ngIf="!dayEvent.event.meta.reservation.booked"
              class="event">
             <div *ngIf="dayEvent.event.meta.reservation.direction=='OUTWARD'">
                 ANDATA
@@ -51,7 +51,7 @@
                 {{weekEvent.event.time}} - {{weekEvent.event.meta.reservation.stopName}}
             </div>
         </div>
-        <div fxFlexFill [ngClass]="selectedReservation!=undefined ? ((weekEvent.event.meta.reservation.date==selectedReservation.date && weekEvent.event.meta.reservation.direction == selectedReservation.direction) ? 'YELLOW' : weekEvent.event.color) : weekEvent.event.color" *ngIf="!weekEvent.event.meta.reservation.booked"
+        <div fxFlexFill [ngClass]="selectedReservation!=undefined ? ((weekEvent.event.meta.reservation.date.isEqual(selectedReservation.date) && weekEvent.event.meta.reservation.direction == selectedReservation.direction) ? 'YELLOW' : weekEvent.event.color) : weekEvent.event.color" *ngIf="!weekEvent.event.meta.reservation.booked"
              class="event">
             <div *ngIf="weekEvent.event.meta.reservation.direction=='OUTWARD'">
                 ANDATA
@@ -66,7 +66,7 @@
     </div>
 </ng-template>
 
-<div class="container" fxLayout="column">
+<div class="container" fxLayout="column" (resized)="onPageResize()">
     <mat-card>
         <mat-card-header>
             <mat-card-title style="text-align: center">
@@ -74,7 +74,7 @@
             </mat-card-title>
             <mat-card-subtitle>
                 Seleziona destra o sinistra per scorrere le settimane, cliccare una corsa per rimuovere una
-                prenotazioe o prenutare usando linea e fermata di default. Tenere premuta una prenotazione per
+                prenotazione o prenotare usando linea e fermata di default. Tenere premuta una prenotazione per
                 modificarne
                 la fermata e la linea (e corsa se presente).
             </mat-card-subtitle>
@@ -86,10 +86,15 @@
                         Legenda
                     </mat-panel-title>
                 </mat-expansion-panel-header>
+                <h3 class="text center">Prenotazioni</h3>
                 <p><span class="legend RED"></span>Corsa non prenotata</p>
                 <p><span class="legend BLUE"></span>Corsa prenotata</p>
                 <p><span class="legend GRAY"></span>Corsa passata e non modificabile</p>
                 <p><span class="legend YELLOW"></span>Corsa selezionata di cui si può modificare la fermata e linea di default</p>
+                <h3 class="text center">Fermate</h3>
+                <p><span class="legend ORANGE"></span>Fermata selezionata</p>
+                <p><span class="legend LIGHT_BLUE"></span>Fermata disponibile</p>
+                <p><span class="legend GRAY"></span>Fermata non disponibile</p>
             </mat-expansion-panel>
             <div fxFlexFill>
                 <div fxLayout="column nowrap">
@@ -124,14 +129,14 @@
                         </div>
                         <h3 style="text-align: center">{{ viewDate | calendarDate:(view + 'ViewTitle'):'it':1 }}</h3>
                     </div>
-                    <mwl-calendar-day-view *ngIf="isMobile() && selectedChild"
+                    <mwl-calendar-day-view *ngIf="mobile && selectedChild"
                                            [locale]="locale"
                                            [viewDate]="viewDate"
                                            [events]="reservationsService.getReservations() | async"
                                            [refresh]="refresh"
                                            [eventTemplate]="eventDayTemplate">
                     </mwl-calendar-day-view>
-                    <mwl-calendar-week-view *ngIf="!isMobile() && selectedChild"
+                    <mwl-calendar-week-view *ngIf="!mobile && selectedChild"
                                             [locale]="locale"
                                             weekStartsOn="1"
                                             [viewDate]="viewDate"
@@ -170,6 +175,7 @@
                                 <app-stop-list (window:resize)="onResize($event)"
                                                *ngIf="stopRows; else spinner"
                                                [times]="times[0][i]"
+                                               [today]="today"
                                                [selected_stop]="selectedReservation.stopName"
                                                [stops]="stopRows[0]"></app-stop-list>
                             </div>
@@ -181,6 +187,7 @@
                             <div class="stops">
                                 <app-stop-list *ngIf="stopRows; else spinner"
                                                [times]="times[1][i]"
+                                               [today]="today"
                                                [selected_stop]="selectedReservation.stopName"
                                                [stops]="stopRows[1]"></app-stop-list>
 

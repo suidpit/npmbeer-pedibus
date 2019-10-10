@@ -3,12 +3,12 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 180 135" style="enable-background:new 0 0 180 135;" xml:space="preserve">
 <style type="text/css">
-	.selected_flag{fill:#FFA500;}
+	.disabled_flag{fill:#acacac;}
 	.st1{fill:#553900;}
 </style>
 <g>
 	<g>
-		<polygon class="selected_flag" points="5.5,125.6 5.5,19.4 169.3,19.4 150.6,72.5 169.3,125.6 		"/>
+		<polygon class="disabled_flag" points="5.5,125.6 5.5,19.4 169.3,19.4 150.6,72.5 169.3,125.6 		"/>
 		<path d="M168.6,19.9l-18.4,52.2l-0.1,0.3l0.1,0.3l18.4,52.2L6,125.1V19.9H168.6 M170,18.9H5v107.1v0h165l-18.9-53.6L170,18.9
 			L170,18.9z"/>
 	</g>

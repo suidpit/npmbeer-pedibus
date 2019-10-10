@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit} from '@angular/core';
-import {LocalTime} from "js-joda";
+import {LocalDate, LocalTime, ZoneId} from "js-joda";
 import {ReservationsService} from "../../services/reservations/reservations.service";
 import {FormControl} from "@angular/forms";
 import {StopService} from "../../services/stop/stop.service";
@@ -47,6 +47,7 @@ export class ReservationsComponent implements OnInit, OnDestroy {
 
     updateChild() {
         this.selectedReservation = undefined;
+        this.today = false;
         this.selectedLine = this.selectedLine[0];
         this.selectedRun = 0;
         if (this.selectedChild != null)
@@ -157,6 +158,7 @@ export class ReservationsComponent implements OnInit, OnDestroy {
                                     this.openSnackbar("Operazione completata con successo");
                                     this.reservationsService.buildReservations(this.viewDate, this.selectedChild.id);
                                     this.selectedReservation = undefined;
+                                    this.today = false;
                                     this.selectedLine = this.lines[0];
                                     this.selectedRun = 0;
                                 }else{
@@ -167,6 +169,10 @@ export class ReservationsComponent implements OnInit, OnDestroy {
                     }
                 }
             )
+    }
+
+    onPageResize(){
+        this.mobile = this.isMobile();
     }
 
     onResize(event: ResizedEvent) {
@@ -198,6 +204,9 @@ export class ReservationsComponent implements OnInit, OnDestroy {
     start = 0;
     refresh: Subject<any> = new Subject();
 
+    mobile: boolean = false;
+    today: boolean = false;
+
     isMobile(): boolean{
         if(window.innerWidth<800){
             this.view = CalendarView.Day;
@@ -205,6 +214,9 @@ export class ReservationsComponent implements OnInit, OnDestroy {
         }
         else{
             this.viewDate = this.getMonday(this.viewDate);
+            if(this.selectedChild!=null) {
+                this.reservationsService.buildReservations(this.viewDate, this.selectedChild.id);
+            }
             this.view = CalendarView.Week;
             return false;
         }
@@ -217,6 +229,7 @@ export class ReservationsComponent implements OnInit, OnDestroy {
         }
         this.reservationsService.buildReservations(this.viewDate, this.selectedChild.id);
         this.selectedReservation = undefined;
+        this.today = false;
         this.selectedLine = this.lines[0];
         this.selectedRun = 0;
     }
@@ -244,14 +257,14 @@ export class ReservationsComponent implements OnInit, OnDestroy {
             //long tap
             this.opening = false;
             this.selectedReservation = element;
-            console.log(this.lines);
+            this.today = element.date.isEqual(LocalDate.now());
             this.selectedLine = this.lines.filter((value) => value.name == this.selectedReservation.lineName)[0];
             this.selectedRun = this.selectedReservation.tripIndex;
             return;
         }
     }
 
-    mouseUp($event, element: Reservation) {
+    mouseUp($event, element) {
         if (!this.opening || element.color == 'GRAY')
             return;
         this.opening = false;
@@ -259,30 +272,46 @@ export class ReservationsComponent implements OnInit, OnDestroy {
         if ($event.timeStamp - this.timestamp >= 1000 && element.booked) {
             //long tap
             this.selectedReservation = element;
+            this.today = element.date.isEqual(LocalDate.now());
             this.selectedLine = this.lines.filter((value) => value.name == this.selectedReservation.lineName)[0];
             this.selectedRun = this.selectedReservation.tripIndex;
         } else {
             //click
             if (!element.booked) {
+                //element not booked
                 let dateString = ("0" + element.date.dayOfMonth()).slice(-2) +
                     ("0" + element.date.monthValue()).slice(-2) +
                     element.date.year();
                 if (this.reservationsService.defaultStop == undefined) {
+                    //no default stops
                     this.openSnackbar("Nessuna fermata di default trovata. Selezionare la fermata manualmente");
                     this.selectedReservation = element;
+                    this.today = element.date.isEqual(LocalDate.now());
                     this.selectedLine = this.lines[0];
                     this.selectedRun = 0;
                 } else {
-                    this.reservationsService.reserveDefault(dateString, this.selectedChild.id, element.direction)
-                        .subscribe(() => {
-                            //success
-                            this.reservationsService.buildReservations(this.viewDate, this.selectedChild.id);
-                            this.openSnackbar("Prenotazione inserita con successo");
-                        }, () => {
-                            this.openSnackbar("Qualcosa è andato storto. Per favore riprovare più tardi.");
-                        });
+                    //default stops available
+                    if(element.date.isEqual(LocalDate.now()) && element.default_stop_time.isBefore(LocalTime.now())){
+                        console.log(element.default_stop_time);
+                        //default stop not bookable
+                        this.openSnackbar("Corsa partita. Impossibile prenotare fermata di default, selezionarne un'altra");
+                        this.selectedReservation = element;
+                        this.today = element.date.isEqual(LocalDate.now());
+                        this.selectedLine = this.lines[0];
+                        this.selectedRun = 0;
+                    }else
+                        //book default
+                        this.reservationsService.reserveDefault(dateString, this.selectedChild.id, element.direction, element.date.isEqual(LocalDate.now()))
+                            .subscribe(() => {
+                                //success
+                                this.reservationsService.buildReservations(this.viewDate, this.selectedChild.id);
+                                this.openSnackbar("Prenotazione inserita con successo");
+                            }, () => {
+                                this.openSnackbar("Qualcosa è andato storto. Per favore riprovare più tardi.");
+                            });
                 }
             } else {
+                //remove reservation
                 this.reservationsService.removeReservation(element).subscribe(() => {
                     this.reservationsService.buildReservations(this.viewDate, this.selectedChild.id);
                     this.reservationsService.buildReservations(this.viewDate, this.selectedChild.id);

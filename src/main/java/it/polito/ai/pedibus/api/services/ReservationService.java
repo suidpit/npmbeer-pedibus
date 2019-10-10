@@ -4,6 +4,7 @@ import it.polito.ai.pedibus.api.dtos.ReservationDTO;
 import it.polito.ai.pedibus.api.models.Child;
 import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.repositories.ChildRepository;
+import it.polito.ai.pedibus.api.repositories.LineRepository;
 import it.polito.ai.pedibus.api.repositories.ReservationRepository;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
 import it.polito.ai.pedibus.security.CustomUserDetails;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,15 +28,17 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
     private final ChildRepository childRepository;
+    private final LineRepository lineRepository;
 
     private final DateTimeFormatter fmt;
 
     public ReservationService(ReservationRepository reservationRepository, DateTimeFormatter fmt,
-                              UserRepository userRepository, ChildRepository childRepository) {
+                              UserRepository userRepository, ChildRepository childRepository, LineRepository lineRepository) {
         this.reservationRepository = reservationRepository;
         this.userRepository = userRepository;
         this.childRepository = childRepository;
         this.fmt = fmt;
+        this.lineRepository = lineRepository;
     }
 
     public List<Reservation> getAllReservations() {
@@ -98,9 +102,15 @@ public class ReservationService {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
         }
 
+        //check date
         LocalDate date = LocalDate.parse(dateString, fmt);
         if (date.isBefore(LocalDate.now()))
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+
+        //check time
+        System.out.println(lineName);
+        System.out.println(resd.getStopName());
+        checkTime(lineName, date, resd.getDirection(), resd.getStopName(), resd.getTripIndex());
         // The stop is now identified by a line, a direction, and a trip index.
 
         checkChild(resd.getChild(), user);
@@ -145,7 +155,26 @@ public class ReservationService {
         LocalDate date = LocalDate.parse(dateString, fmt);
         if (reservationRepository.findByLineNameAndDateAndId(line, date, id) == null)
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+        Reservation res = reservationRepository.findById(id);
+        checkTime(line, date, res.getDirection(), res.getStopName(), res.getTripIndex());
         reservationRepository.deleteById(id);
+    }
+
+    private void checkTime(String line, LocalDate date, Reservation.Direction direction, String stopName, Integer tripIndex) {
+        if(date.isEqual(LocalDate.now()) && (
+                (direction == Reservation.Direction.OUTWARD &&
+                        lineRepository.findByName(line).getStops()
+                                .stream()
+                                .filter(stop-> stop.getName().equals(stopName))
+                                .findFirst().get().getOutward().get(tripIndex)
+                                .isBefore(LocalTime.now())) ||
+                        (direction == Reservation.Direction.BACK &&
+                                lineRepository.findByName(line).getStops()
+                                        .stream()
+                                        .filter(stop-> stop.getName().equals(stopName))
+                                        .findFirst().get().getBack().get(tripIndex)
+                                        .isBefore(LocalTime.now())) ))
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
     }
 
     public Reservation getReservation(ObjectId id) {

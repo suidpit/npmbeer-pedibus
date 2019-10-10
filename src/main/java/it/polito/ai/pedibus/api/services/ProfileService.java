@@ -125,12 +125,17 @@ public class ProfileService {
         user.setSurname(profileInfoDTO.getSurname());
         user.setAddress(profileInfoDTO.getAddress());
         user.setTelNumber(profileInfoDTO.getTelephone());
-        if(lineRepository.findByName(profileInfoDTO.getDefaultLine())==null)
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-        if(lineRepository.findByName(profileInfoDTO.getDefaultLine()).getStops().stream().noneMatch(stop->stop.getName().equals(profileInfoDTO.getDefaultStop())))
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-        user.setDefaultLine(profileInfoDTO.getDefaultLine());
-        user.setDefaultStop(profileInfoDTO.getDefaultStop());
+        if(profileInfoDTO.getDefaultLine()!=null){
+            if(lineRepository.findByName(profileInfoDTO.getDefaultLine())==null)
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+            if(lineRepository.findByName(profileInfoDTO.getDefaultLine()).getStops().stream().noneMatch(stop->stop.getName().equals(profileInfoDTO.getDefaultStop())))
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+            user.setDefaultLine(profileInfoDTO.getDefaultLine());
+            user.setDefaultStop(profileInfoDTO.getDefaultStop());
+        }else{
+            user.setDefaultStop(null);
+            user.setDefaultLine(null);
+        }
         userRepository.save(user);
     }
 

@@ -89,6 +89,10 @@ export class AppComponent {
         {
             "name": "selected_flag",
             "path": "line_material/selected_flag.svg"
+        },
+        {
+            "name": "disabled_flag",
+            "path": "line_material/disabled_flag.svg"
         }
     ];
 
