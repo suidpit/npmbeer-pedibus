@@ -1,9 +1,4 @@
-import {
-    ChangeDetectionStrategy, ChangeDetectorRef,
-    Component,
-    Inject, OnDestroy,
-    OnInit
-} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit} from '@angular/core';
 import {LocalTime} from "js-joda";
 import {ReservationsService} from "../../services/reservations/reservations.service";
 import {FormControl} from "@angular/forms";
@@ -23,10 +18,9 @@ import localeIt from '@angular/common/locales/it';
     styleUrls: ['./reservations.component.scss']
 })
 export class ReservationsComponent implements OnInit, OnDestroy {
-
     private unsubscribe$ = new Subject<void>();
     view: CalendarView = CalendarView.Week;
-    viewDate: Date = this.getMonday(new Date());
+    viewDate: Date = new Date();
 
     stops = [];
     lines = [];
@@ -203,11 +197,22 @@ export class ReservationsComponent implements OnInit, OnDestroy {
 
     start = 0;
     refresh: Subject<any> = new Subject();
-    isMobile: boolean = false;
+
+    isMobile(): boolean{
+        if(window.innerWidth<800){
+            this.view = CalendarView.Day;
+            return true;
+        }
+        else{
+            this.viewDate = this.getMonday(this.viewDate);
+            this.view = CalendarView.Week;
+            return false;
+        }
+    };
 
     changedDate() {
         let temp = this.getMonday(this.viewDate);
-        if (temp != this.viewDate) {
+        if (temp != this.viewDate && this.view==CalendarView.Week) {
             this.viewDate = temp;
         }
         this.reservationsService.buildReservations(this.viewDate, this.selectedChild.id);

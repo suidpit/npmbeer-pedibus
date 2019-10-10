@@ -1,6 +1,35 @@
 <ng-template
     #eventDayTemplate
     let-dayEvent="dayEvent">
+    <div fxFlexFill (tap)="mouseDown($event, dayEvent.event.meta.reservation); mouseUp($event, dayEvent.event.meta.reservation)"
+         (press)="mouseDown($event, dayEvent.event.meta.reservation)"
+         (pressup)="mouseUp($event, dayEvent.event.meta.reservation)"
+         class='calendar_cell'>
+        <div [ngClass]="selectedReservation!=undefined ? (dayEvent.event.meta.reservation.id==selectedReservation.id ? 'YELLOW' : dayEvent.event.color) : dayEvent.event.color" *ngIf="dayEvent.event.meta.reservation.booked"
+             class="event">
+            <div *ngIf="dayEvent.event.meta.reservation.direction=='OUTWARD'">
+                ANDATA
+            </div>
+            <div *ngIf="dayEvent.event.meta.reservation.direction=='BACK'">
+                RITORNO
+            </div>
+            <div style="border-top: black 1px solid; margin-top: 5px">
+                {{dayEvent.event.time}} - {{dayEvent.event.meta.reservation.stopName}}
+            </div>
+        </div>
+        <div fxFlexFill [ngClass]="selectedReservation!=undefined ? ((dayEvent.event.meta.reservation.date==selectedReservation.date && dayEvent.event.meta.reservation.direction == selectedReservation.direction) ? 'YELLOW' : dayEvent.event.color) : dayEvent.event.color" *ngIf="!dayEvent.event.meta.reservation.booked"
+             class="event">
+            <div *ngIf="dayEvent.event.meta.reservation.direction=='OUTWARD'">
+                ANDATA
+            </div>
+            <div *ngIf="dayEvent.event.meta.reservation.direction=='BACK'">
+                RITORNO
+            </div>
+            <div style="border-top: black 1px solid; margin-top: 5px">
+                CORSA NON PRENOTATA
+            </div>
+        </div>
+    </div>
 </ng-template>
 
 <ng-template
@@ -95,14 +124,14 @@
                         </div>
                         <h3 style="text-align: center">{{ viewDate | calendarDate:(view + 'ViewTitle'):'it':1 }}</h3>
                     </div>
-                    <mwl-calendar-day-view *ngIf="isMobile && selectedChild"
+                    <mwl-calendar-day-view *ngIf="isMobile() && selectedChild"
                                            [locale]="locale"
                                            [viewDate]="viewDate"
                                            [events]="reservationsService.getReservations() | async"
                                            [refresh]="refresh"
                                            [eventTemplate]="eventDayTemplate">
                     </mwl-calendar-day-view>
-                    <mwl-calendar-week-view *ngIf="!isMobile && selectedChild"
+                    <mwl-calendar-week-view *ngIf="!isMobile() && selectedChild"
                                             [locale]="locale"
                                             weekStartsOn="1"
                                             [viewDate]="viewDate"
