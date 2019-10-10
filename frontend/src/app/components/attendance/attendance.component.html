@@ -50,7 +50,6 @@
             </button>
           </span-->
           </mat-grid-tile>
-
         </mat-grid-list>
 
       </div>
@@ -58,7 +57,7 @@
       <div class="tabs attendance-tabs" fxFlex="1 0 100%" fxLayout="column">
         <mat-tab-group mat-align-tabs="center" [selectedIndex]="selectedRun" fxFlex="1 0 100%" (selectedTabChange)="tabSwitch($event)">
           <div *ngIf="selectedLine">
-            <mat-tab *ngFor="let run of selectedLine.outward; let i = index" label="Andata {{i+1}}" fxLayout="column" fxFlexAlign="center center" fxFlex="1 0 100%">
+            <mat-tab *ngFor="let run of selectedLine.stops.stops[0].outward; let i = index" label="Andata {{i+1}}" fxLayout="column" fxFlexAlign="center center" fxFlex="1 0 100%">
               <mat-list dense>
                 <mat-list-item>
                   <app-stop-row [stop-name]="'Partenza'" [type]="'start'"></app-stop-row>
@@ -66,7 +65,7 @@
                 <mat-list-item>
                   <app-stop-row [type]="'dots'"></app-stop-row>
                 </mat-list-item>
-                <div *ngFor="let stop of run.stops; let j = index">
+                <div *ngFor="let stop of selectedLine.stops.stops; let j = index">
                   <mat-list-item>
                     <app-stop-row
                                   [type]="'intermediate'"
@@ -75,7 +74,7 @@
                                   [tripIndex]="i"
                                   [stopIndex]="j"
                                   [stop-name]="stop.name"
-                                  [stop-time]="stop.time"
+                                  [stop-time]="stop.outward[i]"
                                   [not-reserved-kids]="notReservedKids$"
                                   (add-child)="addChild($event)"
                                   (child-presence)="toggleChildPresence($event)"></app-stop-row>
@@ -89,7 +88,7 @@
                 </mat-list-item>
               </mat-list>
             </mat-tab>
-            <mat-tab *ngFor="let run of selectedLine.back; let i = index" label="Ritorno {{i+1}}">
+            <mat-tab *ngFor="let run of selectedLine.stops.stops[0].back; let i = index" label="Ritorno {{i+1}}">
               <mat-list dense>
                 <mat-list-item>
                   <app-stop-row [stop-name]="'Scuola'" [type]="'start'"></app-stop-row>
@@ -97,7 +96,7 @@
                 <mat-list-item>
                   <app-stop-row [type]="'dots'"></app-stop-row>
                 </mat-list-item>
-                <div *ngFor="let stop of run.stops; let j = index">
+                <div *ngFor="let stop of selectedLine.stops.stops.slice().reverse(); let j = index">
                   <mat-list-item>
                     <app-stop-row
                                   [type]="'intermediate'"
@@ -106,7 +105,7 @@
                                   [tripIndex]="i"
                                   [stopIndex]="j"
                                   [stop-name]="stop.name"
-                                  [stop-time]="stop.time"
+                                  [stop-time]="stop.back[i]"
                                   [not-reserved-kids]="notReservedKids$"
                                   (add-child)="addChild($event)"
                                   (child-presence)="toggleChildPresence($event)"></app-stop-row>

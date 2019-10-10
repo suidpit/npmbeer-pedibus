@@ -1,20 +1,15 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormControl} from "@angular/forms";
-import {LocalDate, LocalDateTime, LocalTime} from 'js-joda';
+import {LocalTime} from 'js-joda';
 
 import {Child} from '../../models/child'
-import {Stop} from "../../models/stop";
-import {Builder} from "builder-pattern";
-import {StopList} from "../../models/stop-list";
 import {AttendanceService} from 'src/app/services/attendance/attendance.service';
-import {Line} from "../../models/line";
 import {Subject} from "rxjs";
-import {filter, map, take, takeUntil} from "rxjs/operators";
+import {map, take, takeUntil} from "rxjs/operators";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {ProfileService} from "../../services/profile/profile.service";
 import {Observable} from "rxjs/internal/Observable";
 import {BehaviorSubject} from "rxjs/internal/BehaviorSubject";
-import {MatTab} from "@angular/material";
 
 export interface IReservedStops {
   outward: Array<any[]>;
@@ -94,11 +89,11 @@ export class AttendanceComponent implements OnInit, OnDestroy {
   updateData() {
     let index;
     if (this.selectedLine != null) {
-      if (this.selectedLine.outward[0].endsAt.isAfter(LocalTime.now()) || this.selectedDirection === 'outward') {
+      if (this.selectedLine.stops.endsAt[0][0].isAfter(LocalTime.now()) || this.selectedDirection === 'outward') {
         index = 0;
-      } else if (this.selectedLine.back[0].endsAt.isAfter(LocalTime.now())) {
+      } else if (this.selectedLine.stops.endsAt[1][0].isAfter(LocalTime.now())) {
         index = 1;
-      } else if (this.selectedLine.back[1].endsAt.isAfter(LocalTime.now())) {
+      } else if (this.selectedLine.stops.endsAt[1][1].isAfter(LocalTime.now())) {
         index = 2;
       } else if (this.selectedDirection === 'back') {
         index = 1;
@@ -148,36 +143,37 @@ export class AttendanceComponent implements OnInit, OnDestroy {
             this.reservedStops = {"outward": [], "back": []};
             let arr = [];
 
-            let i =0;
-
             // build ReservedStops object.
-            for(let stop of this.selectedLine.outward[0].stops){ // we want to consider only one outward (i.e. towards school)
-              let children = this.childrenByStop(stop.name, 0, "outward");
-              if(children !== undefined){
-                arr.push(children);
-              }else{
-                arr.push([])
-              }
-              i++;
+            for(let i=0; i<this.selectedLine.stops.stops[0].outward.length; i++){
+              this.reservedStops["outward"].push([]);
             }
-            this.reservedStops["outward"].push(arr);
+            for(let i=0; i<this.selectedLine.stops.stops[0].back.length; i++){
+              this.reservedStops["back"].push([]);
+            }
 
-            i=0;
-            for(let run of this.selectedLine.back){
-              let arr = [];
-              for(let stop of run.stops){
-                let children = this.childrenByStop(stop.name, i, "back");
-                if(children !== undefined){
-                  arr.push(children);
+            for(let stop of this.selectedLine.stops.stops){
+              //outward
+              for(let i=0; i<stop.outward.length; i++){
+                let children = this.childrenByStop(stop.name, i, "outward");
+                if(children!==undefined){
+                  this.reservedStops["outward"][i].push(children);
                 }else{
-                  arr.push([])
+                  this.reservedStops["outward"][i].push([]);
                 }
               }
-              this.reservedStops["back"].push(arr);
-              i++;
+
+              //backward
+              for(let i=0; i<stop.back.length; i++){
+                let children = this.childrenByStop(stop.name, i, "back");
+                if(children!==undefined){
+                  this.reservedStops["back"][i].push(children);
+                }else{
+                  this.reservedStops["back"][i].push([]);
+                }
+                this.reservedStops["back"][i] = this.reservedStops["back"][i].slice().reverse();
+              }
             }
 
-            debugger;
             this.reservedStopsSubject.next(this.reservedStops);
             this.buildDownloadFile();
           }
@@ -277,17 +273,17 @@ export class AttendanceComponent implements OnInit, OnDestroy {
       fermate: []
     };
 
-    for(let i in this.reservedStops[this.selectedDirection][this.tripIndex]){
+    for(let i=0; i<this.reservedStops[this.selectedDirection][this.tripIndex].length; i++){
       let stop;
       if(this.selectedDirection === "outward"){
         stop = {
-          nomeFermata: this.selectedLine.outward[this.tripIndex].stops[i].name,
+          nomeFermata: this.selectedLine.stops.stops[i].name,
           presenze: this.reservedStops[this.selectedDirection][this.tripIndex][i]
         }
       }
       else{
         stop = {
-          nomeFermata: this.selectedLine.back[this.tripIndex].stops[i].name,
+          nomeFermata: this.selectedLine.stops.stops[this.selectedLine.stops.stops.length-1-i].name,
           presenze: this.reservedStops[this.selectedDirection][this.tripIndex][i]
         }
       }
@@ -331,7 +327,7 @@ export class AttendanceComponent implements OnInit, OnDestroy {
     this.tripIndex = event.index;
     // the following is because the backward tabs indexes start with an offset = to the number of outward runs.
     if(fields[0].match(/Ritorno/i)){
-      this.tripIndex -= this.selectedLine.outward.length;
+      this.tripIndex -= this.selectedLine.stops.stops[0].outward.length;
       this.selectedDirection = "back";
     }
     else{

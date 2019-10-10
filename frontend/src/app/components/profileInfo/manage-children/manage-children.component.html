@@ -20,7 +20,6 @@
         <mat-card *ngIf="title!=null">
             <mat-card-title>{{title}}</mat-card-title>
             <mat-card-content>
-                <p class="error">{{error}}</p>
                 <form #f="ngForm" (ngSubmit)="f.valid && onSubmit()">
                     <div fxLayout="column">
                         <div fxFill fxLayout="row">
