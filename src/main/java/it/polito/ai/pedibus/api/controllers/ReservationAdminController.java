@@ -97,7 +97,7 @@ public class ReservationAdminController {
                     reservationDTO.getDirection(),
                     reservationDTO.getTripIndex(),
                     reservationDTO.getStopName(),
-                    reservationDTO.getChild().get(0));
+                    reservationDTO.getChild());
         }
         catch(Exception e){
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);

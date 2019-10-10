@@ -7,9 +7,10 @@
 }
 
 .main {
-  min-height: 0;
+  height: 100%;
+  width: 100%;
+  margin: 0;
   overflow: auto;
-  padding: 10px;
 }
 
 .element {
@@ -57,14 +58,62 @@ mat-form-field {
   width: fit-content;
 }
 
-mat-tab-group{
+mat-tab-group {
   height: auto;
 }
 
-mat-tab-body{
+mat-tab-body {
   place-content: center;
+  margin-bottom: 5px;
 }
 
-.presenze{
-  min-width: 270px;
+.legend {
+  vertical-align: middle;
+  display: inline-block;
+  min-width: 30px;
+  min-height: 15px;
+}
+
+.RED {
+  background-color: #e3170a;
+  color: white;
+}
+
+.BLUE {
+  background-color: #3788d8;
+  color: black;
+}
+
+.GRAY {
+  background-color: #acacac;
+  color: black;
+}
+
+.YELLOW{
+  background-color: yellow;
+  color: black;
+}
+
+p {
+  margin: 5px 0;
+}
+
+.event {
+  padding: 5px;
+  flex-direction: row !important;
+  -webkit-box-shadow: inset 0px 0px 0px 1px black;
+  -moz-box-shadow: inset 0px 0px 0px 1px black;
+  box-shadow: inset 0px 0px 0px 1px black;
+  height: 100%;
+}
+
+.calendar_cell {
+  width: inherit!important;
+  margin: auto;
+  padding: 5px;
+  height: 100%;
+}
+
+mat-expansion-panel{
+  margin: 10px;
 }

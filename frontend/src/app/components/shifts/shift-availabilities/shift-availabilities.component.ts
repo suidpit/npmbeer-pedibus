@@ -43,6 +43,7 @@ export class ShiftAvailabilitiesComponent implements OnInit {
             self.shiftService.buildShifts(start, end);
         });
 
+
         this.isAdmin = this.auth.getCurrentUser().hasMinAuthority(Role.ADMIN);
     }
 

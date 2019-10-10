@@ -12,6 +12,13 @@ export class AppComponent {
     title = 'frontend';
     icons = [
         {
+            "name": "next",
+            "path": "next.svg"
+        },        {
+            "name": "before",
+            "path": "before.svg"
+        },
+        {
             "name": "growing_dots",
             "path": "growing_dots.svg"
         },
@@ -78,6 +85,10 @@ export class AppComponent {
         {
             "name": "flag",
             "path": "line_material/flag.svg"
+        },
+        {
+            "name": "selected_flag",
+            "path": "line_material/selected_flag.svg"
         }
     ];
 

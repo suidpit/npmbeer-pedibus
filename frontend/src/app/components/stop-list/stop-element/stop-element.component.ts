@@ -19,8 +19,10 @@ export class StopElementComponent{
     @Input("selected") selected;
     @Input("type") type;
     @Input("time") time;
+    @Input("selected_stop") selected_stop;
 
     constructor(private stopService: StopService, private reservationService: ReservationsService) {
+        console.log(this.selected_stop);
     }
 
     selectStop() {

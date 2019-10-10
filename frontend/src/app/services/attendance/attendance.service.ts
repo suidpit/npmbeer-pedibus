@@ -152,7 +152,7 @@ export class AttendanceService {
     console.log("OK");
     const reservation = Builder(ReservationReq)
       .stopName(stopName)
-      .child([childId])
+      .child(childId)
       .direction(direction.toUpperCase())
       .tripIndex(tripIndex)
       .build();

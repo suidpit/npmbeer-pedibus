@@ -1,68 +1,196 @@
-<div class="container" fxLayout.gt-sm="row" fxLayout.lt-sm="column">
-    <div class="main" fxFlex>
-        <mat-card class="presenze">
+<ng-template
+    #eventDayTemplate
+    let-dayEvent="dayEvent">
+    <div fxFlexFill (tap)="mouseDown($event, dayEvent.event.meta.reservation); mouseUp($event, dayEvent.event.meta.reservation)"
+         (press)="mouseDown($event, dayEvent.event.meta.reservation)"
+         (pressup)="mouseUp($event, dayEvent.event.meta.reservation)"
+         class='calendar_cell'>
+        <div [ngClass]="selectedReservation!=undefined ? (dayEvent.event.meta.reservation.id==selectedReservation.id ? 'YELLOW' : dayEvent.event.color) : dayEvent.event.color" *ngIf="dayEvent.event.meta.reservation.booked"
+             class="event">
+            <div *ngIf="dayEvent.event.meta.reservation.direction=='OUTWARD'">
+                ANDATA
+            </div>
+            <div *ngIf="dayEvent.event.meta.reservation.direction=='BACK'">
+                RITORNO
+            </div>
+            <div style="border-top: black 1px solid; margin-top: 5px">
+                {{dayEvent.event.time}} - {{dayEvent.event.meta.reservation.stopName}}
+            </div>
+        </div>
+        <div fxFlexFill [ngClass]="selectedReservation!=undefined ? ((dayEvent.event.meta.reservation.date==selectedReservation.date && dayEvent.event.meta.reservation.direction == selectedReservation.direction) ? 'YELLOW' : dayEvent.event.color) : dayEvent.event.color" *ngIf="!dayEvent.event.meta.reservation.booked"
+             class="event">
+            <div *ngIf="dayEvent.event.meta.reservation.direction=='OUTWARD'">
+                ANDATA
+            </div>
+            <div *ngIf="dayEvent.event.meta.reservation.direction=='BACK'">
+                RITORNO
+            </div>
+            <div style="border-top: black 1px solid; margin-top: 5px">
+                CORSA NON PRENOTATA
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template
+    #eventWeekTemplate
+    let-weekEvent="weekEvent">
+    <div fxFlexFill (mousemove)="mouseMove($event, weekEvent.event.meta.reservation)"
+         (mousedown)="mouseDown($event, weekEvent.event.meta.reservation)"
+         (mouseup)="mouseUp($event, weekEvent.event.meta.reservation)"
+         class='calendar_cell'>
+        <div [ngClass]="selectedReservation!=undefined ? (weekEvent.event.meta.reservation.id==selectedReservation.id ? 'YELLOW' : weekEvent.event.color) : weekEvent.event.color" *ngIf="weekEvent.event.meta.reservation.booked"
+             class="event">
+            <div *ngIf="weekEvent.event.meta.reservation.direction=='OUTWARD'">
+                ANDATA
+            </div>
+            <div *ngIf="weekEvent.event.meta.reservation.direction=='BACK'">
+                RITORNO
+            </div>
+            <div style="border-top: black 1px solid; margin-top: 5px">
+                {{weekEvent.event.time}} - {{weekEvent.event.meta.reservation.stopName}}
+            </div>
+        </div>
+        <div fxFlexFill [ngClass]="selectedReservation!=undefined ? ((weekEvent.event.meta.reservation.date==selectedReservation.date && weekEvent.event.meta.reservation.direction == selectedReservation.direction) ? 'YELLOW' : weekEvent.event.color) : weekEvent.event.color" *ngIf="!weekEvent.event.meta.reservation.booked"
+             class="event">
+            <div *ngIf="weekEvent.event.meta.reservation.direction=='OUTWARD'">
+                ANDATA
+            </div>
+            <div *ngIf="weekEvent.event.meta.reservation.direction=='BACK'">
+                RITORNO
+            </div>
+            <div style="border-top: black 1px solid; margin-top: 5px">
+                CORSA NON PRENOTATA
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<div class="container" fxLayout="column">
+    <mat-card>
+        <mat-card-header>
             <mat-card-title style="text-align: center">
                 Prenotazione
             </mat-card-title>
-            <mat-card-content class="presenze">
-                <div fxLayout="column">
+            <mat-card-subtitle>
+                Seleziona destra o sinistra per scorrere le settimane, cliccare una corsa per rimuovere una
+                prenotazioe o prenutare usando linea e fermata di default. Tenere premuta una prenotazione per
+                modificarne
+                la fermata e la linea (e corsa se presente).
+            </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content fxLayout="column" fxLayoutAlign="center center">
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Legenda
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <p><span class="legend RED"></span>Corsa non prenotata</p>
+                <p><span class="legend BLUE"></span>Corsa prenotata</p>
+                <p><span class="legend GRAY"></span>Corsa passata e non modificabile</p>
+                <p><span class="legend YELLOW"></span>Corsa selezionata di cui si può modificare la fermata e linea di default</p>
+            </mat-expansion-panel>
+            <div fxFlexFill>
+                <div fxLayout="column nowrap">
                     <div fxLayout.gt-xs="row" fxLayout.lt-sm="column" class="row">
                         <mat-form-field class="element">
-                            <mat-label>Seleziona una linea</mat-label>
-                            <mat-select [(value)]="selectedLine" (valueChange)="updateData()">
-                                <mat-option *ngFor="let line of lines" [value]="line">{{line.name}}</mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                        <mat-form-field class="element">
-                            <mat-label>Direzione</mat-label>
-                            <mat-select [(value)]="selectedDirection" (valueChange)="updateData()">
-                                <mat-option value="outward">Scuola</mat-option>
-                                <mat-option value="back">Casa</mat-option>
+                            <mat-label>Seleziona un bambino</mat-label>
+                            <mat-select [(value)]="selectedChild" (valueChange)="updateChild()">
+                                <mat-option *ngFor="let child of children"
+                                            [value]="child">{{child.name}}</mat-option>
                             </mat-select>
                         </mat-form-field>
                     </div>
-                    <div fxLayout="row">
-                        <mat-form-field class="element">
-                            <input matInput [matDatepickerFilter]="allowedDaysFilter" [matDatepicker]="picker"
-                                   placeholder="Seleziona una data" [formControl]="selectedDate"
-                                   (dateChange)="updateData()">
-                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                            <mat-datepicker [touchUi]="isMobile" #picker></mat-datepicker>
-                        </mat-form-field>
-                    </div>
-                </div>
-                <div #tabs *ngIf="selectedLine">
-                    <mat-divider [inset]="true"></mat-divider>
-                    <p style="font-weight: bold;">
-                        Clicca su una fermata per selezionarla
-                    </p>
-                    <mat-divider [inset]="true"></mat-divider>
-                    <mat-tab-group dynamicHeight class="tabs" (resized)="onResize($event)" mat-stretch-tabs
-                                   [(selectedIndex)]="selectedRun" (selectedIndexChange)="changeTab()">
-                        <div>
-                            <mat-tab *ngFor="let run of selectedLine.stops.stops[0].outward; let i = index" label="Andata {{i+1}}">
-                                <div class="stops">
-                                    <app-stop-list (window:resize)="onResize($event)"
-                                                   *ngIf="stopRows; else spinner"
-                                                   [times]="times[0][i]"
-                                                   [stops]="stopRows[0]"></app-stop-list>
-                                </div>
-
-                            </mat-tab>
-                            <mat-tab *ngFor="let run of selectedLine.stops.stops[0].back; let i = index" label="Ritorno {{i+1}}">
-                                <div class="stops">
-                                    <app-stop-list *ngIf="stopRows; else spinner"
-                                                   [times]="times[1][i]"
-                                                   [stops]="stopRows[1]"></app-stop-list>
-
-                                </div>
-                            </mat-tab>
+                    <div fxFlexFill fxLayout="row" *ngIf="selectedChild" fxLayoutAlign="center">
+                        <div
+                                class="btn btn-primary"
+                                mwlCalendarPreviousView
+                                [view]="view"
+                                [(viewDate)]="viewDate"
+                                (viewDateChange)="changedDate()"
+                        >
+                            <mat-icon svgIcon="before"></mat-icon>
                         </div>
-                    </mat-tab-group>
+                        <div
+                                class="btn btn-primary"
+                                mwlCalendarNextView
+                                [view]="view"
+                                [(viewDate)]="viewDate"
+                                (change)="changedDate()"
+                                (viewDateChange)="changedDate()"
+                        >
+                            <mat-icon svgIcon="next"></mat-icon>
+                        </div>
+                        <h3 style="text-align: center">{{ viewDate | calendarDate:(view + 'ViewTitle'):'it':1 }}</h3>
+                    </div>
+                    <mwl-calendar-day-view *ngIf="isMobile() && selectedChild"
+                                           [locale]="locale"
+                                           [viewDate]="viewDate"
+                                           [events]="reservationsService.getReservations() | async"
+                                           [refresh]="refresh"
+                                           [eventTemplate]="eventDayTemplate">
+                    </mwl-calendar-day-view>
+                    <mwl-calendar-week-view *ngIf="!isMobile() && selectedChild"
+                                            [locale]="locale"
+                                            weekStartsOn="1"
+                                            [viewDate]="viewDate"
+                                            [events]="reservationsService.getReservations() | async"
+                                            [refresh]="refresh"
+                                            [eventTemplate]="eventWeekTemplate">
+                    </mwl-calendar-week-view>
                 </div>
-            </mat-card-content>
-        </mat-card>
-    </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+    <mat-card>
+        <mat-card-content *ngIf="selectedReservation!=undefined">
+            <div fxLayout="column">
+                <div fxLayout.gt-xs="row" fxLayout.lt-sm="column" class="row">
+                    <mat-form-field class="element">
+                        <mat-label>Seleziona una linea</mat-label>
+                        <mat-select [(value)]="selectedLine" (selectionChange)="updateLine()">
+                            <mat-option *ngFor="let line of lines" [value]="line">{{line.name}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div #tabs *ngIf="selectedLine">
+                <mat-divider [inset]="true"></mat-divider>
+                <p style="font-weight: bold;">
+                    Clicca su una fermata per selezionarla
+                </p>
+                <mat-divider [inset]="true"></mat-divider>
+                <mat-tab-group dynamicHeight class="tabs" (resized)="onResize($event)" mat-stretch-tabs
+                               [(selectedIndex)]="selectedRun">
+                    <div *ngIf="selectedReservation.direction=='OUTWARD'">
+                        <mat-tab *ngFor="let run of selectedLine.stops.stops[0].outward; let i = index"
+                                 label="Andata {{i+1}}">
+                            <div class="stops">
+                                <app-stop-list (window:resize)="onResize($event)"
+                                               *ngIf="stopRows; else spinner"
+                                               [times]="times[0][i]"
+                                               [selected_stop]="selectedReservation.stopName"
+                                               [stops]="stopRows[0]"></app-stop-list>
+                            </div>
+                        </mat-tab>
+                    </div>
+                    <div *ngIf="selectedReservation.direction=='BACK'">
+                        <mat-tab *ngFor="let run of selectedLine.stops.stops[0].back; let i = index"
+                                 label="Ritorno {{i+1}}">
+                            <div class="stops">
+                                <app-stop-list *ngIf="stopRows; else spinner"
+                                               [times]="times[1][i]"
+                                               [selected_stop]="selectedReservation.stopName"
+                                               [stops]="stopRows[1]"></app-stop-list>
+
+                            </div>
+                        </mat-tab>
+                    </div>
+                </mat-tab-group>
+            </div>
+        </mat-card-content>
+    </mat-card>
 </div>
 
 
