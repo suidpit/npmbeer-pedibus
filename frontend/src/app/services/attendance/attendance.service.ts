@@ -149,6 +149,7 @@ export class AttendanceService {
   }
 
   addOnTheFlyChild(childId: string, stopName: string, lineName: string, direction: string, tripIndex: number, dateString: string){
+    console.log("OK");
     const reservation = Builder(ReservationReq)
       .stopName(stopName)
       .child([childId])

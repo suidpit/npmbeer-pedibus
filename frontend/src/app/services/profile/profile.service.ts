@@ -79,7 +79,6 @@ export class ProfileService {
             .subscribe(() => {
                 },
                 (error) => {
-                    console.log(error);
                     this.error$.next("Operation failed, retry later");
                 },
                 () => {

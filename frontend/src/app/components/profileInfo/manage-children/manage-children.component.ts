@@ -5,6 +5,7 @@ import {FormControl} from "@angular/forms";
 import {takeUntil} from "rxjs/operators";
 import {Subject} from "rxjs";
 import {DomSanitizer} from '@angular/platform-browser';
+import {MatSnackBar} from "@angular/material";
 
 @Component({
     selector: 'app-manage-children',
@@ -20,7 +21,6 @@ export class ManageChildrenComponent implements OnInit, OnDestroy {
     birthday = new FormControl('');
     children = null;
     private unsubscribe$ = new Subject<void>();
-    public error = undefined;
     previewUrl = null;
     selectedFile: File = undefined;
 
@@ -48,7 +48,13 @@ export class ManageChildrenComponent implements OnInit, OnDestroy {
     }
 
 
-    constructor(private profileService: ProfileService) {
+    constructor(private profileService: ProfileService, private _snackBar: MatSnackBar) {
+    }
+
+    openSnackbar(message: string, duration = 3000) {
+        this._snackBar.open(message, "OK", {
+            duration: duration
+        });
     }
 
     ngOnDestroy(): void {
@@ -68,13 +74,13 @@ export class ManageChildrenComponent implements OnInit, OnDestroy {
             if (error == "Operation completed") {
                 this.task = '';
                 this.title = null;
-                this.error = null;
+                this.openSnackbar("Operazione completata");
                 this.child_to_update = null;
                 this.selectedFile = null;
                 this.previewUrl = null;
-            } else {
+            } else if(error!=undefined){
                 this.task = '';
-                this.error = error;
+                this.openSnackbar("Qualcosa è andato storto, riprovare più tardi");
             }
         })
     }
@@ -83,7 +89,6 @@ export class ManageChildrenComponent implements OnInit, OnDestroy {
 
     task_children(child: Child) {
         this.title = null;
-        this.error = null;
         this.child_to_update = null;
         this.selectedFile = null;
         if (child == null) {

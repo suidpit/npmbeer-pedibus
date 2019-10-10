@@ -6,6 +6,7 @@ import {Subject, throwError} from "rxjs";
 import {catchError, take, takeUntil} from "rxjs/operators";
 import {ReservationsService} from "../../../services/reservations/reservations.service";
 import {HttpErrorResponse} from "@angular/common/http";
+import {MatSnackBar} from "@angular/material";
 
 @Component({
     selector: 'app-profile',
@@ -19,7 +20,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     previewUrl = null;
     lines = [];
 
-    constructor(private profileService: ProfileService, private reservationService: ReservationsService) {
+    constructor(private profileService: ProfileService, private reservationService: ReservationsService,private _snackBar: MatSnackBar){
     }
 
     private unsubscribe$ = new Subject<void>();
@@ -49,8 +50,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
         this.task = 'loading';
         this.profileService.saveUser(this.user, this.selectedFile).subscribe(() => {
-                this.error = null;
                 this.task = '';
+                this.openSnackbar("Operazione completata con successo");
                 this.profileService.getProfileinformation();
                 this.selectedFile = null;
                 this.previewUrl = null;
@@ -60,19 +61,24 @@ export class ProfileComponent implements OnInit, OnDestroy {
             });
     }
 
+    openSnackbar(message: string, duration = 3000) {
+        this._snackBar.open(message, "OK", {
+            duration: duration
+        });
+    }
 
-    public error = null;
+
     image_error: string = null;
 
     private handleError(error: HttpErrorResponse) {
         if (error.error instanceof ErrorEvent) {
-            this.error = "Qualcosa è andato storto, riprovare più tardi";
+            this.openSnackbar("Qualcosa è andato stotro, riprovare più tardi");
         } else {
             // The backend returned an unsuccessful response code.
             if (error.status == 400) {
-                this.error = "Formato errato";
+                this.openSnackbar("Formato errato");
             } else {
-                this.error = "Qualcosa è andato storto, riprovare più tardi";
+                this.openSnackbar("Qualcosa è andato stotro, riprovare più tardi");
             }
         }
         this.task = '';
@@ -111,17 +117,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
 
     findStops() {
-        //TODO
-        //Must me changed after fixing the lines db
         for (let line of this.lines) {
             let stops = [];
             if (line.name == this.user.defaultLine) {
-                for (let stop of line.outward[0].stops) {
+                for (let stop of line.stops.stops) {
                     stops.push(stop.name);
                 }
                 return stops;
             }
-
         }
         return [];
     }
