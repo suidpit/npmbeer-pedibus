@@ -14,4 +14,6 @@ public class EmailDTO {
     @Size(max = 255,
             message = "{registration.nome.max.message}")
     private String email;
+
+    private boolean checkboxCompanion;
 }

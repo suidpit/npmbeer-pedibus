@@ -90,6 +90,8 @@ public class UserService implements IUserService {
         }
         ArrayList<String> roles = new ArrayList<>();
         roles.add("USER");
+        if(emailDTO.isCheckboxCompanion())
+            roles.add("COMPANION");
         ArrayList<SystemAuthority> authorities = new ArrayList<>();
         SystemAuthority authority = new SystemAuthority();
         authority.setAuthority(SystemAuthority.Authority.USER);

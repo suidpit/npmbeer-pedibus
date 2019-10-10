@@ -176,7 +176,6 @@ export class AttendanceComponent implements OnInit, OnDestroy {
             for(let i=0; i<this.selectedLine.stops.stops[0].back.length; i++) {
               this.reservedStops["back"][i] = this.reservedStops["back"][i].slice().reverse();
             }
-
             this.reservedStopsSubject.next(this.reservedStops);
             this.buildDownloadFile();
           }

@@ -36,6 +36,7 @@ return pass === confirmPass ? null : { notSame: true }
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router,private activatedRoute: ActivatedRoute,private _snackBar: MatSnackBar) { }
 
   ngOnInit() {
+   // this.auth.logout();
   }
 
    onSubmit(){
