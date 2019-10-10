@@ -22,13 +22,17 @@ export class ProfileService {
     public children$: Subject<Child[]> = new BehaviorSubject(null);
     public user$: Subject<UserProfile> = new BehaviorSubject(null);
     baseUrl = "http://localhost:8080";
-    error$: Subject<any> = new BehaviorSubject(undefined);
-    private authService: AuthService;
 
     constructor(private http: HttpClient, private auth: AuthService) {
-        this.getChildren();
-        this.getProfileinformation();
-        this.authService = auth;
+        auth.isLoggedIn$.subscribe(((logged)=>{
+            if(logged){
+                this.getChildren();
+                this.getProfileinformation();
+            }else{
+                this.children$.next(null);
+                this.user$.next(null);
+            }
+        }))
     }
 
     public getChildren() {
@@ -74,32 +78,11 @@ export class ProfileService {
         if (file != null) {
             child.photoFile = true;
         }
-        this.http.put(this.baseUrl + "/profile/children/" + child.id, ProfileService.prepareChild(child, file),
-        )
-            .subscribe(() => {
-                },
-                (error) => {
-                    this.error$.next("Operation failed, retry later");
-                },
-                () => {
-                    this.error$.next("Operation completed");
-                    this.getChildren();
-                }
-            )
+        return this.http.put(this.baseUrl + "/profile/children/" + child.id, ProfileService.prepareChild(child, file));
     }
 
     public deleteChild(child: Child) {
-        this.http.delete(this.baseUrl + "/profile/children/" + child.id)
-            .subscribe(() => {
-                },
-                () => {
-                    this.error$.next("Operazione fallita, riprovare più tardi")
-                },
-                () => {
-                    this.error$.next("Operation completed");
-                    this.getChildren();
-                }
-            )
+        return this.http.delete(this.baseUrl + "/profile/children/" + child.id)
     }
 
     private static prepareChild(child: Child, file: File): FormData {
@@ -113,19 +96,7 @@ export class ProfileService {
         if (file != null) {
             child.photoFile = true;
         }
-        this.http.post(this.baseUrl + "/profile/children", ProfileService.prepareChild(child, file),
-        )
-            .subscribe(() => {
-                },
-                (error) => {
-                    console.log(error);
-                    this.error$.next("Operazione fallita, riprovare più tardi");
-                },
-                () => {
-                    this.error$.next("Operation completed");
-                    this.getChildren();
-                }
-            )
+        return this.http.post(this.baseUrl + "/profile/children", ProfileService.prepareChild(child, file));
     }
 
     getProfileinformation(){

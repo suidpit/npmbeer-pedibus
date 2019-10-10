@@ -13,6 +13,7 @@ import {ReservationReq} from "../../models/reservation-req";
 export class ReservationsService {
 
     private baseUrl: String = 'http://localhost:8080';
+    selected_stop_observer$: Subject<any> = new BehaviorSubject(undefined);
 
     constructor(private http: HttpClient) {} // using Angular Dependency Injection
 
@@ -37,8 +38,6 @@ export class ReservationsService {
             .build();
         return this.http.post(this.baseUrl + "/reservations/user/" + line + "/" + date, JSON.stringify(reservation));
     }
-
-    selected_stop_observer$: Subject<any> = new BehaviorSubject(undefined);
 
     closePopup() {
         this.selected_stop_observer$.next(undefined);
