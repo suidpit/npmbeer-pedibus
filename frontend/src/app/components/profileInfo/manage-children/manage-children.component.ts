@@ -5,6 +5,7 @@ import {FormControl} from "@angular/forms";
 import {takeUntil} from "rxjs/operators";
 import {Subject} from "rxjs";
 import {DomSanitizer} from '@angular/platform-browser';
+import {MatSnackBar} from "@angular/material";
 
 @Component({
     selector: 'app-manage-children',
@@ -20,7 +21,6 @@ export class ManageChildrenComponent implements OnInit, OnDestroy {
     birthday = new FormControl('');
     children = null;
     private unsubscribe$ = new Subject<void>();
-    public error = undefined;
     previewUrl = null;
     selectedFile: File = undefined;
 
@@ -48,7 +48,13 @@ export class ManageChildrenComponent implements OnInit, OnDestroy {
     }
 
 
-    constructor(private profileService: ProfileService) {
+    constructor(private profileService: ProfileService, private _snackBar: MatSnackBar) {
+    }
+
+    openSnackbar(message: string, duration = 3000) {
+        this._snackBar.open(message, "OK", {
+            duration: duration
+        });
     }
 
     ngOnDestroy(): void {
@@ -62,28 +68,12 @@ export class ManageChildrenComponent implements OnInit, OnDestroy {
         ).subscribe((children) => {
             this.children = children;
         })
-        this.profileService.error$.pipe(
-            takeUntil(this.unsubscribe$)
-        ).subscribe((error) => {
-            if (error == "Operation completed") {
-                this.task = '';
-                this.title = null;
-                this.error = null;
-                this.child_to_update = null;
-                this.selectedFile = null;
-                this.previewUrl = null;
-            } else {
-                this.task = '';
-                this.error = error;
-            }
-        })
     }
 
     private sanitizer: DomSanitizer;
 
     task_children(child: Child) {
         this.title = null;
-        this.error = null;
         this.child_to_update = null;
         this.selectedFile = null;
         if (child == null) {
@@ -102,6 +92,7 @@ export class ManageChildrenComponent implements OnInit, OnDestroy {
     }
 
     task = '';
+
     onSubmit() {
         this.task = 'loading';
         let child = Object.assign({}, this.child_to_update);
@@ -115,15 +106,52 @@ export class ManageChildrenComponent implements OnInit, OnDestroy {
             month + "-" +
             child.birthday.getFullYear();
         if (child.id == null) {
-            this.profileService.addChild(child, this.selectedFile);
+            this.profileService.addChild(child, this.selectedFile).subscribe(() => {
+                this.task = '';
+                this.title = null;
+                this.openSnackbar("Operazione completata");
+                this.profileService.getChildren();
+                this.child_to_update = null;
+                this.selectedFile = null;
+                this.previewUrl = null;
+            },() => {
+                this.task = '';
+                this.openSnackbar("Qualcosa è andato storto, riprovare più tardi");
+            }
+        )
+
         } else {
-            this.profileService.updateChild(child, this.selectedFile);
+            this.profileService.updateChild(child, this.selectedFile).subscribe(() => {
+                    this.task = '';
+                    this.title = null;
+                    this.openSnackbar("Operazione completata");
+                    this.profileService.getChildren();
+                    this.child_to_update = null;
+                    this.selectedFile = null;
+                    this.previewUrl = null;
+                },() => {
+                    this.task = '';
+                    this.openSnackbar("Qualcosa è andato storto, riprovare più tardi");
+                }
+            )
         }
     }
 
     onDelete() {
         this.task = 'loading';
-        this.profileService.deleteChild(Object.assign({}, this.child_to_update))
+        this.profileService.deleteChild(Object.assign({}, this.child_to_update)).subscribe(() => {
+                this.task = '';
+                this.title = null;
+                this.openSnackbar("Operazione completata");
+                this.profileService.getChildren();
+                this.child_to_update = null;
+                this.selectedFile = null;
+                this.previewUrl = null;
+            },() => {
+                this.task = '';
+                this.openSnackbar("Qualcosa è andato storto, riprovare più tardi");
+            }
+        )
     }
 }
 

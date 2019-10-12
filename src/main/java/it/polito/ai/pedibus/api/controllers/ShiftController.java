@@ -152,18 +152,28 @@ public class ShiftController {
                 s.setDirection(sDTO.getDirection());
                 s.setTripIndex(sDTO.getTripIndex());
 
-                // setting starting and ending stops
+                // setting starting and ending stops and times
+                Stop from = l.getStops().get(l.getStops().size()-1);
+                Stop to = l.getStops().get(0);
                 if(s.getDirection() == Reservation.Direction.BACK){
-                    s.setFrom(l.getBack().get(s.getTripIndex()).get(0));
+                    s.setFrom(from.getName());
+                    s.setStartsAt(from.getBack().get(s.getTripIndex()));
                     // Take last stop
-                    s.setTo(l.getBack().get(s.getTripIndex()).get(l.getBack().get(s.getTripIndex()).size()-1));
+                    s.setTo(to.getName());
+                    s.setEndsAt(to.getBack().get(s.getTripIndex()));
                 }
                 else{
-                    s.setFrom(l.getOutward().get(s.getTripIndex()).get(0));
-                    s.setTo(l.getOutward().get(s.getTripIndex()).get(l.getOutward().get(s.getTripIndex()).size()-1));
+                    Stop temp = from;
+                    from = to;
+                    to = temp;
+                    s.setFrom(from.getName());
+                    s.setStartsAt(from.getOutward().get(s.getTripIndex()));
+                    // Take last stop
+                    s.setTo(to.getName());
+                    s.setEndsAt(to.getOutward().get(s.getTripIndex()));
                 }
 
-                s.setLastUpdate(s.getFrom().getPosition());
+                s.setLastUpdate(from.getPosition());
                 ArrayList<ObjectId> availabilities = new ArrayList<>();
                 availabilities.add(userId);
 
@@ -217,18 +227,18 @@ public class ShiftController {
                 if(u != null){
                     s.setCompanionId(u.getId());
                     s.setOpen(true);
-                    if(shiftRequestDTO.getTo() == null || shiftRequestDTO.getTo().hasNullFields() || s.getTo().equals(shiftRequestDTO.getTo())){
+                    if(shiftRequestDTO.getTo() == null || s.getTo().equals(shiftRequestDTO.getTo())){
                         this.shiftService.insertOrUpdateShift(s);
                         String eventBody = new StringBuilder("Sei stato assegnato al turno del ")
                                 .append(s.getDate().toString())
                                 .append(" delle ore ")
-                                .append(s.getFrom().getTime().toString())
+                                .append(s.getStartsAt().toString())
                                 .append(" sulla linea ")
                                 .append(s.getLineName())
                                 .append(" in direzione ")
                                 .append(s.getDirection())
                                 .append(" in partenza dalla fermata: ")
-                                .append(s.getFrom().getName())
+                                .append(s.getFrom())
                                 .toString();
                         NewEventDTO event = NewEventDTO.builder()
                                 .type("Shift")
@@ -240,26 +250,30 @@ public class ShiftController {
                         return this.eventService.pushNewEvent(event);
                     }
                     else{
+                        if(shiftRequestDTO.getEndsAt()==null || shiftRequestDTO.getPosition()==null)
+                            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
                         // create complementary shift.
                         try{
                             Shift complementary_shift = (Shift) s.clone();
                             complementary_shift.setId(null);
                             complementary_shift.setCompanionId(null);
                             complementary_shift.setFrom(shiftRequestDTO.getTo());
-                            complementary_shift.setLastUpdate(complementary_shift.getFrom().getPosition());
+                            complementary_shift.setLastUpdate(shiftRequestDTO.getPosition());
+                            complementary_shift.setStartsAt(shiftRequestDTO.getEndsAt());
                             s.setTo(shiftRequestDTO.getTo());
+                            s.setEndsAt(shiftRequestDTO.getEndsAt());
                             this.shiftService.insertOrUpdateShift(s);
                             this.shiftService.insertOrUpdateShift(complementary_shift);
                             String eventBody = new StringBuilder("Sei stato assegnato al turno del ")
                                     .append(s.getDate().toString())
                                     .append(" delle ore ")
-                                    .append(s.getFrom().getTime().toString())
+                                    .append(s.getStartsAt().toString())
                                     .append(" sulla linea ")
                                     .append(s.getLineName())
                                     .append(" in direzione ")
                                     .append(s.getDirection())
                                     .append(" in partenza dalla fermata: ")
-                                    .append(s.getFrom().getName())
+                                    .append(s.getFrom())
                                     .toString();
                             NewEventDTO event = NewEventDTO.builder()
                                     .type("Shift")
@@ -341,6 +355,8 @@ public class ShiftController {
                 dto.setFrom(s.getFrom());
                 dto.setTo(s.getTo());
                 dto.setLatestUpdate(s.getLastUpdate());
+                dto.setStartsAt(s.getStartsAt());
+                dto.setEndsAt(s.getEndsAt());
                 return_array.add(dto);
             }
             return return_array;

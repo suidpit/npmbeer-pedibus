@@ -19,8 +19,7 @@
 
     <span fxShow="true" fxHide.lt-md="true" fxLayoutAlign="space-around center"
           *ngIf="auth.isLoggedIn$ | async" class="side-container">
-
-        <div class="avatar"></div>
+        <div class="avatar" [ngStyle]="{'background-image' : pic ? 'url('+pic+')' : 'url(\'../../../../assets/icons/img_avatar.png\')'}"></div>
         <div fxLayout="column" fxLayoutAlign="center center">
           <span class="logged-user-style" *ngIf="auth.currentUser$ | async as user">
             <span class="user-email" [matMenuTriggerFor]="userMenu">

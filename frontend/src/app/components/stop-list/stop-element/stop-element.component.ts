@@ -6,6 +6,7 @@ import {
 } from '@angular/core';
 import {StopService} from "../../../services/stop/stop.service";
 import {ReservationsService} from "../../../services/reservations/reservations.service";
+import {LocalTime} from "js-joda";
 
 @Component({
     selector: 'app-stop-element',
@@ -18,6 +19,10 @@ export class StopElementComponent{
     @ViewChild("container", {static: false}) container: ElementRef;
     @Input("selected") selected;
     @Input("type") type;
+    @Input("time") time: LocalTime;
+    @Input("selected_stop") selected_stop;
+    @Input("today") today;
+    now = LocalTime.now();
 
     constructor(private stopService: StopService, private reservationService: ReservationsService) {
     }

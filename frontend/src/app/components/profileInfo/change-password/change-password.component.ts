@@ -4,6 +4,7 @@ import {ProfileService} from "../../../services/profile/profile.service";
 import {ChangePassword} from "../../../models/changepassword";
 import {Builder} from "builder-pattern";
 import {HttpErrorResponse} from "@angular/common/http";
+import {MatSnackBar} from "@angular/material";
 
 @Component({
     selector: 'app-change-password',
@@ -15,9 +16,8 @@ export class ChangePasswordComponent implements OnInit {
     wrong_password = false;
     result = null;
     task = '';
-    error = false;
 
-    constructor(private profileService: ProfileService) {
+    constructor(private profileService: ProfileService, private _snackBar: MatSnackBar) {
         this.cp = Builder(ChangePassword)
             .oldpass('')
             .pass('')
@@ -30,10 +30,8 @@ export class ChangePasswordComponent implements OnInit {
 
     private handleError(error: HttpErrorResponse) {
         this.task = '';
-        this.result = "false";
         if (error.error instanceof ErrorEvent) {
-            this.error = true;
-            this.result = "false";
+            this.openSnackbar("Qualcosa è andato storto, riprovare più tardi")
         } else {
             // The backend returned an unsuccessful response code.
             if (error.status == 403) {
@@ -41,16 +39,21 @@ export class ChangePasswordComponent implements OnInit {
                 return;
             }
         }
-        this.error = true;
+        this.openSnackbar("Qualcosa è andato storto, riprovare più tardi")
     };
+
+    openSnackbar(message: string, duration = 3000) {
+        this._snackBar.open(message, "OK", {
+            duration: duration
+        });
+    }
 
     onSubmit(form: NgForm) {
         this.profileService.changePassword(this.cp)
             .subscribe(
                 () => {
                     this.wrong_password = false;
-                    this.error = false;
-                    this.result = 'success';
+                    this.openSnackbar("Password cambiata con successo");
                     this.task = '';
                     form.resetForm();
                 }, (error) => {

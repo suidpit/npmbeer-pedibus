@@ -1,48 +1,116 @@
 [
   {
-    "name":"linea1",
-    "admin_email":"admin@me.com",
-    "outward":[
-      [
-        {"name":"P.za Solferino", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"08:00"},
-        {"name":"P.za Castello", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"08:15"},
-        {"name":"Sansa", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"08:30"}
-      ]
-    ],
-    "back":[
-      [
-        {"name":"Sansa", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"12:30"},
-        {"name":"P.za Castello", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"12:45"},
-        {"name":"P.za Solferino", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"13:00"}
-      ],
-      [
-        {"name":"Sansa", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"16:00"},
-        {"name":"P.za Castello", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"16:15"},
-        {"name":"P.za Solferino", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"16:30"}
-      ]
+    "name": "linea1",
+    "admin_email": "admin@me.com",
+    "stops": [
+      {
+        "name": "P.za Solferino",
+        "position": {
+          "type": "Point",
+          "coordinates": [
+            46.24,
+            7.68
+          ]
+        },
+        "outward": [
+          "08:00"
+        ],
+        "back": [
+          "13:00",
+          "16:30"
+        ]
+      },
+      {
+        "name": "P.za Castello",
+        "position": {
+          "type": "Point",
+          "coordinates": [
+            46.24,
+            7.68
+          ]
+        },
+        "outward": [
+          "08:15"
+        ],
+        "back": [
+          "12:45",
+          "16:15"
+        ]
+      },
+      {
+        "name": "Sansa",
+        "position": {
+          "type": "Point",
+          "coordinates": [
+            46.24,
+            7.68
+          ]
+        },
+        "outward": [
+          "08:30"
+        ],
+        "back": [
+          "12:30",
+          "16:00"
+        ]
+      }
     ]
   },
   {
-    "name":"linea2",
-    "admin_email":"n@palm.beer",
-    "outward":[
-      [
-        {"name":"P.ta Susa", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"08:00"},
-        {"name":"Vinzaglio", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"08:15"},
-        {"name":"Poli", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"08:30"}
-      ]
-    ],
-    "back":[
-      [
-        {"name":"Poli", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"12:30"},
-        {"name":"Vinzaglio", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"12:45"},
-        {"name":"P.ta Susa", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"13:00"}
-      ],
-      [
-        {"name":"Poli", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"16:00"},
-        {"name":"Vinzaglio", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"16:15"},
-        {"name":"P.ta Susa", "position":{"type":"Point", "coordinates":[46.24, 7.68]}, "time":"16:30"}
-      ]
+    "name": "linea2",
+    "admin_email": "n@palm.beer",
+    "stops": [
+      {
+        "name": "P.ta Susa",
+        "position": {
+          "type": "Point",
+          "coordinates": [
+            46.24,
+            7.68
+          ]
+        },
+        "outward": [
+          "08:00"
+        ],
+        "back": [
+          "13:00",
+          "16:30"
+        ]
+      },
+      {
+        "name": "Vinzaglio",
+        "position": {
+          "type": "Point",
+          "coordinates": [
+            46.24,
+            7.68
+          ]
+        },
+        "outward": [
+          "08:15"
+        ],
+        "back": [
+          "12:45",
+          "16:15"
+        ]
+      },
+      {
+        "name": "Poli",
+        "position": {
+          "type": "Point",
+          "coordinates": [
+            46.24,
+            7.68
+          ]
+        },
+        "outward": [
+          "08:30"
+        ],
+        "back": [
+          "12:30",
+          "16:00"
+        ]
+      }
     ]
   }
 ]

@@ -1,3 +1,4 @@
+import { CalendarUtils as BaseCalendarUtils } from 'angular-calendar';
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -91,7 +92,9 @@ import {
 } from './components/profileInfo/manage-children/manage-children.component';
 import { ChangePasswordComponent } from './components/profileInfo/change-password/change-password.component';
 import { ManageUsersComponent } from './components/profileInfo/manage-users/manage-users.component';
-
+import { CalendarModule, DateAdapter } from 'angular-calendar';
+import {adapterFactory} from "angular-calendar/date-adapters/date-fns";
+import {MyCalendarUtilsComponent} from "./components/reservations/MyCalendarUtils.component";
 
 
 @NgModule({
@@ -138,6 +141,15 @@ import { ManageUsersComponent } from './components/profileInfo/manage-users/mana
     ManageUsersComponent,
   ],
   imports: [
+    CalendarModule.forRoot({
+      provide: DateAdapter,
+      useFactory: adapterFactory
+    }, {
+      utils: {
+        provide: BaseCalendarUtils,
+        useClass: MyCalendarUtilsComponent
+      }
+    }),
     BrowserModule,
     BrowserAnimationsModule,
     RouterModule.forRoot([
@@ -204,6 +216,5 @@ import { ManageUsersComponent } from './components/profileInfo/manage-users/mana
                     DialogEventInfo, DialogEventNormal, DialogEventAdmin, DialogEmailSendedNewReg, PizzaPartyComponent, BookingDialog],
   bootstrap: [AppComponent]
 
-})
-export class AppModule {
+}) export class AppModule {
 }

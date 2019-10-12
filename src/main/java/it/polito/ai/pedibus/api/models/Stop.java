@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import it.polito.ai.pedibus.api.constraints.ValidCoordinate;
 import it.polito.ai.pedibus.api.serializers.GeoJsonPointDeserializer;
+import it.polito.ai.pedibus.api.utils.ValidList;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.geo.GeoJsonModule;
@@ -25,16 +26,20 @@ public class Stop {
 
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    private LocalTime time;
+    private ValidList<LocalTime> outward;
 
-    @JsonDeserialize(using=GeoJsonPointDeserializer.class)
+    @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    private ValidList<LocalTime> back;
+
+    @JsonDeserialize(using = GeoJsonPointDeserializer.class)
     @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
     @ValidCoordinate
     private GeoJsonPoint position;
 
     @Transient
-    public boolean hasNullFields(){
-        return this.name == null || this.time == null || this.position == null;
+    public boolean hasNullFields() {
+        return this.name == null || this.outward == null || this.back == null || this.position == null;
     }
 
 }

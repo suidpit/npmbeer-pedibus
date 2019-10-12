@@ -83,15 +83,6 @@ export class ShiftService {
     this.http.get<any[]>(`${this.shift_url}/assigned/${dateString}/${uid}`).subscribe((retrieved_shifts)=>{
       let events = [];
       for(let s of retrieved_shifts){
-        let from = new Stop();
-        from.position = s.from.position;
-        from.time = LocalTime.parse(s.from.time);
-        from.name = s.from.name;
-
-        let to = new Stop();
-        to.position = s.to.position;
-        to.time = LocalTime.parse(s.to.time);
-        to.name = s.to.name;
 
         let shift = new Shift();
         let date = LocalDate.parse(s.date, DateTimeFormatter.ofPattern("d-M-yyyy"));
@@ -101,10 +92,10 @@ export class ShiftService {
         shift.direction = s.direction;
         shift.tripIndex = s.tripIndex;
         shift.open = s.open;
-        shift.from = from;
-        shift.to = to;
-        shift.startsAt = from.time;
-        shift.endsAt = to.time;
+        shift.from = s.from;
+        shift.to = s.to;
+        shift.startsAt = LocalTime.parse(s.startsAt);
+        shift.endsAt = LocalTime.parse(s.endsAt);
         shift.availabilities = this.auth.getUsersDetails(s.availabilities);
         shift.companionId = s.companionId;
         shift.defaultCompanion = s.defaultCompanion;
@@ -146,28 +137,20 @@ export class ShiftService {
     this.http.get<any[]>(`${this.shift_url}/assigned/${dateString}/${uid}`).subscribe((retrieved_shifts)=>{
       let shifts = [];
       for(let s of retrieved_shifts){
-        let from = new Stop();
-        from.position = s.from.position;
-        from.time = LocalTime.parse(s.from.time);
-        from.name = s.from.name;
 
-        let to = new Stop();
-        to.position = s.to.position;
-        to.time = LocalTime.parse(s.to.time);
-        to.name = s.to.name;
-
+        console.log(s);
         let shift = new Shift();
         let date = LocalDate.parse(s.date, DateTimeFormatter.ofPattern("d-M-yyyy"));
+        shift.startsAt = LocalTime.parse(s.startsAt);
+        shift.endsAt = LocalTime.parse(s.endsAt);
         shift.id = s.id;
         shift.date = date;
         shift.lineName = s.lineName;
         shift.direction = s.direction;
         shift.tripIndex = s.tripIndex;
         shift.open = s.open;
-        shift.from = from;
-        shift.to = to;
-        shift.startsAt = from.time;
-        shift.endsAt = to.time;
+        shift.from = s.from;
+        shift.to = s.to;
         shift.availabilities = this.auth.getUsersDetails(s.availabilities);
         shift.companionId = s.companionId;
         shift.defaultCompanion = s.defaultCompanion;
@@ -197,31 +180,22 @@ export class ShiftService {
     this.http.get<any[]>(`${this.shift_url}/by-date/${dateString}`).subscribe((retrieved_shifts)=>{
       let shifts = [];
       for(let s of retrieved_shifts){
-        let from = new Stop();
-        from.position = s.from.position;
-        from.time = LocalTime.parse(s.from.time);
-        from.name = s.from.name;
-
-        let to = new Stop();
-        to.position = s.to.position;
-        to.time = LocalTime.parse(s.to.time);
-        to.name = s.to.name;
 
         // shift has passed, no need to insert it.
-        if(to.time.isBefore(LocalTime.now())) continue;
+        if(LocalTime.parse(s.endsAt).isBefore(LocalTime.now())) continue;
 
         let shift = new Shift();
         let date = LocalDate.parse(s.date, DateTimeFormatter.ofPattern("d-M-yyyy"));
+        shift.startsAt = LocalTime.parse(s.startsAt);
+        shift.endsAt = LocalTime.parse(s.endsAt);
         shift.id = s.id;
         shift.date = date;
         shift.lineName = s.lineName;
         shift.direction = s.direction;
         shift.tripIndex = s.tripIndex;
         shift.open = s.open;
-        shift.from = from;
-        shift.to = to;
-        shift.startsAt = from.time;
-        shift.endsAt = to.time;
+        shift.from = s.from;
+        shift.to = s.to;
         shift.availabilities = this.auth.getUsersDetails(s.availabilities);
         shift.companionId = s.companionId;
         shift.defaultCompanion = s.defaultCompanion;
@@ -262,28 +236,19 @@ export class ShiftService {
     this.http.get<any[]>(this.shift_url+"/"+dateString).subscribe((retrieved_shifts) => {
       let shifts = [];
       for(let s of retrieved_shifts){
-        let from = new Stop();
-        from.position = s.from.position;
-        from.time = LocalTime.parse(s.from.time);
-        from.name = s.from.name;
-
-        let to = new Stop();
-        to.position = s.to.position;
-        to.time = LocalTime.parse(s.to.time);
-        to.name = s.to.name;
 
         let shift = new Shift();
         let date = LocalDate.parse(s.date, DateTimeFormatter.ofPattern("d-M-yyyy"));
+        shift.startsAt = LocalTime.parse(s.startsAt);
+        shift.endsAt = LocalTime.parse(s.endsAt);
         shift.id = s.id;
         shift.date = date;
         shift.lineName = s.lineName;
         shift.direction = s.direction;
         shift.tripIndex = s.tripIndex;
         shift.open = s.open;
-        shift.from = from;
-        shift.to = to;
-        shift.startsAt = from.time;
-        shift.endsAt = to.time;
+        shift.from = s.from;
+        shift.to = s.to;
         shift.availabilities = this.auth.getUsersDetails(s.availabilities);
         shift.companionId = s.companionId;
         shift.defaultCompanion = s.defaultCompanion;
@@ -323,19 +288,20 @@ export class ShiftService {
               "-" + ("0" + date.monthValue()).slice(-2) +
               "-" + ("0" + date.dayOfMonth()).slice(-2);
             for (let line of line_list) {
+              console.log(line);
               let event = {};
               let new_shift;
               // create a shift for each ride
-              for(let tripIndex in line.outward){
+              for(let tripIndex in line.stops.stops[0].outward){
                 new_shift = new Shift();
                 new_shift.date = date;
                 new_shift.lineName = line.name;
                 new_shift.direction = "OUTWARD";
                 new_shift.tripIndex = tripIndex;
-                new_shift.startsAt = line.outward[tripIndex].startsAt;
-                new_shift.endsAt = line.outward[tripIndex].endsAt;
-                new_shift.from = line.outward[tripIndex].stops[0];
-                new_shift.to = line.outward[tripIndex].stops[line.outward[tripIndex].stops.length - 1];
+                new_shift.startsAt = line.stops.startsAt[0][tripIndex];
+                new_shift.endsAt = line.stops.endsAt[0][tripIndex];
+                new_shift.from = line.stops.stops[0].name;
+                new_shift.to = line.stops.stops[line.stops.stops.length-1].name;
                 new_shift.defaultCompanion = line.adminEmail;
 
                 // filter shifts finding all elements which are equal to new_shift. If any exists, don't add event.
@@ -357,16 +323,16 @@ export class ShiftService {
                 }
               }
 
-              for(let tripIndex in line.back){
+              for(let tripIndex in line.stops.stops[0].back){
                 new_shift = new Shift();
                 new_shift.date = date;
                 new_shift.lineName = line.name;
                 new_shift.direction = "BACK";
                 new_shift.tripIndex = tripIndex;
-                new_shift.startsAt = line.back[tripIndex].startsAt;
-                new_shift.endsAt = line.back[tripIndex].endsAt;
-                new_shift.from = line.back[tripIndex].stops[0];
-                new_shift.to = line.back[tripIndex].stops[line.back[tripIndex].stops.length - 1];
+                new_shift.startsAt = line.stops.startsAt[1][tripIndex];
+                new_shift.endsAt = line.stops.endsAt[1][tripIndex];
+                new_shift.from = line.stops.stops[line.stops.stops.length-1].name;
+                new_shift.to = line.stops.stops[0].name;
                 new_shift.defaultCompanion = line.adminEmail;
 
                 if (shifts.filter(elem => new_shift.compareTo(elem.shift)).length <= 0) {
@@ -490,10 +456,18 @@ export class ShiftService {
   }
 
   sendShiftAssignment(s: Shift, assigned_user: string, arrival_stop: Stop){
-    let stop = {};
+    console.log(arrival_stop);
+    let stop = null;
+    let time = null;
+    let coords = null;
     if(arrival_stop != null) {
-      let coords = {type: arrival_stop.position['type'], coordinates: arrival_stop.position['coordinates']};
-      stop = {name: arrival_stop.name, position: coords, time: arrival_stop.time};
+      coords = {type: arrival_stop.position['type'], coordinates: arrival_stop.position['coordinates']};
+      stop = arrival_stop.name;
+      if(s.direction=='OUTWARD'){
+        time = arrival_stop.outward[s.tripIndex];
+      }else{
+        time = arrival_stop.back[s.tripIndex];
+      }
     }
 
     let body = {
@@ -503,7 +477,10 @@ export class ShiftService {
       direction:s.direction,
       tripIndex: s.tripIndex,
       assignedCompanionEmail: assigned_user,
-      to: stop};
+      to: stop,
+      position: coords,
+      endsAt: time
+    };
     console.log(body);
     return this.http.post(`${this.shift_url}/confirm`, body);
   }

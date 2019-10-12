@@ -34,21 +34,31 @@ public class ReservationUserController {
     }
 
     /**
-     * GET /reservations/user/{nome_linea}/{data} –> Restituisce un oggetto JSON contenente due liste,
-     * riportanti, le prenotazioni dell'utente per quella data
+     * GET /reservations/user/{nome_linea}/{data} –> Restituisce un array JSON,
+     * riportante le prenotazioni dell'utente per quella data e linea
      *
      * @param lineName
      * @param dateString
      * @return
      */
     @RequestMapping(value = "/{lineName}/{date}", method = RequestMethod.GET)
-    public List<Reservation> getOwnChildsForStop(@PathVariable("lineName") String lineName,
+    public List<Reservation> getOwnReservationsByLineAndDate(@PathVariable("lineName") String lineName,
                                                  @PathVariable("date") String dateString) {
         return reservationService.getUserReservationsByDateAndLine(lineName, dateString);
     }
 
 
-    //TODO: Change this to return a JSON?
+    /**
+     * GET /reservations/user/{data} –> Restituisce una array JSON
+     * riportante le prenotazioni dell'utente per quella data
+     *
+     * @param dateString
+     * @return
+     */
+    @RequestMapping(value = "/{date}", method = RequestMethod.GET)
+    public List<Reservation> getOwnReservationsByLineAndDate(@PathVariable("date") String dateString) {
+        return reservationService.getUserReservationsByDate(dateString);
+    }
 
     /**
      * POST /reservations/user/{nome_linea}/{data} – invia un oggetto JSON contenente il nome
@@ -59,7 +69,7 @@ public class ReservationUserController {
     @Transactional
     @ReservationPostFields
     @RequestMapping(value = "{lineName}/{date}", method = RequestMethod.POST)
-    public List<Reservation> insert(@PathVariable("lineName") String lineName,
+    public Reservation insert(@PathVariable("lineName") String lineName,
                          @PathVariable("date") String dateString,
                          @RequestBody ReservationDTO resd) {
         return reservationService.insertReservationUser(lineName, dateString, resd);
@@ -78,7 +88,7 @@ public class ReservationUserController {
      */
     @Transactional
     @ReservationPutFields
-    @RequestMapping(value = "{lineName}/{date}", method = RequestMethod.PUT)
+    @RequestMapping(value = "{lineName}/{date}/{id}", method = RequestMethod.PUT)
     public void update(@PathVariable("lineName") String lineName,
                        @PathVariable("date") String dateString,
                        @PathVariable("id") ObjectId id,
@@ -125,5 +135,12 @@ public class ReservationUserController {
         LocalDate today = LocalDate.now();
         ObjectId userId = ((CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         return this.reservationService.getReservationsByDateAndUser(today, userId);
+    }
+
+    @RequestMapping(value = "{child}/from/{date}", method = RequestMethod.GET)
+    public List<Reservation> getReservationsFromDate(@PathVariable("date") String dateString,
+                                                     @PathVariable("child") ObjectId childId){
+        ObjectId userId = ((CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        return this.reservationService.getReservationsByUserAndChildAndFromDate(dateString, childId , userId);
     }
 }

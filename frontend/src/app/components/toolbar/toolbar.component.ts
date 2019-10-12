@@ -5,6 +5,7 @@ import {of} from "rxjs/internal/observable/of";
 import {Observable} from "rxjs/internal/Observable";
 import {Role} from "../../models/authority";
 import {MatSidenav} from "@angular/material";
+import {ProfileService} from "../../services/profile/profile.service";
 
 @Component({
   selector: 'app-toolbar',
@@ -69,12 +70,21 @@ export class ToolbarComponent implements OnInit {
       icon: "person_add"
     }
     ];
-  constructor(public auth: AuthService) {
+  constructor(public auth: AuthService, private profileService: ProfileService) {
   }
+
+  pic = null;
 
   ngOnInit() {
     this.isAuthenticated = false;
     this.user = null;
+
+    this.profileService.user$.subscribe((user)=>{
+      if(user!=null)
+        this.pic = user.photo;
+      else
+        this.pic = null;
+    });
 
     this.auth.currentUser$.subscribe(
       (user) =>

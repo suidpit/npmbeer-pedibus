@@ -4,6 +4,7 @@ import it.polito.ai.pedibus.api.dtos.ReservationDTO;
 import it.polito.ai.pedibus.api.models.Child;
 import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.repositories.ChildRepository;
+import it.polito.ai.pedibus.api.repositories.LineRepository;
 import it.polito.ai.pedibus.api.repositories.ReservationRepository;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
 import it.polito.ai.pedibus.security.CustomUserDetails;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,15 +28,17 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
     private final ChildRepository childRepository;
+    private final LineRepository lineRepository;
 
     private final DateTimeFormatter fmt;
 
     public ReservationService(ReservationRepository reservationRepository, DateTimeFormatter fmt,
-                              UserRepository userRepository, ChildRepository childRepository) {
+                              UserRepository userRepository, ChildRepository childRepository, LineRepository lineRepository) {
         this.reservationRepository = reservationRepository;
         this.userRepository = userRepository;
         this.childRepository = childRepository;
         this.fmt = fmt;
+        this.lineRepository = lineRepository;
     }
 
     public List<Reservation> getAllReservations() {
@@ -79,17 +83,17 @@ public class ReservationService {
         return mappazza;
     }
 
-    private HashMap<String, Object> getChildReservationInfo(ObjectId childId, String childName, ObjectId resid, Boolean isPresent, ObjectId companionWhoInserted){
+    private HashMap<String, Object> getChildReservationInfo(ObjectId childId, String childName, ObjectId resid, Boolean isPresent, ObjectId companionWhoInserted) {
         HashMap<String, Object> childReservationInfo = new HashMap<>();
         childReservationInfo.put("id", childId.toString());
         childReservationInfo.put("name", childName);
         childReservationInfo.put("resid", resid.toString());
         childReservationInfo.put("isPresent", isPresent);
-        childReservationInfo.put("companionWhoInserted", companionWhoInserted!=null?companionWhoInserted.toString():null);
+        childReservationInfo.put("companionWhoInserted", companionWhoInserted != null ? companionWhoInserted.toString() : null);
         return childReservationInfo;
     }
 
-    public List<Reservation> insertReservationUser(String lineName, String dateString, ReservationDTO resd) {
+    public Reservation insertReservationUser(String lineName, String dateString, ReservationDTO resd) {
         ObjectId user;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof CustomUserDetails) {
@@ -98,50 +102,35 @@ public class ReservationService {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
         }
 
+        //check date
         LocalDate date = LocalDate.parse(dateString, fmt);
+        if (date.isBefore(LocalDate.now()))
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+
+        //check time
+        System.out.println(lineName);
+        System.out.println(resd.getStopName());
+        checkTime(lineName, date, resd.getDirection(), resd.getStopName(), resd.getTripIndex());
         // The stop is now identified by a line, a direction, and a trip index.
 
-        for (ObjectId child : resd.getChild()) {
-            boolean check = false;
+        checkChild(resd.getChild(), user);
+        if (this.reservationRepository.findAllByDateAndLineNameAndDirectionAndChildId(
+                date, lineName, resd.getDirection(), resd.getChild()).size() > 0)
+            throw new HttpClientErrorException(HttpStatus.CONFLICT);
 
-            for (ObjectId c: userRepository.getById(user).getChildren()) {
-                if (childRepository.getById(c).getId().equals(child)) {
-                    check = true;
-                    break;
-                }
-            }
-            if (!check)
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-
-            /*for(Reservation res : reservationRepository.findByLineNameAndDateAndUser(lineName, date, user)){
-                if(res.getDirection()==resd.getDirection()){
-                    for(ObjectId c : res.getChildId()){
-                        if(c.equals(child))
-                            throw new HttpClientErrorException(HttpStatus.CONFLICT);
-                    }
-                }
-            }*/
-            for(Reservation res: this.reservationRepository.findAllByDateAndLineNameAndDirectionAndTripIndex(
-                    date, lineName, resd.getDirection(), resd.getTripIndex()
-            )){
-                if(res.getChildId().equals(child)) throw new HttpClientErrorException(HttpStatus.CONFLICT);
-            }
-        }
         List<Reservation> reservations = new ArrayList<Reservation>();
-        for(ObjectId childId: resd.getChild()){
-            Reservation res = Reservation.builder()
-                    .date(date)
-                    .lineName(lineName)
-                    .user(user)
-                    .stopName(resd.getStopName())
-                    .childId(childId)
-                    .direction(resd.getDirection())
-                    .tripIndex(resd.getTripIndex())
-                    .build();
-            reservationRepository.insert(res);
-            reservations.add(res);
-        }
-        return reservations;
+        Reservation res = Reservation.builder()
+                .date(date)
+                .lineName(lineName)
+                .user(user)
+                .stopName(resd.getStopName())
+                .childId(resd.getChild())
+                .direction(resd.getDirection())
+                .tripIndex(resd.getTripIndex())
+                .build();
+        reservationRepository.insert(res);
+        return res;
+
     }
 
     private ObjectId getUserId() {
@@ -152,15 +141,13 @@ public class ReservationService {
 
     public void updateReservation(String line, String dateString, ReservationDTO resd, ObjectId id) {
         LocalDate date = LocalDate.parse(dateString, fmt);
-        ObjectId userId = ((CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
-        Reservation res = reservationRepository.findById(id);
-        if ( res == null ) {
+        Reservation res = reservationRepository.findByLineNameAndDateAndId(line, date, id);
+        if (res == null) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
         }
-        if(!res.getUser().equals(userId)){
-            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
-        }
         res.setStopName(resd.getStopName());
+        res.setTripIndex(resd.getTripIndex());
+        res.setLineName(resd.getLineName());
         reservationRepository.save(res);
     }
 
@@ -168,7 +155,26 @@ public class ReservationService {
         LocalDate date = LocalDate.parse(dateString, fmt);
         if (reservationRepository.findByLineNameAndDateAndId(line, date, id) == null)
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+        Reservation res = reservationRepository.findById(id);
+        checkTime(line, date, res.getDirection(), res.getStopName(), res.getTripIndex());
         reservationRepository.deleteById(id);
+    }
+
+    private void checkTime(String line, LocalDate date, Reservation.Direction direction, String stopName, Integer tripIndex) {
+        if(date.isEqual(LocalDate.now()) && (
+                (direction == Reservation.Direction.OUTWARD &&
+                        lineRepository.findByName(line).getStops()
+                                .stream()
+                                .filter(stop-> stop.getName().equals(stopName))
+                                .findFirst().get().getOutward().get(tripIndex)
+                                .isBefore(LocalTime.now())) ||
+                        (direction == Reservation.Direction.BACK &&
+                                lineRepository.findByName(line).getStops()
+                                        .stream()
+                                        .filter(stop-> stop.getName().equals(stopName))
+                                        .findFirst().get().getBack().get(tripIndex)
+                                        .isBefore(LocalTime.now())) ))
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
     }
 
     public Reservation getReservation(ObjectId id) {
@@ -191,6 +197,16 @@ public class ReservationService {
         if (principal instanceof CustomUserDetails) {
             LocalDate date = LocalDate.parse(dateString, fmt);
             return reservationRepository.findByLineNameAndDateAndUser(lineName, date, getUserId());
+        } else {
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    public List<Reservation> getUserReservationsByDate(String dateString) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof CustomUserDetails) {
+            LocalDate date = LocalDate.parse(dateString, fmt);
+            return reservationRepository.findByDateAndUser(date, getUserId());
         } else {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
         }
@@ -226,7 +242,7 @@ public class ReservationService {
     }
 
     public Reservation getReservationByAllParams(ObjectId userId, String lineName, Integer tripIndex,
-                                                 Reservation.Direction direction, LocalDate date){
+                                                 Reservation.Direction direction, LocalDate date) {
         return this.reservationRepository.findFirstByLineNameAndDateAndTripIndexAndDirectionAndUser(
                 lineName,
                 date,
@@ -235,20 +251,20 @@ public class ReservationService {
                 userId);
     }
 
-    public List<Reservation> getReservationsByDateAndUser(LocalDate date, ObjectId userId){
+    public List<Reservation> getReservationsByDateAndUser(LocalDate date, ObjectId userId) {
         return this.reservationRepository.findByUserAndDate(userId, date);
     }
 
     public List<String> notReservedChildrenOnTrip(String dateString, String lineName,
-                                                    Reservation.Direction direction, Integer tripIndex){
+                                                  Reservation.Direction direction, Integer tripIndex) {
         LocalDate date = LocalDate.parse(dateString, this.fmt);
         List<Reservation> reservations = this.reservationRepository.findAllByDateAndLineNameAndDirectionAndTripIndex(date, lineName, direction, tripIndex);
         return this.childRepository.findAll()
                 .stream()
-                .filter(child ->{
+                .filter(child -> {
                     boolean filter_in = true;
-                    for(Reservation res: reservations){
-                        if(res.getChildId().equals(child.getId())){
+                    for (Reservation res : reservations) {
+                        if (res.getChildId().equals(child.getId())) {
                             filter_in = false;
                             break;
                         }
@@ -259,24 +275,24 @@ public class ReservationService {
                 .collect(Collectors.toList());
     }
 
-    public void togglePresenceOnReservation(ObjectId resid){
+    public void togglePresenceOnReservation(ObjectId resid) {
         Reservation res = this.reservationRepository.findById(resid);
-        if(res == null){
+        if (res == null) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
         }
         res.setPresent(!res.isPresent());
         this.reservationRepository.save(res);
     }
 
-    public Reservation addOnTheFlyChild(String dateString, String lineName,Reservation.Direction direction,
-                                        Integer tripIndex, String stopName, ObjectId childId){
+    public Reservation addOnTheFlyChild(String dateString, String lineName, Reservation.Direction direction,
+                                        Integer tripIndex, String stopName, ObjectId childId) {
 
-        if(childId == null || dateString == null || direction == null || tripIndex == null || stopName == null){
+        if (childId == null || dateString == null || direction == null || tripIndex == null || stopName == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }
 
         LocalDate date = LocalDate.parse(dateString, this.fmt);
-        ObjectId companion = ((CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        ObjectId companion = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         Reservation res = Reservation.builder()
                 .childId(childId)
                 .lineName(lineName)
@@ -288,5 +304,23 @@ public class ReservationService {
                 .present(true)
                 .build();
         return this.reservationRepository.insert(res);
+    }
+
+    public List<Reservation> getReservationsByUserAndChildAndFromDate(String dateString, ObjectId childId, ObjectId userId) {
+        LocalDate date = LocalDate.parse(dateString, this.fmt);
+        checkChild(childId, userId);
+        return this.reservationRepository.findByDateGreaterThanEqualAndChildId(date, childId);
+    }
+
+    private void checkChild(ObjectId childId, ObjectId userId) {
+        boolean check = false;
+        for (ObjectId c : userRepository.getById(userId).getChildren()) {
+            if (childRepository.getById(c).getId().equals(childId)) {
+                check = true;
+                break;
+            }
+        }
+        if (!check)
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
     }
 }
