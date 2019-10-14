@@ -18,19 +18,23 @@ mat-icon {
   margin: auto;
 }
 
-.error{
+.error {
   color: red;
 }
 
-.preview{
+.preview {
   width: 150px;
   height: 150px;
 }
 
-button{
+button {
   margin: 20px;
 }
 
-mat-card-content{
+mat-card-content {
   padding: 10px;
+}
+
+.small-options {
+  margin-top: 10px;
 }
