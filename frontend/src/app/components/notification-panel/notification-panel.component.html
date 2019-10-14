@@ -1,0 +1,48 @@
+<div class="overall-container">
+    <mat-card role="group" fxLayout="column">
+        <mat-card-header fxLayout="column" fxFlexAlign="center center" fxFlex="0 1 50px">
+            <mat-card-title style="text-align: center;">
+                Notifiche
+            </mat-card-title>
+            <mat-card-subtitle style="text-align: center;">
+                Leggi le ultime notifiche sulle attivitá dell'account.
+            </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content fxLayoutAlign="center center">
+<!-- <mat-table [dataSource]="notifications">
+    <ng-container matColumnDef="type">
+        <mat-header-cell *matHeaderCellDef>Tipo</mat-header-cell>
+        <mat-cell class="type-cell"
+                  *matCellDef="let not"><mat-icon>notifications</mat-icon></mat-cell>
+    </ng-container>
+  
+    <ng-container matColumnDef="body">
+        <mat-header-cell *matHeaderCellDef>Testo</mat-header-cell>
+        <mat-cell class="body-cell"
+                  *matCellDef="let not">{{not.body}}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="created_at">
+        <mat-header-cell *matHeaderCellDef>Data</mat-header-cell>
+        <mat-cell class="date-cell" *matCellDef="let not">{{not.created_at}}</mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    
+    <mat-row *matRowDef="let row; columns: displayedColumns"
+    [ngClass]="{'bold': !row.read}"></mat-row>
+</mat-table>
+-->
+            <mat-list class="notifications">
+                <mat-list-item class='clickable' [ngClass]="{'highlight': !not.read}" *ngFor="let not of notifications"
+                (click)="onNotClick(not)">
+                    <h3 matLine>{{not.body}}</h3>
+                    <p matLine>
+                       <span> {{not.type}} -- {{not.created_at | date:'medium'}}</span>
+                    </p>
+                    <mat-icon>notifications</mat-icon>
+                </mat-list-item>
+            </mat-list>
+        </mat-card-content>
+    </mat-card>
+</div>

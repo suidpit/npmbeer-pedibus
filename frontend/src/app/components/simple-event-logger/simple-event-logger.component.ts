@@ -17,7 +17,6 @@ export class SimpleEventLoggerComponent implements OnInit {
     this._eventsService.getServerSentEvent('http://localhost:8080/events/stream').subscribe({
       next: event => {
         this._zone.run(() => {
-          console.log(event.body)
           this.events.push(event)
         })
       },

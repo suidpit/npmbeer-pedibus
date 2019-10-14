@@ -56,7 +56,7 @@ export class ToolbarComponent implements OnInit {
     },
     {
       displayName: "Notifiche",
-      url: "/eventi",
+      url: "/notifiche",
       roles: [Role.COMPANION],
       icon: "list"
     }

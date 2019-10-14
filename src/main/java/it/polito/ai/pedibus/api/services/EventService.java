@@ -6,6 +6,9 @@ import it.polito.ai.pedibus.api.repositories.EventRepository;
 import it.polito.ai.pedibus.api.serializers.ObjectIdSerializer;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -49,5 +52,20 @@ public class EventService {
 
     public Mono<Event> getByReferenceObject(ObjectId objectId){
         return this.eventRepository.findByObjectReferenceId(objectId);
+    }
+
+    public Mono<Event> setRead(String notId) {
+        Mono<Event> eventMono = this.eventRepository.findById(notId);
+        return eventMono
+                .map(notification -> Event.builder()
+                    .body(notification.getBody())
+                    .type(notification.getType())
+                    .read(true)
+                    .created_at(notification.getCreated_at())
+                    .userId(notification.getUserId())
+                    .objectReferenceId(notification.getObjectReferenceId())
+                    .id(notification.getId())
+                    .build())
+                .flatMap(updatedNotification -> this.eventRepository.save(updatedNotification));
     }
 }

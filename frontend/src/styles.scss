@@ -139,3 +139,9 @@
 .cal-hour{
   display: none!important;
 }
+
+.mat-snack-bar-container .flex {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}

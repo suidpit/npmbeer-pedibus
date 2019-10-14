@@ -95,6 +95,10 @@ import { ManageUsersComponent } from './components/profileInfo/manage-users/mana
 import { CalendarModule, DateAdapter } from 'angular-calendar';
 import {adapterFactory} from "angular-calendar/date-adapters/date-fns";
 import {MyCalendarUtilsComponent} from "./components/reservations/MyCalendarUtils.component";
+import { NotificationItemComponent } from './components/notification-item/notification-item.component';
+import { NotificationPanelComponent } from './components/notification-panel/notification-panel.component';
+import { SnackbarComponent } from './components/snackbar/snackbar.component';
+import {MAT_SNACK_BAR_DATA} from "@angular/material/snack-bar";
 
 
 @NgModule({
@@ -139,6 +143,9 @@ import {MyCalendarUtilsComponent} from "./components/reservations/MyCalendarUtil
     ChildCardComponent,
     ChangePasswordComponent,
     ManageUsersComponent,
+    NotificationItemComponent,
+    NotificationPanelComponent,
+    SnackbarComponent,
   ],
   imports: [
     CalendarModule.forRoot({
@@ -163,7 +170,7 @@ import {MyCalendarUtilsComponent} from "./components/reservations/MyCalendarUtil
       { path: "impostaPassword/:token", component: UserPasswordSetupComponent},
       { path: "auth_error" , component: UnauthorizedComponent},
       { path: "prenotazione", component: ReservationsComponent, canActivate: [AuthGuard], data: {roles: [Role.USER]}},
-      { path: "eventi", component: SimpleEventLoggerComponent},
+      { path: "notifiche", component: NotificationPanelComponent},
       { path: "profilo", component: LateralmenuComponent, canActivate: [AuthGuard], data:{roles: [Role.USER]}},
       { path: "**", redirectTo: "home", pathMatch: "full"}
     ]),
@@ -211,8 +218,10 @@ import {MyCalendarUtilsComponent} from "./components/reservations/MyCalendarUtil
     provide: HTTP_INTERCEPTORS,
     useClass: AuthInterceptor,
     multi: true
+  }, {
+    provide: MAT_SNACK_BAR_DATA, useValue: {}
   }],
-  entryComponents: [DialogAddKid,DialogAddKidReg,DialogEmailSended, DialogEmailExists, DialogEmailExistsNewReg,
+  entryComponents: [SnackbarComponent,DialogAddKidReg,DialogEmailSended, DialogEmailExists, DialogEmailExistsNewReg,
                     DialogEventInfo, DialogEventNormal, DialogEventAdmin, DialogEmailSendedNewReg, PizzaPartyComponent, BookingDialog],
   bootstrap: [AppComponent]
 
