@@ -92,4 +92,8 @@ public class ShiftService {
         return this.shiftRepository.findByLineNameAndDate(lineName, date);
     }
 
+    public List<Shift> getShiftsByDateAndLineNames(LocalDate date, List<String> lineNames){
+        return this.shiftRepository.findByDateAfterAndLineNameIn(date, lineNames);
+    }
+
 }

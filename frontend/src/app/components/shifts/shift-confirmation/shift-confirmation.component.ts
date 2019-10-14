@@ -44,8 +44,8 @@ export class ShiftConfirmationComponent implements OnInit {
   }
 
   setup(){
-    this.shiftService.buildUpcomingEvents();
-    this.shiftService.getShifts().subscribe((shifts)=>{
+    this.shiftService.buildAdministeredEvents();
+    this.shiftService.getAdministeredShifts().subscribe((shifts)=>{
       let arr = [];
       for(let s of shifts){
         arr.push(new DataHolder(s, false, this.auth.getUsersDetails([s.companionId]), this.shiftService.getEventFromShiftId(s.id)));
