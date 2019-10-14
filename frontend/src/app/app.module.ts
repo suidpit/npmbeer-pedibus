@@ -84,7 +84,6 @@ import { ProfileComponent } from './components/profileInfo/profile/profile.compo
 import { HomeComponent } from './components/home/home.component';
 import { KidTrackerComponent } from './components/kid-tracker/kid-tracker.component';
 import {AgmCoreModule} from "@agm/core";
-import { SimpleEventLoggerComponent } from './components/simple-event-logger/simple-event-logger.component';
 
 import {
     ChildCardComponent,
@@ -138,7 +137,6 @@ import {MAT_SNACK_BAR_DATA} from "@angular/material/snack-bar";
     ProfileComponent,
     HomeComponent,
     KidTrackerComponent,
-    SimpleEventLoggerComponent,
     ManageChildrenComponent,
     ChildCardComponent,
     ChangePasswordComponent,

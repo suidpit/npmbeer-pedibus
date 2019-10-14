@@ -99,7 +99,7 @@ public class GeneralConfiguration {
 //        }
 
 
-        MongoClient mc = new MongoClient("127.0.0.1", 27017);
+        MongoClient mc = new MongoClient("db", 27017);
         MongoDatabase collections = mc.getDatabase("test");
         boolean checkR = true;
         boolean checkP = true;
