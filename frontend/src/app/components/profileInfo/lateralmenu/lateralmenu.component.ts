@@ -53,7 +53,6 @@ export class LateralmenuComponent implements OnInit, OnDestroy {
           this.form.controls.addressDopo.value,
           this.form.controls.telephoneDopo.value).subscribe(
           (res) => {
-              console.log(res);
           }
       )
   }

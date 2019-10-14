@@ -45,7 +45,6 @@ return pass === confirmPass ? null : { notSame: true }
 // err: (err) => /*callback per errore*/,
 // final: (res) => /*callback da eseguire per ultima come nel blocco finally*/
     let self = this;
-    console.log(this.activatedRoute.snapshot.params['token']);
     //debugger;
 
     this.auth.sendPassword(
@@ -54,7 +53,6 @@ return pass === confirmPass ? null : { notSame: true }
       this.activatedRoute.snapshot.params['token'])
       .subscribe(
                   (data) => {
-                          console.log("%cAttivazione account","color:green");
                           this.openSnackBar();
 
                           self.router.navigate(["/login"]);
@@ -63,13 +61,10 @@ return pass === confirmPass ? null : { notSame: true }
                         },
                   (error) => {
                     if(error==200){
-                      console.log("%cAttivazione account","color:green");
                       this.openSnackBar();
 
                       self.router.navigate(["/login"]);
                     }else{
-                      console.log("%cErrore codice:"  + error,"color:red");
-
                     }
                         }
                   // () => {

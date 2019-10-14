@@ -6,13 +6,13 @@ import {LocalTime} from "js-joda";
 export class Line {
   name;
   id;
-  adminEmail;
+  admin_email;
   stops: StopList;
 
   constructor(values: any = {}) {
     this.name = values.name;
     this.id = values.id;
-    this.adminEmail = values.adminEmail;
+    this.admin_email = values.admin_email;
     this.stops = new StopList(values.stops);
   }
 }

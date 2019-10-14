@@ -77,7 +77,6 @@ export class AuthService {
   }
 
   sendPassword(pass:string, repass:string,token:string){
-    console.log("invio pwd to " +this.send_pwd_url+token);
     return this.http.post<any>(this.send_pwd_url+token, { "pass" : pass, "repass" : repass}).pipe(catchError(err=>this.handleError(err)));
   }
 
