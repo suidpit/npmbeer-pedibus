@@ -13,15 +13,12 @@ export class SimpleEventLoggerComponent implements OnInit {
   constructor(private _eventsService: EventsService, private _zone: NgZone) { }
 
   ngOnInit() {
-    console.log("Heeey")
     this._eventsService.getServerSentEvent('http://localhost:8080/events/stream').subscribe({
       next: event => {
         this._zone.run(() => {
-          console.log(event.body)
           this.events.push(event)
         })
-      },
-      error: err => console.log(err)
+      }
     });
   }
 }

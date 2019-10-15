@@ -131,7 +131,6 @@ export class ReservationsComponent implements OnInit, OnDestroy {
                             ("0" + date.monthValue()).slice(-2) +
                             date.year();
                         let lt: LocalTime = null;
-                        console.log(stop);
                         if (this.selectedReservation.direction == 'OUTWARD') {
                             lt = stop.outward[this.selectedReservation.tripIndex];
                         } else {
@@ -292,7 +291,6 @@ export class ReservationsComponent implements OnInit, OnDestroy {
                 } else {
                     //default stops available
                     if(element.date.isEqual(LocalDate.now()) && element.default_stop_time.isBefore(LocalTime.now())){
-                        console.log(element.default_stop_time);
                         //default stop not bookable
                         this.openSnackbar("Corsa partita. Impossibile prenotare fermata di default, selezionarne un'altra");
                         this.selectedReservation = element;

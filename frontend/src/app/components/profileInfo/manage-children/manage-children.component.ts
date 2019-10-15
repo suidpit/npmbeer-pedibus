@@ -2,10 +2,12 @@ import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {ProfileService} from "../../../services/profile/profile.service";
 import {Child} from "../../../models/child";
 import {FormControl} from "@angular/forms";
-import {takeUntil} from "rxjs/operators";
-import {Subject} from "rxjs";
+import {map, startWith, takeUntil} from "rxjs/operators";
+import {Observable, Subject, fromEvent} from "rxjs";
 import {DomSanitizer} from '@angular/platform-browser';
 import {MatSnackBar} from "@angular/material";
+import {throttleTime} from "rxjs/operators";
+
 
 @Component({
     selector: 'app-manage-children',
@@ -62,7 +64,19 @@ export class ManageChildrenComponent implements OnInit, OnDestroy {
         this.unsubscribe$.complete();
     }
 
+    isScreenSmall$ = null;
     ngOnInit() {
+        // Checks if screen size is less than 1024 pixels
+        const checkScreenSize = () => document.body.offsetWidth < 600;
+
+        // Create observable from window resize event throttled so only fires every 500ms
+        const screenSizeChanged$ = fromEvent(window, 'resize').pipe(throttleTime(500), map(checkScreenSize));
+
+        // Start off with the initial value use the isScreenSmall$ | async in the
+        // view to get both the original value and the new value after resize.
+        this.isScreenSmall$ = screenSizeChanged$.pipe(startWith(checkScreenSize()))
+
+
         this.profileService.children$.pipe(
             takeUntil(this.unsubscribe$)
         ).subscribe((children) => {

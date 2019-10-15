@@ -59,7 +59,6 @@ onSubmit(){
     let self = this;
     this.auth.registerEmail(this.emailFormGroup.controls.email.value,this.emailFormGroup.controls.checkbox.value)
       .subscribe( (res) => {
-                          console.log("Email inviata");
                           self.showPopupEmailSended();
                           self.router.navigate(["/login"]);
                         },
@@ -69,8 +68,6 @@ onSubmit(){
                             self.emailFormGroup.controls.email.setErrors({"exists": true})
                           }
                           else if(err.status === 403){
-                            console.log("%cAzione proibita","color:red");
-
                           }
                           self.error = true;
 
@@ -81,9 +78,6 @@ onSubmit(){
                   // }
 
      );
-     console.log(this.emailFormGroup.controls.email.value);
-     console.log(this.emailFormGroup.controls.checkbox.value);
-
 
 }
   showPopupEmailSended(){

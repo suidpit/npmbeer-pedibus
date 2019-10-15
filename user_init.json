@@ -71,5 +71,16 @@
       }
     ],
     "enabled": true
+  },
+  {
+    "email": "admin@me.com",
+    "password": "1234",
+    "roles": [
+      "USER",
+      "SYSTEM_ADMIN"
+    ],
+    "authorities": [],
+    "children": [],
+    "enabled": true
   }
 ]

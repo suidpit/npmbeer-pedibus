@@ -101,7 +101,6 @@ export class ProfileService {
 
     getProfileinformation(){
         this.http.get<UserProfile>(this.baseUrl+"/profile/information").subscribe((user)=>{
-            console.log(user);
             this.user$.next(user);
         });
     }

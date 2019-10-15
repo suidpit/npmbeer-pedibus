@@ -1,97 +1,101 @@
-<mat-card>
-    <mat-card-header>
-      <mat-card-title>Profilo</mat-card-title>
-      <mat-card-subtitle>Gestisci le tue informazioni personali</mat-card-subtitle>
-    </mat-card-header>
+<mat-card ngClass.gt-sm="content-big" ngClass.xs="content-small" *ngIf="user" fxLayout="column">
     <mat-divider [inset]="true"></mat-divider>
-    <mat-card-content *ngIf="user" fxLayout="column">
+    <mat-card-header>
+        <mat-card-title>Profilo</mat-card-title>
+        <mat-card-subtitle>Gestisci le tue informazioni personali</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
         <form role=form name="profileForm" #f="ngForm" (submit)="f.form.valid && saveUser()">
-                <div fxFill fxLayout="row">
-                    <div fxFlex="50%">
-                        <p>Avatar: </p>
-                        <img [src]="(user && user.photo) ? user.photo : '../../../../assets/icons/img_avatar.png'"
-                             class="preview">
-                    </div>
-                    <div fxFlex="50%" class="btn btn-default">
-                        <input class="input_file" type="file" (change)="selectFile($event)">
-                        <p class="error" *ngIf="image_error">{{image_error}}</p>
-                        <img *ngIf="previewUrl" [src]="previewUrl" class="preview">
-                    </div>
-                    <div>
-
+            <div fxLayout.gt-xs="row" fxLayout.xs="column nowrap">
+                <div fxFlex.gt-xs="50%">
+                    <p>Avatar: </p>
+                    <img [src]="(user && user.photo) ? user.photo : '../../../../assets/icons/img_avatar.png'"
+                         class="preview">
+                </div>
+                <div fxFlex.gt-xs="50%">
+                    <input class="input_file" type="file" (change)="selectFile($event)">
+                    <p class="error" *ngIf="image_error">{{image_error}}</p>
+                    <img *ngIf="previewUrl" [src]="previewUrl" class="preview">
+                </div>
+            </div>
+            <mat-divider [inset]="true" style="margin: 20px 0;"></mat-divider>
+            <div fxFill fxLayout.gt-xs="row" fxLayout.xs="column">
+                <div fxFlex.gt-xs="50%">
+                    <mat-form-field>
+                        <input ngClass.gt-xs="input email" ngClass.xs="input-small email" matInput [disabled]="true" placeholder="Email" value="{{user.email}}">
+                    </mat-form-field>
+                </div>
+                <div fxFlex.gt-xs="50%">
+                    <mat-form-field>
+                        <input matInput ngClass.gt-xs="input form-control" ngClass.xs="input-small form-control"
+                               type="email"
+                               placeholder="Email Alternativa"
+                               name="alt_email" [(ngModel)]="user.alt_email" #alt_email="ngModel" email>
+                    </mat-form-field>
+                    <div *ngIf="f.submitted && alt_email.invalid " class="invalid-feedback">
+                        <div class="error">Email deve essere un indirizzo valido</div>
                     </div>
                 </div>
-                <mat-divider [inset]="true" style="margin: 20px 0;"></mat-divider>
-                <div fxFill fxLayout="row">
-                    <div fxFlex="50%">
-                        <mat-form-field>
-                          <input matInput [disabled]="true" placeholder="Email" class="email" value="{{user.email}}">
-                        </mat-form-field>
-                    </div>
-                    <div fxFlex="50%">
-                        <mat-form-field>
-                          <input matInput type="email" placeholder="Email Alternativa" class="form-control"
-                                 name="alt_email" [(ngModel)]="user.alt_email" #alt_email="ngModel" email>
-                        </mat-form-field>
-
-                        <div *ngIf="f.submitted && alt_email.invalid " class="invalid-feedback">
-                            <div class="error">Email deve essere un indirizzo valido</div>
-                        </div>
-                    </div>
+            </div>
+            <div fxFill fxLayout.gt-xs="row" fxLayout.xs="column">
+                <div fxFlex="50%">
+                    <mat-form-field>
+                        <input ngClass.gt-xs="input" ngClass.xs="input-small" matInput placeholder="Nome"
+                               [(ngModel)]="user.name" name="name">
+                    </mat-form-field>
                 </div>
-                <div fxFill fxLayout="row">
-                    <div fxFlex="50%">
-                      <mat-form-field>
-                        <input matInput placeholder="Nome" [(ngModel)]="user.name" name="name">
-                      </mat-form-field>
-                    </div>
-                    <div fxFlex="50%">
-                      <mat-form-field>
-                        <input matInput placeholder="Cognome" [(ngModel)]="user.surname" name="surname">
-                      </mat-form-field>
-                    </div>
+                <div fxFlex="50%">
+                    <mat-form-field>
+                        <input ngClass.gt-xs="input" ngClass.xs="input-small" matInput placeholder="Cognome"
+                               [(ngModel)]="user.surname" name="surname">
+                    </mat-form-field>
                 </div>
-                <div fxFill fxLayout="row">
-                    <div fxFlex="50%">
-                      <mat-form-field>
-                        <input matInput placeholder="Indirizzo" [(ngModel)]="user.address" name="address">
-                      </mat-form-field>
-                    </div>
-                    <div fxFlex="50%">
-                      <mat-form-field>
-                        <input matInput [(ngModel)]="user.telephone" placeholder="Telefono" name="telephone" #tel="ngModel" pattern="(\+[0-9][0-9])?[0-9]+"></mat-form-field>
+            </div>
+            <div fxFill fxLayout.gt-xs="row" fxLayout.xs="column">
+                <div fxFlex="50%">
+                    <mat-form-field>
+                        <input ngClass.gt-xs="input" ngClass.xs="input-small" matInput placeholder="Indirizzo"
+                               [(ngModel)]="user.address" name="address">
+                    </mat-form-field>
+                </div>
+                <div fxFlex="50%">
+                    <mat-form-field>
+                        <input matInput [(ngModel)]="user.telephone" ngClass.gt-xs="input" ngClass.xs="input-small"
+                               placeholder="Telefono" name="telephone"
+                               #tel="ngModel" pattern="(\+[0-9][0-9])?[0-9]+">
                         <div *ngIf="tel.invalid" class="invalid-feedback">
                             <div class="error">Formato numero non valido</div>
                         </div>
-                    </div>
+                    </mat-form-field>
                 </div>
-                <div fxFill fxLayout="row">
-                    <div fxFlex="50%">
-                        <p>Seleziona una linea di default</p>
-                        <mat-form-field>
-                            <mat-select placeholder="Seleziona una linea" name="defaultLine"
-                                        [(ngModel)]="user.defaultLine" (valueChange)="user.defaultStop = null">
-                                <mat-option>Nessuna linea selezionata</mat-option>
-                                <mat-option *ngFor="let line of lines" [value]="line.name">
-                                    {{line.name}}
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
-                    <div fxFlex="50%">
-                        <p>Seleziona una fermata di default</p>
-                        <mat-form-field>
-                            <mat-select placeholder="Seleziona una fermata" [(value)]="user.defaultStop">
-                                <mat-option>Nessuna fermata selezionata</mat-option>
-                                <mat-option *ngFor="let stop of findStops()" [value]="stop">
-                                    {{stop}}
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
+            </div>
+            <div fxFill fxLayout.gt-xs="row" fxLayout.xs="column">
+                <div fxFlex="50%">
+                    <p>Seleziona una linea di default</p>
+                    <mat-form-field ngClass.gt-xs="field" ngClass.xs="field-small">
+                        <mat-select placeholder="Seleziona una linea" name="defaultLine"
+                                    [(ngModel)]="user.defaultLine" (valueChange)="user.defaultStop = null">
+                            <mat-option>Nessuna linea selezionata</mat-option>
+                            <mat-option *ngFor="let line of lines" [value]="line.name">
+                                {{line.name}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
                 </div>
-                <mat-divider [inset]="true" style="margin: 5px 0 20px 0"></mat-divider>
-                <button mat-raised-button color="primary">SALVA</button>
+                <div fxFlex="50%">
+                    <p>Seleziona una fermata di default</p>
+                    <mat-form-field ngClass.gt-xs="field" ngClass.xs="field-small">
+                        <mat-select placeholder="Seleziona una fermata" [(value)]="user.defaultStop">
+                            <mat-option>Nessuna fermata selezionata</mat-option>
+                            <mat-option *ngFor="let stop of findStops()" [value]="stop">
+                                {{stop}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <mat-divider [inset]="true" style="margin: 5px 0 20px 0"></mat-divider>
+            <button mat-raised-button color="primary">SALVA</button>
         </form>
     </mat-card-content>
     <app-spinner *ngIf="task=='loading'"></app-spinner>
