@@ -59,7 +59,6 @@ export class ReservationsService {
         let line = this.defaultLine;
         let tripIndex = 0;
         let times: LocalTime[] = [];
-        console.log(today);
         if(today) {
             if (direction == 'OUTWARD')
                 times = this.lines.filter(value => value.name === line)[0].stops.stops

@@ -141,7 +141,6 @@ export class ShiftService {
       let shifts = [];
       for(let s of retrieved_shifts){
 
-        console.log(s);
         let shift = new Shift();
         let date = LocalDate.parse(s.date, DateTimeFormatter.ofPattern("d-M-yyyy"));
         shift.startsAt = LocalTime.parse(s.startsAt);
@@ -333,7 +332,6 @@ export class ShiftService {
               "-" + ("0" + date.monthValue()).slice(-2) +
               "-" + ("0" + date.dayOfMonth()).slice(-2);
             for (let line of line_list) {
-              console.log(line);
               let event = {};
               let new_shift;
               // create a shift for each ride
@@ -347,7 +345,7 @@ export class ShiftService {
                 new_shift.endsAt = line.stops.endsAt[0][tripIndex];
                 new_shift.from = line.stops.stops[0].name;
                 new_shift.to = line.stops.stops[line.stops.stops.length-1].name;
-                new_shift.defaultCompanion = line.adminEmail;
+                new_shift.defaultCompanion = line.admin_email;
 
                 // filter shifts finding all elements which are equal to new_shift. If any exists, don't add event.
                 if (shifts.filter(elem => new_shift.compareTo(elem.shift)).length <= 0) {
@@ -378,7 +376,7 @@ export class ShiftService {
                 new_shift.endsAt = line.stops.endsAt[1][tripIndex];
                 new_shift.from = line.stops.stops[line.stops.stops.length-1].name;
                 new_shift.to = line.stops.stops[0].name;
-                new_shift.defaultCompanion = line.adminEmail;
+                new_shift.defaultCompanion = line.admin_email;
 
                 if (shifts.filter(elem => new_shift.compareTo(elem.shift)).length <= 0) {
 
@@ -505,7 +503,6 @@ export class ShiftService {
   }
 
   sendShiftAssignment(s: Shift, assigned_user: string, arrival_stop: Stop){
-    console.log(arrival_stop);
     let stop = null;
     let time = null;
     let coords = null;
@@ -530,7 +527,6 @@ export class ShiftService {
       position: coords,
       endsAt: time
     };
-    console.log(body);
     return this.http.post(`${this.shift_url}/confirm`, body);
   }
 

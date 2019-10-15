@@ -12,7 +12,6 @@ export class SseService {
   }
 
   getEventSource(url: string): EventSourcePolyfill {
-    console.log("HEEEY FROM SSE");
     let token = localStorage.getItem('token_id');
     return new EventSourcePolyfill(url, { headers: {
       'Authorization': 'bearer ' + token

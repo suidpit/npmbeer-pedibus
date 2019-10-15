@@ -3,6 +3,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AngularResizedEventModule} from 'angular-resize-event';
+import {NgPipesModule} from 'ngx-pipes';
 import {
     MatBadgeModule,
     MatExpansionModule,
@@ -211,6 +212,7 @@ import {MAT_SNACK_BAR_DATA} from "@angular/material/snack-bar";
     MatSnackBarModule,
     AngularResizedEventModule,
     LayoutModule,
+    NgPipesModule
   ],
   providers: [MatDatepickerModule, {
     provide: HTTP_INTERCEPTORS,

@@ -118,8 +118,7 @@ export class ShiftConfirmationComponent implements OnInit {
       this.n = 0;
       this.setup();
       this.openSnackbar("Turni salvati con successo.");
-    },
-      (err) => console.log(err));
+    });
   }
 
 

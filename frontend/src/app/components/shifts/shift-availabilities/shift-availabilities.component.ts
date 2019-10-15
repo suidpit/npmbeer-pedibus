@@ -181,7 +181,6 @@ export class DialogEventAdmin {
         public dialogRef: MatDialogRef<DialogEventInfo>,
         @Inject(MAT_DIALOG_DATA) public data: DialogEventData) {
 
-        console.log(data);
         this.shift = data.extendedProps.obj;
         if (this.shift != null) {
             this.lineService.getLineByName(this.shift.lineName).subscribe((data) => {
@@ -223,7 +222,6 @@ export class DialogEventAdmin {
         }
 
 
-        // TODO get default companion
         this.shiftInputs = this.formBuilder.group({
             companion: ["", [
                 Validators.required

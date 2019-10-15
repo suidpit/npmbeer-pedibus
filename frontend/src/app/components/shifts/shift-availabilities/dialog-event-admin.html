@@ -29,8 +29,11 @@
             <span fxFlex="30">Arrivo:</span>
             <span fxFlex="70">
               <mat-form-field class="companion_select" style="max-width: 130px;">
-                <mat-select formControlName="stop">
-                    <mat-option *ngFor="let stop of stops$ | async" [value]="stop">[{{stop.back[shift.tripIndex]}}] {{stop.name}}</mat-option>
+                <mat-select *ngIf="shift.direction=='OUTWARD'" formControlName="stop">
+                    <mat-option *ngFor="let stop of stops$ | async" [value]="stop.name">[{{stop.outward[shift.tripIndex]}}] {{stop.name}}</mat-option>
+                </mat-select>
+                <mat-select *ngIf="shift.direction=='BACK'" formControlName="stop">
+                    <mat-option *ngFor="let stop of stops$ |  reverse |async " [value]="stop.name">[{{stop.back[shift.tripIndex]}}] {{stop.name}}</mat-option>
                 </mat-select>
               </mat-form-field>
               <div [hidden]="!warning" class="stop-warning" style="max-width: 130px;font-weight: bold;text-align: center; cursor: help;"

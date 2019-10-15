@@ -245,8 +245,48 @@ public class ShiftController {
     public Mono<Event> postShiftConfirmation(@RequestBody @Valid ShiftRequestDTO shiftRequestDTO){
         // TODO send notification to user.
         if(canView(shiftRequestDTO.getLineName())){
-            if(shiftRequestDTO.getShiftId() != null){
-                Shift s = this.shiftService.getShiftById(shiftRequestDTO.getShiftId());
+            if(shiftRequestDTO.getShiftId() != null || shiftRequestDTO.getAssignedCompanionEmail().equals(lineService.getLine(shiftRequestDTO.getLineName()).getAdmin_email())){
+                Shift s;
+                if(shiftRequestDTO.getShiftId()==null){
+                    s = new Shift();
+                    Line l = this.lineService.getLine(shiftRequestDTO.getLineName());
+
+                    if(l == null){
+                        throw new LineNotExistingException();
+                    }
+
+                    s.setLineName(shiftRequestDTO.getLineName());
+                    s.setDate(shiftRequestDTO.getDate());
+                    s.setDefaultCompanion(l.getAdmin_email());
+                    s.setOpen(true);
+                    s.setDirection(shiftRequestDTO.getDirection());
+                    s.setTripIndex(shiftRequestDTO.getTripIndex());
+
+                    // setting starting and ending stops and times
+                    Stop from = l.getStops().get(l.getStops().size()-1);
+                    Stop to = l.getStops().get(0);
+                    if(s.getDirection() == Reservation.Direction.BACK){
+                        s.setFrom(from.getName());
+                        s.setStartsAt(from.getBack().get(s.getTripIndex()));
+                        // Take last stop
+                        s.setTo(to.getName());
+                        s.setEndsAt(to.getBack().get(s.getTripIndex()));
+                    }
+                    else{
+                        Stop temp = from;
+                        from = to;
+                        to = temp;
+                        s.setFrom(from.getName());
+                        s.setStartsAt(from.getOutward().get(s.getTripIndex()));
+                        // Take last stop
+                        s.setTo(to.getName());
+                        s.setEndsAt(to.getOutward().get(s.getTripIndex()));
+                    }
+
+                    s.setLastUpdate(from.getPosition());
+                }else{
+                    s = this.shiftService.getShiftById(shiftRequestDTO.getShiftId());
+                }
                 User u = this.userService.getUserByEmail(shiftRequestDTO.getAssignedCompanionEmail());
                 if(u != null){
                     s.setCompanionId(u.getId());

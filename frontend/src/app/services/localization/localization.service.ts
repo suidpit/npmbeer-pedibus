@@ -81,7 +81,6 @@ export class LocalizationService {
                 timems = (shift.startsAt.toSecondOfDay() - LocalTime.now().toSecondOfDay())*1000;
                 end_timems = (shift.endsAt.toSecondOfDay() - shift.startsAt.toSecondOfDay())*1000;
               }
-              console.log("Position streaming will start in "+Number(timems/(60*1000)).toFixed(2) + " minutes");
 
               // start streaming at shift start time -- stop at shift end
               setTimeout(() => {
@@ -91,8 +90,7 @@ export class LocalizationService {
                 }, end_timems)
               }, timems)
             }
-          },
-          (err) => console.log(err));
+          });
     }
   }
 
@@ -120,7 +118,6 @@ export class LocalizationService {
 
   private togglePositionStreaming(on = true, stompClient, shift: Shift = null){
     if(on && shift){
-      console.log("Position streaming starting  in 20 seconds.");
       this.position_subscription = interval(20000).subscribe(() =>{
 
         //send position info.
@@ -164,7 +161,7 @@ export class LocalizationService {
       return;
     }
     let headers = this.getAuthenticationHeaders();
-    this.stomp_client.connect(headers, () =>{ console.log("Stomp Client Connected")});
+    this.stomp_client.connect(headers, () =>{});
   }
 
   disconnectStompClient(){
