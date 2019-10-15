@@ -21,8 +21,17 @@
                 <button (click)=selectTaskBambini()
                         class="menu-item"
                         mat-flat-button>
-                    <mat-icon>work</mat-icon>
+                    <mat-icon>insert_emoticon</mat-icon>
                     Bambini
+                </button>
+
+                <button
+                  *ngIf="isAdmin"
+                  (click)="selectTaskGestioneUtenti()"
+                  class="menu-item"
+                  mat-flat-button>
+                  <mat-icon>contacts</mat-icon>
+                  Gestione Utenti
                 </button>
 
                 <button (click)=selectTaskCambioPassword()
@@ -47,6 +56,14 @@
                     <mat-icon>work</mat-icon>
                 </button>
 
+                <button
+                  *ngIf="isAdmin"
+                  (click)="selectTaskGestioneUtenti()"
+                  class="menu-item"
+                  mat-flat-button>
+                  <mat-icon>contacts</mat-icon>
+                </button>
+
                 <button (click)=selectTaskCambioPassword()
                         class="menu-item"
                         mat-flat-button>
@@ -64,7 +81,7 @@
     <div ngClass.gt-xs="task" ngClass.xs="task-small" *ngIf="task==='cambioPwd'">
         <app-change-password></app-change-password>
     </div>
-    <div class="task" *ngIf="task==='manageUsers'">
+    <div ngClass.gt-xs="task" ngClass.xs="task-small" class="task" *ngIf="task==='manageUsers'">
         <app-manage-users></app-manage-users>
     </div>
 </div>

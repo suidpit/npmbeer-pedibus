@@ -19,7 +19,7 @@ export class LateralmenuComponent implements OnInit, OnDestroy {
     user = null;
     userInfo;
     task = "profilo";
-    email: Observable<string>
+    email: Observable<string>;
     name;
     surname;
     address;
@@ -71,7 +71,9 @@ export class LateralmenuComponent implements OnInit, OnDestroy {
             takeUntil(this.unsubscribe$)
         ).subscribe((user) => {
             this.user = user;
-        })
+        });
+
+        this.isAdmin = this.auth.getCurrentUser().hasMinAuthority(Role.ADMIN);
     }
 
     isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)

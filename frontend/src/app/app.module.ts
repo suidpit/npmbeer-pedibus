@@ -221,7 +221,7 @@ import {MAT_SNACK_BAR_DATA} from "@angular/material/snack-bar";
   }, {
     provide: MAT_SNACK_BAR_DATA, useValue: {}
   }],
-  entryComponents: [SnackbarComponent,DialogAddKidReg,DialogEmailSended, DialogEmailExists, DialogEmailExistsNewReg,
+  entryComponents: [SnackbarComponent,DialogAddKidReg,DialogEmailSended, DialogEmailExists, DialogEmailExistsNewReg, DialogAddKid,
                     DialogEventInfo, DialogEventNormal, DialogEventAdmin, DialogEmailSendedNewReg, PizzaPartyComponent, BookingDialog],
   bootstrap: [AppComponent]
 
