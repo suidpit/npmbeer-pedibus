@@ -32,6 +32,6 @@ export class EventsService {
   }
 
   setNotificationRead(notId: string): Observable<any> {
-    return this.http.post(`http://localhost:8080/events/read`, notId);
+    return this.http.post(`http://192.168.99.100:8080/events/read`, notId);
   }
 }

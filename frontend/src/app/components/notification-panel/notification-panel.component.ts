@@ -11,7 +11,7 @@ export class NotificationPanelComponent implements OnInit {
   constructor(private _eventsService: EventsService, private _zone: NgZone) { }
 
   ngOnInit() {
-    this._eventsService.getServerSentEvent('http://localhost:8080/events/stream').subscribe({
+    this._eventsService.getServerSentEvent('http://192.168.99.100:8080/events/stream').subscribe({
       next: notification => {
         this._zone.run(() => {
           this.notifications.push(notification)
