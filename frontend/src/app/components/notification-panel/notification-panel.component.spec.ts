@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SimpleEventLoggerComponent } from './simple-event-logger.component';
+import { NotificationPanelComponent } from './notification-panel.component';
 
-describe('SimpleEventLoggerComponent', () => {
-  let component: SimpleEventLoggerComponent;
-  let fixture: ComponentFixture<SimpleEventLoggerComponent>;
+describe('NotificationPanelComponent', () => {
+  let component: NotificationPanelComponent;
+  let fixture: ComponentFixture<NotificationPanelComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SimpleEventLoggerComponent ]
+      declarations: [ NotificationPanelComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SimpleEventLoggerComponent);
+    fixture = TestBed.createComponent(NotificationPanelComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -15,7 +15,7 @@ export  interface DialogEventData {
   to: string;
   line: string;
   direction: string;
-  extendedProps: { obj: null}
+  extendedProps: { obj: any}
 }
 
 @Component({

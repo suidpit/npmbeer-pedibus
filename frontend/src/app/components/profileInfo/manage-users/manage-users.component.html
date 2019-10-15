@@ -5,7 +5,7 @@
   </mat-card-header>
   <mat-divider [inset]="true"></mat-divider>
   <mat-card-content  fxFlex="2 0 100%">
-    <form (ngSubmit)="f.valid && onSubmit(f)" #f="ngForm">
+    <form (ngSubmit)="f.valid && onSubmit()" #f="ngForm">
 
       <div fxLayout="column">
 
@@ -38,4 +38,3 @@
     </form>
   </mat-card-content>
 </mat-card>
-<app-spinner *ngIf="task=='loading'"></app-spinner>

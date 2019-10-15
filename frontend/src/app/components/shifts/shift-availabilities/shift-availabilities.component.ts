@@ -167,11 +167,12 @@ export class DialogEventNormal {
 })
 export class DialogEventAdmin {
 
-    private stops$: Observable<Stop[]>;
+    public stops$: Observable<Stop[]>;
     private stop_dict = {};
     public shiftInputs;
-    private readonly shift: Shift;
-    private warning: boolean;
+    public readonly shift: Shift;
+    // FIX THIS
+    public warning: boolean;
 
     constructor(
         private shiftService: ShiftService,

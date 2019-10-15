@@ -70,4 +70,15 @@ public class EventController {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/read", method=RequestMethod.POST)
+    public Mono<Event> readEvent(@RequestBody String notificationId) {
+        try {
+            return this.eventService.setRead(notificationId);
+        }
+        catch (Exception e) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        }
+    }
 }

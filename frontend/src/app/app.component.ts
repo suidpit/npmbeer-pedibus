@@ -2,6 +2,9 @@ import {Component} from '@angular/core';
 import {MatIconRegistry} from "@angular/material/icon";
 import {DomSanitizer} from "@angular/platform-browser";
 import {LocalizationService} from "./services/localization/localization.service";
+import {MatSnackBar} from "@angular/material/snack-bar";
+import {EventsService} from "./services/events/events.service";
+import {SnackbarComponent} from "./components/snackbar/snackbar.component";
 
 @Component({
     selector: 'app-root',
@@ -98,11 +101,21 @@ export class AppComponent {
 
     constructor(private matIconRegistry: MatIconRegistry,
                 private domSanitizer: DomSanitizer,
-                private locService: LocalizationService) {
+                private locService: LocalizationService,
+                private snackBar: MatSnackBar,
+                private eventsService: EventsService) {
         for (let img of this.icons) {
             this.matIconRegistry.addSvgIcon(
                 img.name, this.domSanitizer.bypassSecurityTrustResourceUrl("../assets/icons/" + img.path)
             );
         }
+        this.eventsService.currentNotification.subscribe(message => {
+            if (message != null) {
+                this.snackBar.openFromComponent(SnackbarComponent, {
+                    data: message.body,
+                    duration: 10000
+                })
+            }
+        })
     }
 }

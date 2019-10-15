@@ -10,7 +10,10 @@ import it.polito.ai.pedibus.api.repositories.LineRepository;
 import it.polito.ai.pedibus.api.repositories.ShiftRepository;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
 import it.polito.ai.pedibus.api.services.PhotoService;
+import it.polito.ai.pedibus.api.services.UserService;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +30,8 @@ import java.util.List;
 @Configuration
 public class GeneralConfiguration {
 
+
+    Logger logger = LoggerFactory.getLogger(GeneralConfiguration.class);
     @Autowired
     PasswordEncoder encoder;
 
@@ -51,24 +56,22 @@ public class GeneralConfiguration {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.registerModule(new GeoJsonModule());
-
+        logger.info("Inside general configuration");
         // Read lines from .json using the mapper (second argument returns a TypeReference to List<Line> type
         List<Line> lines = mapper.readValue(new File(initDataFileName),
                 mapper.getTypeFactory().constructCollectionType(List.class, Line.class));
-
         // Automatically inserting all the lines data only if it has not been already initialized.
         if (lineRepository.findAll().size() == 0) {
             lineRepository.insert(lines);
         }
 
-
+        logger.info("Before user init");
         // Inserting all the user and child data only if user has not been already initialized.
         if (userRepository.findAll().size() == 0) {
             childRepository.deleteAll();
 
             List<UserTemp> tempUsers = mapper.readValue(new File(userInitDataFileName),
                     mapper.getTypeFactory().constructCollectionType(List.class, UserTemp.class));
-
             for(UserTemp o : tempUsers){
                 User u = new User();
                 u.setPassword(encoder.encode(o.getPassword()));
@@ -85,7 +88,8 @@ public class GeneralConfiguration {
                     ids.add(c.getId());
                 }
                 u.setChildren(ids);
-                userRepository.insert(u);
+                logger.info(u.toString());
+                userRepository.save(u);
             }
         }
 
@@ -99,7 +103,7 @@ public class GeneralConfiguration {
 //        }
 
 
-        MongoClient mc = new MongoClient("127.0.0.1", 27017);
+        MongoClient mc = new MongoClient("db", 27017);
         MongoDatabase collections = mc.getDatabase("test");
         boolean checkR = true;
         boolean checkP = true;

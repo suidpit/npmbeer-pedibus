@@ -7,7 +7,8 @@
       {{data.date.toLocaleDateString("it-IT",{ weekday: 'long'}) | titlecase}}, <br>
       {{data.date.toLocaleDateString("it-IT",{ year: 'numeric', month: 'long', day: 'numeric' }) | titlecase}}
     </h2>
-    <h3>Ore {{data.time}}</h3>
+    <!-- FIX THIS -->
+    <h3>Ore {{data.startsAt}}</h3>
   </div>
   <div>
     <h3 style="font-family: 'Bookman Old Style';font-weight: bold; color: #f29d27;">{{data.line}}</h3>
