@@ -61,9 +61,12 @@ export class ShiftService {
   constructor(private lineService: AttendanceService, private auth: AuthService, private http: HttpClient) {
     this.auth.isLoggedIn$.subscribe((login) =>{
       if(login){
-        this.updateCalendarShifts(new Date());
-        this.buildUpcomingEvents();
-        this.updateTodaysShifts();
+        if(Role.COMPANION in auth.getCurrentUser().authorities ||
+            Role.ADMIN in auth.getCurrentUser().authorities ||
+            Role.SYSTEM_ADMIN in auth.getCurrentUser().authorities)
+          this.updateCalendarShifts(new Date());
+          this.buildUpcomingEvents();
+          this.updateTodaysShifts();
       }
     });
   }
