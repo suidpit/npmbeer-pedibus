@@ -52,6 +52,9 @@ export class ShiftService {
   private todays_shift_subject: Subject<any[]> = new BehaviorSubject([]);
   todays_shifts$: Observable<any[]> = this.todays_shift_subject.asObservable();
 
+  private administered_shifts_subject: Subject<Shift[]> = new BehaviorSubject([]);
+  administered_shifts$: Observable<Shift[]> = this.administered_shifts_subject.asObservable();
+
   private currentStartDate: Date;
   private currentEndDate: Date;
 
@@ -160,6 +163,48 @@ export class ShiftService {
         shifts.push(shift);
       }
       this.shifts_subject.next(shifts);
+    });
+  }
+
+  /**
+   * Same as upcoming events but gathers all those for which user is admin.
+   */
+  buildAdministeredEvents(){
+    let startDate = new Date();
+    let start = LocalDate.of(startDate.getFullYear(), startDate.getMonth()+1, startDate.getDate());
+    // let start = LocalDateTime.ofEpochSecond(startDate.valueOf()/1000+1, ZoneOffset.of());
+    // backend compliant string
+    let dateString =("0" + start.dayOfMonth()).slice(-2) +
+      ("0" + start.monthValue()).slice(-2) +
+      start.year();
+
+    this.http.get<any[]>(`${this.shift_url}/administered/${dateString}`).subscribe((retrieved_shifts)=>{
+      let shifts = [];
+      for(let s of retrieved_shifts){
+
+        console.log(s);
+        let shift = new Shift();
+        let date = LocalDate.parse(s.date, DateTimeFormatter.ofPattern("d-M-yyyy"));
+        shift.startsAt = LocalTime.parse(s.startsAt);
+        shift.endsAt = LocalTime.parse(s.endsAt);
+        shift.id = s.id;
+        shift.date = date;
+        shift.lineName = s.lineName;
+        shift.direction = s.direction;
+        shift.tripIndex = s.tripIndex;
+        shift.open = s.open;
+        shift.from = s.from;
+        shift.to = s.to;
+        shift.availabilities = this.auth.getUsersDetails(s.availabilities);
+        shift.companionId = s.companionId;
+        shift.defaultCompanion = s.defaultCompanion;
+
+        let color = this.getBackgroundColor(shift, s.lineName, s.availabilities);
+        shift.color = color === Colors.GREEN?Colors.GREEN : Colors.BLUE;
+
+        shifts.push(shift);
+      }
+      this.administered_shifts_subject.next(shifts);
     });
   }
 
@@ -437,6 +482,10 @@ export class ShiftService {
 
   getTodaysShifts(): Observable<Shift[]>{
     return this.todays_shifts$;
+  }
+
+  getAdministeredShifts(): Observable<Shift[]>{
+    return this.administered_shifts$;
   }
 
   sendShiftAvailability(s: Shift){

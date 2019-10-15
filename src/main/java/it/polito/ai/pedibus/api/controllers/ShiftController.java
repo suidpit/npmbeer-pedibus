@@ -104,6 +104,30 @@ public class ShiftController {
 
 
     @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN') or hasAuthority('COMPANION')")
+    @RequestMapping(value = "/administered/{date}", method = RequestMethod.GET)
+    public List<Shift> getAdministeredShifts(@PathVariable("date") String dateString){
+
+        CustomUserDetails usr = ((CustomUserDetails)SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal());
+
+        List<String> lines = new ArrayList<>();
+
+        for(GrantedAuthority ga: usr.getAuthorities()){
+            if(ga instanceof LineGrantedAuthority){
+                if(ga.getAuthority().equals(SystemAuthority.Authority.ADMIN.name())){
+                    lines = ((LineGrantedAuthority) ga).getLineNames();
+                }
+            }
+        }
+
+        LocalDate date = LocalDate.parse(dateString, this.fmt);
+        List<Shift> shifts = this.shiftService.getShiftsByDateAndLineNames(date, lines);
+
+        return shifts;
+    }
+
+
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN') or hasAuthority('COMPANION')")
     @RequestMapping(value = "/{lineName}/{date}", method = RequestMethod.GET)
     public List<Shift> getShiftsByLineAndDate(@PathVariable("lineName") String lineName,
                                  @PathVariable("date") String dateString){
