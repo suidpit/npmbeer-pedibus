@@ -21,7 +21,16 @@ services:
             - db
         networks:
             - app-network
-
+    frontend:
+        restart: always
+        container_name: frontend
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile
+        ports:
+            - 80:80
+        networks:
+            - app-network
 networks:
     app-network:
         driver: bridge

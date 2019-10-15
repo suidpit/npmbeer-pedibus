@@ -23,6 +23,7 @@ public class User {
     @JsonSerialize(using = ObjectIdSerializer.class)
     ObjectId id;
 
+
     @Email
     private String email;
 
@@ -30,12 +31,10 @@ public class User {
     private String password;
 
     private List<String> roles;
-
+    private boolean enabled;
     private List<SystemAuthority> authorities;
-
     private List<ObjectId> children;
 
-    private boolean enabled;
 
     @Nullable
     private String name;
