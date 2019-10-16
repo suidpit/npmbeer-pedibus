@@ -63,6 +63,7 @@ export class ShiftService {
             if (login) {
                 for(let a of this.auth.getCurrentUser().authorities){
                     if(a.role == Role.ADMIN || a.role==Role.COMPANION || a.role == Role.SYSTEM_ADMIN) {
+                        console.log("is Admin in shiftService");
                         this.updateCalendarShifts(new Date());
                         this.buildUpcomingEvents();
                         this.updateTodaysShifts();

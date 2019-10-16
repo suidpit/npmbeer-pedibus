@@ -8,14 +8,14 @@
                 Leggi le ultime notifiche sulle attivitá dell'account.
             </mat-card-subtitle>
         </mat-card-header>
-        <mat-card-content fxLayoutAlign="center center">
+        <mat-card-content fxLayoutAlign="center center" fxFlex="1 0 100%">
 <!-- <mat-table [dataSource]="notifications">
     <ng-container matColumnDef="type">
         <mat-header-cell *matHeaderCellDef>Tipo</mat-header-cell>
         <mat-cell class="type-cell"
                   *matCellDef="let not"><mat-icon>notifications</mat-icon></mat-cell>
     </ng-container>
-  
+
     <ng-container matColumnDef="body">
         <mat-header-cell *matHeaderCellDef>Testo</mat-header-cell>
         <mat-cell class="body-cell"
@@ -28,13 +28,13 @@
     </ng-container>
 
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    
+
     <mat-row *matRowDef="let row; columns: displayedColumns"
     [ngClass]="{'bold': !row.read}"></mat-row>
 </mat-table>
 -->
             <mat-list class="notifications">
-                <mat-list-item class='clickable' [ngClass]="{'highlight': !not.read}" *ngFor="let not of notifications"
+                <mat-list-item class='clickable' [ngClass]="{'highlight': !not.read}" *ngFor="let not of notifications | async"
                 (click)="onNotClick(not)">
                     <h3 matLine>{{not.body}}</h3>
                     <p matLine>

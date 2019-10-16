@@ -33,7 +33,7 @@
           <button mat-menu-item (click)="auth.logout()" routerLink="/login">Logout</button>
         </mat-menu>
 
-        <mat-icon matBadge="{{not_read_n}}" matBadgePosition="above after" class="pointer" routerLink="/notifiche">notifications</mat-icon>
+        <mat-icon matBadge="{{not_read_n}}" matBadgePosition="above after" class="pointer btn-hover" routerLink="/notifiche">notifications</mat-icon>
     </span>
 
     <span fxShow="true" fxHide.lt-md="true" fxLayoutAlign="center center" class="side-container" *ngIf="!(auth.isLoggedIn$ | async)">
@@ -54,7 +54,7 @@
           <a class="user-email pointer" mat-button routerLink="/profile">
               {{ (user.email.length>12)? (user.email | slice:0:12)+'..':(user.email) }}
           </a>
-          <mat-icon matBadge="{{not_read_n}}" matBadgePosition="above after" class="pointer" routerLink="/notifiche">notifications</mat-icon>
+          <mat-icon matBadge="{{not_read_n}}" matBadgePosition="above after" class="pointer btn-hover" routerLink="/notifiche">notifications</mat-icon>
         </span>
 
         <mat-divider style="margin: 10px 0;" *ngIf="auth.currentUser$ | async"></mat-divider>

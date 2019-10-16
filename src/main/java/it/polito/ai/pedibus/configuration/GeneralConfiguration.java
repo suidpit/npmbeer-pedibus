@@ -7,13 +7,11 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.CreateCollectionOptions;
 import it.polito.ai.pedibus.api.dtos.NewEventDTO;
 import it.polito.ai.pedibus.api.models.*;
-import it.polito.ai.pedibus.api.repositories.ChildRepository;
-import it.polito.ai.pedibus.api.repositories.LineRepository;
-import it.polito.ai.pedibus.api.repositories.ShiftRepository;
-import it.polito.ai.pedibus.api.repositories.UserRepository;
+import it.polito.ai.pedibus.api.repositories.*;
 import it.polito.ai.pedibus.api.services.EventService;
 import it.polito.ai.pedibus.api.services.PhotoService;
 import it.polito.ai.pedibus.api.services.UserService;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +25,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Configuration
@@ -56,7 +56,7 @@ public class GeneralConfiguration {
                                      ChildRepository childRepository,
                                      PhotoService photoService,
                                      MongoTemplate mongoTemplate,
-                                     EventService eventService)
+                                     EventRepository eventRepository)
             throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -107,6 +107,7 @@ public class GeneralConfiguration {
 
             List<UserTemp> tempUsers = mapper.readValue(new File(userInitDataFileName),
                     mapper.getTypeFactory().constructCollectionType(List.class, UserTemp.class));
+            List<Document> events = new ArrayList<>();
             for(UserTemp o : tempUsers){
                 User u = new User();
                 u.setPassword(encoder.encode(o.getPassword()));
@@ -126,14 +127,17 @@ public class GeneralConfiguration {
                 logger.info(u.toString());
                 User user = userRepository.save(u);
 
-                NewEventDTO welcomeEvent = NewEventDTO.builder()
-                        .type("Welcome")
-                        .body("Benvenuto su Pedibus!")
-                        .userId(user.getId())
-                        .build();
+                Document e = new Document();
+                e.append("body", "Benvenuto su Pedibus!")
+                        .append("type", "Welcome")
+                        .append("userId", user.getId())
+                        .append("read", false)
+                        .append("created_at", new Timestamp(new Date().getTime()))
+                        .append("objectReferenceId", null);
 
-                eventService.pushNewEvent(welcomeEvent).subscribe();
+                events.add(e);
             }
+            collections.getCollection("events").insertMany(events);
         }
 
 

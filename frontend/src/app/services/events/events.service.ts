@@ -1,4 +1,4 @@
-import {Injectable, NgZone} from '@angular/core';
+import {Injectable, NgZone, OnInit} from '@angular/core';
 import {SseService} from "../sse/sse.service";
 import {BehaviorSubject, Observable} from "rxjs";
 import {Event} from "../../models/event"
@@ -8,13 +8,18 @@ import {take} from "rxjs/operators";
 @Injectable({
   providedIn: 'root'
 })
-export class EventsService {
+export class EventsService implements OnInit{
 
-  constructor(private _zone: NgZone, private _sseService: SseService, private http: HttpClient) { }
   private notificationSource: BehaviorSubject<Event[]> = new BehaviorSubject(null);
   currentNotification: Observable<Event[]> = this.notificationSource.asObservable();
 
-  notifications: Event[];
+  notifications: Event[] = [];
+
+  constructor(private _zone: NgZone, private _sseService: SseService, private http: HttpClient) { }
+
+  ngOnInit(): void {
+    this.getServerSentEvent("http://192.168.99.100:8080/events/stream").subscribe(() => {});
+  }
 
   getServerSentEvent(url: string): Observable<Event>{
     return new Observable<Event>((observer) => {
@@ -46,4 +51,5 @@ export class EventsService {
     });
     return obs;
   }
+
 }

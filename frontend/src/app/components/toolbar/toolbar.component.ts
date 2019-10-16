@@ -43,7 +43,7 @@ export class ToolbarComponent implements OnInit {
     {
       displayName: "Notifiche",
       url: "/notifiche",
-      roles: [Role.COMPANION],
+      roles: [Role.USER],
       icon: "list"
     }
   ];
@@ -107,8 +107,10 @@ export class ToolbarComponent implements OnInit {
     )
 
     this.eventService.currentNotification.subscribe((notifications) => {
-      this.not_read_n = notifications.filter(notification => !notification.read).length;
-      console.log(this.not_read_n);
+      if(notifications !== null && notifications !== undefined){
+        this.not_read_n = notifications.filter(notification => !notification.read).length;
+        console.log(this.not_read_n);
+      }
     })
   }
 
