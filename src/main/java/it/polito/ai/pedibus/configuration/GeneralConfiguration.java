@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.CreateCollectionOptions;
 import it.polito.ai.pedibus.api.models.*;
 import it.polito.ai.pedibus.api.repositories.ChildRepository;
 import it.polito.ai.pedibus.api.repositories.LineRepository;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.core.CollectionOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.geo.GeoJsonModule;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -107,12 +109,16 @@ public class GeneralConfiguration {
         MongoDatabase collections = mc.getDatabase("test");
         boolean checkR = true;
         boolean checkP = true;
+        boolean checkE = true;
         for (String name : collections.listCollectionNames()) {
             if (name.equals("reservations")) {
                 checkR = false;
             }
             if (name.equals("photos")) {
                 checkP = false;
+            }
+            if (name.equals("events")) {
+                checkE = false;
             }
         }
         if (checkR) {
@@ -121,6 +127,10 @@ public class GeneralConfiguration {
         if (checkP) {
             collections.createCollection("photos");
             photoService.init();
+        }
+        if (checkE) {
+            CreateCollectionOptions options = new CreateCollectionOptions().capped(true).sizeInBytes(5242880).maxDocuments(5000);
+            collections.createCollection("events", options);
         }
         return mapper;
     }
