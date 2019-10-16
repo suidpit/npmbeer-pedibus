@@ -50,7 +50,7 @@
     <mat-sidenav #sidenav id="sidenav" fxLayout="column">
       <div fxLayout="column" fxLayoutAlign="center">
         <span style="width: 100%; margin-top:15px;" fxLayout="row" fxLayoutAlign="space-around center" *ngIf="auth.currentUser$ | async as user">
-          <div class="avatar pointer" routerLink="/profile"></div>
+          <div class="avatar pointer" [ngStyle]="{'background-image' : pic ? 'url('+pic+')' : 'url(\'../../../../assets/icons/img_avatar.png\')'}" routerLink="/profile"></div>
           <a class="user-email pointer" mat-button routerLink="/profile">
               {{ (user.email.length>12)? (user.email | slice:0:12)+'..':(user.email) }}
           </a>

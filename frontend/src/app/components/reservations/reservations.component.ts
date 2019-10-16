@@ -314,6 +314,10 @@ export class ReservationsComponent implements OnInit, OnDestroy {
                     this.reservationsService.buildReservations(this.viewDate, this.selectedChild.id);
                     this.reservationsService.buildReservations(this.viewDate, this.selectedChild.id);
                     this.openSnackbar("Prenotazione rimossa con successo");
+                    this.selectedReservation = null;
+                    this.today = null;
+                    this.selectedLine = this.lines[0];
+                    this.selectedRun = 0;
                 }, () => {
                     this.openSnackbar("Qualcosa è andato storto. Per favore riprovare più tardi.");
                 });

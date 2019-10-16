@@ -54,6 +54,8 @@ public class ProfileService {
     public List<ChildDTO> getChildren() {
         String email = getUserEmail();
         List<ChildDTO> children = new ArrayList<>();
+        if(userRepository.getByEmail(email).getChildren()==null)
+            return children;
         for (ObjectId id : userRepository.getByEmail(email).getChildren()) {
             Child child = childRepository.getById(id);
 

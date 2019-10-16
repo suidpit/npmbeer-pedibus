@@ -55,7 +55,7 @@
       </div>
       <mat-divider [inset]="true"></mat-divider>
       <div class="tabs attendance-tabs" fxFlex="1 0 100%" fxLayout="column">
-        <mat-tab-group mat-align-tabs="center" [selectedIndex]="selectedRun" fxFlex="1 0 100%" (selectedTabChange)="tabSwitch($event)">
+        <mat-tab-group dynamicHeight mat-align-tabs="center" [selectedIndex]="selectedRun" fxFlex="1 0 100%" (selectedTabChange)="tabSwitch($event)" mat-stretch-tabs>
           <div *ngIf="selectedLine">
             <mat-tab *ngFor="let run of selectedLine.stops.stops[0].outward; let i = index" label="Andata {{i+1}}" fxLayout="column" fxFlexAlign="center center" fxFlex="1 0 100%">
               <mat-list dense>

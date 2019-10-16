@@ -22,7 +22,9 @@ export class NotificationPanelComponent implements OnInit {
   }
 
   onNotClick(notification) {
-    this._eventsService.setNotificationRead(notification.id).subscribe((result) => notification.read = true)
+    this._eventsService.setNotificationRead(notification.id).subscribe((result) => {
+      this.notifications = this.notifications.filter((notific) => notific !== notification.id)
+    });
   }
 
 }

@@ -23,8 +23,10 @@ export class EventsService {
         this._zone.run(() => {
           observer.next(JSON.parse(event.data));
           let notification = JSON.parse(event.data);
-          this.notifications.push(notification);
-          this.notificationSource.next(this.notifications);
+          if(!notification.read) {
+            this.notifications.push(notification);
+            this.notificationSource.next(this.notifications);
+          }
         });
       };
 
@@ -39,7 +41,7 @@ export class EventsService {
   setNotificationRead(notId: string): Observable<any> {
     let obs = this.http.post(`http://192.168.99.100:8080/events/read`, notId);
     obs.pipe(take(1)).subscribe(() => {
-      this.notifications.find(notification => notification.id === notId).read = true;
+      this.notifications = this.notifications.filter(notification => notification.id !== notId);
       this.notificationSource.next(this.notifications);
     });
     return obs;
