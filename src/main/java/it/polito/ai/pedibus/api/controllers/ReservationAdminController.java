@@ -1,8 +1,13 @@
 package it.polito.ai.pedibus.api.controllers;
 
 
+import it.polito.ai.pedibus.api.dtos.NewEventDTO;
 import it.polito.ai.pedibus.api.dtos.ReservationDTO;
+import it.polito.ai.pedibus.api.models.Event;
 import it.polito.ai.pedibus.api.models.Reservation;
+import it.polito.ai.pedibus.api.models.User;
+import it.polito.ai.pedibus.api.repositories.ChildRepository;
+import it.polito.ai.pedibus.api.services.EventService;
 import it.polito.ai.pedibus.api.services.ReservationService;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
@@ -10,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,9 +28,15 @@ import java.util.List;
 public class ReservationAdminController {
 
     private final ReservationService reservationService;
+    private final EventService eventService;
+    private final ChildRepository childRepository;
 
-    public ReservationAdminController(ReservationService reservationService) {
+    public ReservationAdminController(ReservationService reservationService,
+                                      EventService eventService,
+                                      ChildRepository childRepository) {
         this.reservationService = reservationService;
+        this.eventService = eventService;
+        this.childRepository = childRepository;
     }
 
     @PreAuthorize("hasAuthority('SYSTEM_ADMIN') or hasAuthority('ADMIN') or hasAuthority('COMPANION')")
@@ -80,6 +92,22 @@ public class ReservationAdminController {
     public void toggleReservationPresence(@PathVariable("resid") String resid){
         try{
             this.reservationService.togglePresenceOnReservation(new ObjectId(resid));
+        }
+        catch(Exception e){
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        }
+        try{
+            Reservation reservation = this.reservationService.getReservation(new ObjectId(resid));
+            ObjectId parentId = reservation.getUser();
+            ObjectId childId = reservation.getChildId();
+            String childName = this.childRepository.getById(childId).getName();
+            NewEventDTO newEvent = NewEventDTO.builder()
+                    .body("Il tuo bimbo: " + childName + " è stato raccolto da un accompagnatore!")
+                    .type("segnalazione-presenze")
+                    .userId(parentId)
+                    .objectReferenceId(new ObjectId(resid))
+                    .build();
+            this.eventService.pushNewEvent(newEvent).subscribe();
         }
         catch(Exception e){
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
