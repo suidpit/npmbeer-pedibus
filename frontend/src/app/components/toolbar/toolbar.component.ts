@@ -108,6 +108,7 @@ export class ToolbarComponent implements OnInit {
 
     this.eventService.currentNotification.subscribe((notifications) => {
       this.not_read_n = notifications.filter(notification => !notification.read).length;
+      console.log(this.not_read_n);
     })
   }
 

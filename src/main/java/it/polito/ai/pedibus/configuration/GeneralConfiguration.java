@@ -5,11 +5,13 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.CreateCollectionOptions;
+import it.polito.ai.pedibus.api.dtos.NewEventDTO;
 import it.polito.ai.pedibus.api.models.*;
 import it.polito.ai.pedibus.api.repositories.ChildRepository;
 import it.polito.ai.pedibus.api.repositories.LineRepository;
 import it.polito.ai.pedibus.api.repositories.ShiftRepository;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
+import it.polito.ai.pedibus.api.services.EventService;
 import it.polito.ai.pedibus.api.services.PhotoService;
 import it.polito.ai.pedibus.api.services.UserService;
 import org.bson.types.ObjectId;
@@ -53,12 +55,43 @@ public class GeneralConfiguration {
                                      ShiftRepository shiftRepository,
                                      ChildRepository childRepository,
                                      PhotoService photoService,
-                                     MongoTemplate mongoTemplate)
+                                     MongoTemplate mongoTemplate,
+                                     EventService eventService)
             throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.registerModule(new GeoJsonModule());
         logger.info("Inside general configuration");
+
+
+        MongoClient mc = new MongoClient("db", 27017);
+        MongoDatabase collections = mc.getDatabase("test");
+        boolean checkR = true;
+        boolean checkP = true;
+        boolean checkE = true;
+        for (String name : collections.listCollectionNames()) {
+            if (name.equals("reservations")) {
+                checkR = false;
+            }
+            if (name.equals("photos")) {
+                checkP = false;
+            }
+            if (name.equals("events")) {
+                checkE = false;
+            }
+        }
+        if (checkR) {
+            collections.createCollection("reservations");
+        }
+        if (checkP) {
+            collections.createCollection("photos");
+            photoService.init();
+        }
+        if (checkE) {
+            CreateCollectionOptions options = new CreateCollectionOptions().capped(true).sizeInBytes(5242880).maxDocuments(5000);
+            collections.createCollection("events", options);
+        }
+
         // Read lines from .json using the mapper (second argument returns a TypeReference to List<Line> type
         List<Line> lines = mapper.readValue(new File(initDataFileName),
                 mapper.getTypeFactory().constructCollectionType(List.class, Line.class));
@@ -91,7 +124,15 @@ public class GeneralConfiguration {
                 }
                 u.setChildren(ids);
                 logger.info(u.toString());
-                userRepository.save(u);
+                User user = userRepository.save(u);
+
+                NewEventDTO welcomeEvent = NewEventDTO.builder()
+                        .type("Welcome")
+                        .body("Benvenuto su Pedibus!")
+                        .userId(user.getId())
+                        .build();
+
+                eventService.pushNewEvent(welcomeEvent).subscribe();
             }
         }
 
@@ -104,34 +145,6 @@ public class GeneralConfiguration {
 //            shiftRepository.insert(shifts);
 //        }
 
-
-        MongoClient mc = new MongoClient("db", 27017);
-        MongoDatabase collections = mc.getDatabase("test");
-        boolean checkR = true;
-        boolean checkP = true;
-        boolean checkE = true;
-        for (String name : collections.listCollectionNames()) {
-            if (name.equals("reservations")) {
-                checkR = false;
-            }
-            if (name.equals("photos")) {
-                checkP = false;
-            }
-            if (name.equals("events")) {
-                checkE = false;
-            }
-        }
-        if (checkR) {
-            collections.createCollection("reservations");
-        }
-        if (checkP) {
-            collections.createCollection("photos");
-            photoService.init();
-        }
-        if (checkE) {
-            CreateCollectionOptions options = new CreateCollectionOptions().capped(true).sizeInBytes(5242880).maxDocuments(5000);
-            collections.createCollection("events", options);
-        }
         return mapper;
     }
 
