@@ -19,7 +19,7 @@ import {Local} from "protractor/built/driverProviders";
 })
 export class ReservationsService {
 
-    private baseUrl: String = 'http://localhost:8080';
+    private baseUrl: String = 'http://192.168.99.100:8080';
     selected_stop_observer$: Subject<any> = new BehaviorSubject(undefined);
 
     private reservations_subject: Subject<any[]> = new BehaviorSubject([]);

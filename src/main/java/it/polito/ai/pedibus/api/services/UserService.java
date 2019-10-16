@@ -255,4 +255,8 @@ public class UserService implements IUserService {
         user.setPassword(encoder.encode(pass));
         userRepository.save(user);
     }
+
+    public ObjectId getUserIdHavingChild(ObjectId childId){
+        return this.userRepository.getUserByChildrenContains(childId).getId();
+    }
 }

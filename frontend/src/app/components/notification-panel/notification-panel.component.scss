@@ -1,0 +1,28 @@
+.mat-row:nth-child(even){
+  background-color: #e8e8e8;
+}
+
+.mat-header-row{
+  background-color: #393939;
+}
+
+.mat-header-row .mat-header-cell{
+  color: #FFFFFF;
+  font-weight: bold;
+}
+
+.bold{
+  font-weight: bold;
+}
+
+.highlight {
+  background-color: lightgrey;
+}
+
+.clickable {
+  cursor: pointer
+}
+
+.notifications {
+  width:600px;
+}

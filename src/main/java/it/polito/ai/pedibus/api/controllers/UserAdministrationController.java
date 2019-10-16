@@ -7,6 +7,7 @@ import it.polito.ai.pedibus.api.dtos.UserDetailDTO;
 import it.polito.ai.pedibus.api.dtos.UserPrivilegesDTO;
 import it.polito.ai.pedibus.api.events.OnRegistrationCompleteEvent;
 import it.polito.ai.pedibus.api.exceptions.EmailExistsException;
+import it.polito.ai.pedibus.api.models.Event;
 import it.polito.ai.pedibus.api.models.SystemAuthority;
 import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.UserRepository;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.WebRequest;
+import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 
@@ -164,7 +166,7 @@ public class UserAdministrationController {
                     .userId(registered.getId())
                     .build();
 
-            eventService.pushNewEvent(welcomeEvent);
+            eventService.pushNewEvent(welcomeEvent).subscribe();
             eventPublisher.publishEvent(new OnRegistrationCompleteEvent
                     (registered, request.getLocale(), appUrl));
 

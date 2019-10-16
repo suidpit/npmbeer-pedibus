@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -48,18 +49,23 @@ public class LocalizationController implements ApplicationListener<ApplicationEv
 
 
     @Autowired
+    @Lazy
     private WebSocketConfig socketConfig;
 
     @Autowired
+    @Lazy
     private ObjectMapper objectMapper;
 
     @Autowired
+    @Lazy
     private ShiftService shiftService;
 
     @Autowired
+    @Lazy
     private ReservationService reservationService;
 
     @Autowired
+    @Lazy
     private SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/localize/{shiftId}")

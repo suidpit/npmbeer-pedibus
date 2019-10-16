@@ -19,7 +19,7 @@ import {IGeoJsonObject} from "../../models/igeojson-object";
 })
 export class LocalizationService {
 
-  endpoint_url = 'http://localhost:8080/localization-endpoint';
+  endpoint_url = 'http://192.168.99.100:8080/localization-endpoint';
 
   send_url = "/app/localize/";
 

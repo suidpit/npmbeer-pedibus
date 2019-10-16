@@ -33,7 +33,7 @@
           <button mat-menu-item (click)="auth.logout()" routerLink="/login">Logout</button>
         </mat-menu>
 
-        <mat-icon matBadge="1" matBadgePosition="above after">notifications</mat-icon>
+        <mat-icon matBadge="{{not_read_n}}" matBadgePosition="above after" class="pointer btn-hover" routerLink="/notifiche">notifications</mat-icon>
     </span>
 
     <span fxShow="true" fxHide.lt-md="true" fxLayoutAlign="center center" class="side-container" *ngIf="!(auth.isLoggedIn$ | async)">
@@ -50,11 +50,11 @@
     <mat-sidenav #sidenav id="sidenav" fxLayout="column">
       <div fxLayout="column" fxLayoutAlign="center">
         <span style="width: 100%; margin-top:15px;" fxLayout="row" fxLayoutAlign="space-around center" *ngIf="auth.currentUser$ | async as user">
-          <div class="avatar pointer" routerLink="/profile"></div>
+          <div class="avatar pointer" [ngStyle]="{'background-image' : pic ? 'url('+pic+')' : 'url(\'../../../../assets/icons/img_avatar.png\')'}" routerLink="/profile"></div>
           <a class="user-email pointer" mat-button routerLink="/profile">
               {{ (user.email.length>12)? (user.email | slice:0:12)+'..':(user.email) }}
           </a>
-          <mat-icon matBadge="1" matBadgePosition="above after">notifications</mat-icon>
+          <mat-icon matBadge="{{not_read_n}}" matBadgePosition="above after" class="pointer btn-hover" routerLink="/notifiche">notifications</mat-icon>
         </span>
 
         <mat-divider style="margin: 10px 0;" *ngIf="auth.currentUser$ | async"></mat-divider>

@@ -23,4 +23,6 @@ public interface UserRepository extends MongoRepository<User,String> {
 
     User findUserById(ObjectId id);
     User getById(ObjectId id);
+
+    User getUserByChildrenContains(ObjectId childId);
 }
