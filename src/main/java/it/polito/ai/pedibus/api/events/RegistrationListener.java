@@ -51,7 +51,7 @@ public class RegistrationListener implements
         email.setFrom("no-reply@napalm.beer");
         email.setTo(recipientAddress);
         email.setSubject(subject);
-        email.setText(message + " " + "http://localhost:4200/impostaPassword" + confirmationUrl + message_part2);
+        email.setText(message + " " + "http://192.168.99.100:9000/impostaPassword" + confirmationUrl + message_part2);
         mailSender.send(email);
     }
 }

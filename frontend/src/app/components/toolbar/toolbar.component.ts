@@ -6,6 +6,7 @@ import {Observable} from "rxjs/internal/Observable";
 import {Role} from "../../models/authority";
 import {MatSidenav} from "@angular/material";
 import {ProfileService} from "../../services/profile/profile.service";
+import {EventsService} from "../../services/events/events.service";
 
 @Component({
   selector: 'app-toolbar',
@@ -38,6 +39,12 @@ export class ToolbarComponent implements OnInit {
       url: "/prenotazione",
       roles: [Role.USER],
       icon: "menu_book"
+    },
+    {
+      displayName: "Notifiche",
+      url: "/notifiche",
+      roles: [Role.COMPANION],
+      icon: "list"
     }
   ];
 
@@ -53,12 +60,6 @@ export class ToolbarComponent implements OnInit {
       url: "/admin/turni",
       roles: [Role.COMPANION],
       icon: "calendar_today"
-    },
-    {
-      displayName: "Notifiche",
-      url: "/notifiche",
-      roles: [Role.COMPANION],
-      icon: "list"
     }
   ];
 
@@ -70,10 +71,11 @@ export class ToolbarComponent implements OnInit {
       icon: "person_add"
     }
     ];
-  constructor(public auth: AuthService, private profileService: ProfileService) {
-  }
 
   pic = null;
+  not_read_n = 0;
+
+  constructor(public auth: AuthService, private profileService: ProfileService, public eventService: EventsService) {}
 
   ngOnInit() {
     this.isAuthenticated = false;
@@ -103,6 +105,10 @@ export class ToolbarComponent implements OnInit {
         }
       }
     )
+
+    this.eventService.currentNotification.subscribe((notifications) => {
+      this.not_read_n = notifications.filter(notification => !notification.read).length;
+    })
   }
 
   logout(){

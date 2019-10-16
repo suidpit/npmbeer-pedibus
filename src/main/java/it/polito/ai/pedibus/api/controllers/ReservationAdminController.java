@@ -7,8 +7,10 @@ import it.polito.ai.pedibus.api.models.Event;
 import it.polito.ai.pedibus.api.models.Reservation;
 import it.polito.ai.pedibus.api.models.User;
 import it.polito.ai.pedibus.api.repositories.ChildRepository;
+import it.polito.ai.pedibus.api.repositories.UserRepository;
 import it.polito.ai.pedibus.api.services.EventService;
 import it.polito.ai.pedibus.api.services.ReservationService;
+import it.polito.ai.pedibus.api.services.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,13 +31,16 @@ public class ReservationAdminController {
 
     private final ReservationService reservationService;
     private final EventService eventService;
+    private final UserService userService;
     private final ChildRepository childRepository;
 
     public ReservationAdminController(ReservationService reservationService,
                                       EventService eventService,
+                                      UserService userService,
                                       ChildRepository childRepository) {
         this.reservationService = reservationService;
         this.eventService = eventService;
+        this.userService = userService;
         this.childRepository = childRepository;
     }
 
@@ -120,12 +125,23 @@ public class ReservationAdminController {
                                  @PathVariable("dateString") String dateString,
                                  @RequestBody ReservationDTO reservationDTO){
         try{
-            this.reservationService.addOnTheFlyChild(
+            ObjectId resid = this.reservationService.addOnTheFlyChild(
                     dateString, lineName,
                     reservationDTO.getDirection(),
                     reservationDTO.getTripIndex(),
                     reservationDTO.getStopName(),
-                    reservationDTO.getChild());
+                    reservationDTO.getChild()).getId();
+            ObjectId childId = reservationDTO.getChild();
+            ObjectId parentId = this.userService.getUserIdHavingChild(childId);
+            String childName = this.childRepository.getById(childId).getName();
+            NewEventDTO newEvent = NewEventDTO.builder()
+                    .body("Il tuo bimbo: " + childName + " è stato raccolto da un accompagnatore!")
+                    .type("segnalazione-presenze")
+                    .userId(parentId)
+                    .objectReferenceId(resid)
+                    .build();
+            this.eventService.pushNewEvent(newEvent).subscribe();
+
         }
         catch(Exception e){
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);

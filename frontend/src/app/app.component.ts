@@ -109,13 +109,13 @@ export class AppComponent {
                 img.name, this.domSanitizer.bypassSecurityTrustResourceUrl("../assets/icons/" + img.path)
             );
         }
-        this.eventsService.currentNotification.subscribe(message => {
-            if (message != null) {
-                this.snackBar.openFromComponent(SnackbarComponent, {
-                    data: message.body,
-                    duration: 10000
-                })
-            }
-        })
+        // this.eventsService.currentNotification.subscribe(message => {
+        //     if (message != null) {
+        //         this.snackBar.openFromComponent(SnackbarComponent, {
+        //             data: message.body,
+        //             duration: 10000
+        //         })
+        //     }
+        // })
     }
 }

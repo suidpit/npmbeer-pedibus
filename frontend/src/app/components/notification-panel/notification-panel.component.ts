@@ -7,7 +7,7 @@ import {EventsService} from "../../services/events/events.service";
   styleUrls: ['./notification-panel.component.scss']
 })
 export class NotificationPanelComponent implements OnInit {
-  notifications = []
+  notifications = [];
   constructor(private _eventsService: EventsService, private _zone: NgZone) { }
 
   ngOnInit() {
