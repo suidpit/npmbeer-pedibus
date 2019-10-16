@@ -27,8 +27,8 @@ export class ShiftService {
     shifts = [];
     events = [];
 
-    shift_url = "http://192.168.99.100:8080/admin/shifts";
-    availabilty_url = "http://192.168.99.100:8080/admin/shifts/availability";
+    shift_url = "http://localhost:8080/admin/shifts";
+    availabilty_url = "http://localhost:8080/admin/shifts/availability";
     availability_template = {
         date: "",
         shiftId: "",
@@ -63,7 +63,6 @@ export class ShiftService {
             if (login) {
                 for(let a of this.auth.getCurrentUser().authorities){
                     if(a.role == Role.ADMIN || a.role==Role.COMPANION || a.role == Role.SYSTEM_ADMIN) {
-                        console.log("is Admin in shiftService");
                         this.updateCalendarShifts(new Date());
                         this.buildUpcomingEvents();
                         this.updateTodaysShifts();
@@ -462,7 +461,7 @@ export class ShiftService {
      * @returns {Observable<any>} observable of the event related to the assigned shift: can check if viewed.
      */
     public getEventFromShiftId(shiftId): Observable<boolean> {
-        return this.http.get<boolean>("http://192.168.99.100:8080/events/by-shift/" + shiftId);
+        return this.http.get<boolean>("http://localhost:8080/events/by-shift/" + shiftId);
     }
 
     randomIntFromInterval(min, max) { // min and max included

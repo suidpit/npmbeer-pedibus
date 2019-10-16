@@ -11,7 +11,6 @@ import it.polito.ai.pedibus.api.repositories.*;
 import it.polito.ai.pedibus.api.services.EventService;
 import it.polito.ai.pedibus.api.services.PhotoService;
 import it.polito.ai.pedibus.api.services.UserService;
-import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +63,7 @@ public class GeneralConfiguration {
         logger.info("Inside general configuration");
 
 
-        MongoClient mc = new MongoClient("db", 27017);
+        MongoClient mc = new MongoClient("localhost", 27017);
         MongoDatabase collections = mc.getDatabase("test");
         boolean checkR = true;
         boolean checkP = true;
@@ -107,7 +106,7 @@ public class GeneralConfiguration {
 
             List<UserTemp> tempUsers = mapper.readValue(new File(userInitDataFileName),
                     mapper.getTypeFactory().constructCollectionType(List.class, UserTemp.class));
-            List<Document> events = new ArrayList<>();
+            ArrayList<Event> events = new ArrayList<>();
             for(UserTemp o : tempUsers){
                 User u = new User();
                 u.setPassword(encoder.encode(o.getPassword()));
@@ -127,17 +126,17 @@ public class GeneralConfiguration {
                 logger.info(u.toString());
                 User user = userRepository.save(u);
 
-                Document e = new Document();
-                e.append("body", "Benvenuto su Pedibus!")
-                        .append("type", "Welcome")
-                        .append("userId", user.getId())
-                        .append("read", false)
-                        .append("created_at", new Timestamp(new Date().getTime()))
-                        .append("objectReferenceId", null);
-
-                events.add(e);
+                Event e = Event.builder()
+                        .body("Benvenuto su Pedibus!")
+                        .type("Welcome")
+                        .userId(user.getId())
+                        .read(false)
+                        .created_at(new Timestamp(new Date().getTime()))
+                        .objectReferenceId(null)
+                        .build();
+                eventRepository.save(e).subscribe();
             }
-            collections.getCollection("events").insertMany(events);
+
         }
 
 

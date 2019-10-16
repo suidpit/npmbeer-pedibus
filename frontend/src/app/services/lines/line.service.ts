@@ -8,7 +8,7 @@ import {Line} from "../../models/line";
 })
 export class LineService {
 
-  private server_url = "http://192.168.99.100:8080";
+  private server_url = "http://localhost:8080";
 
   constructor(private http: HttpClient) { }
 

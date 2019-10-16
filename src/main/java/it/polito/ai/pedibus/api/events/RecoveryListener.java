@@ -37,7 +37,7 @@ public class RecoveryListener implements ApplicationListener<OnRecoveryCompleteE
         SimpleMailMessage email = new SimpleMailMessage();
         email.setTo(recipientAddress);
         email.setSubject(subject);
-        email.setText(message + " " + "http://192.168.99.100:8080" + confirmationUrl);
+        email.setText(message + " " + "http://localhost:8080" + confirmationUrl);
         mailSender.send(email);
     }
 }

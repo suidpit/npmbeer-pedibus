@@ -21,7 +21,7 @@ import {from} from "rxjs/internal/observable/from";
 export class ProfileService {
     public children$: Subject<Child[]> = new BehaviorSubject(null);
     public user$: Subject<UserProfile> = new BehaviorSubject(null);
-    baseUrl = "http://192.168.99.100:8080";
+    baseUrl = "http://localhost:8080";
 
     constructor(private http: HttpClient, private auth: AuthService) {
         auth.isLoggedIn$.subscribe(((logged)=>{
@@ -46,7 +46,7 @@ export class ProfileService {
      * @returns {Observable<any>} any is actually an object <userID>: <userEmail>
      */
     public getUsers():Observable<any>{
-        return this.http.get<any>("http://192.168.99.100:8080/users");
+        return this.http.get<any>("http://localhost:8080/users");
     }
 
     public putUserAuthority(userId: string, action:string, lineName: string){
@@ -55,7 +55,7 @@ export class ProfileService {
         action: action,
         lineName: lineName
       };
-      return this.http.put("http://192.168.99.100:8080/users/"+userId, payload);
+      return this.http.put("http://localhost:8080/users/"+userId, payload);
     }
 
     public getAllChildren(): Observable<Child[]>{

@@ -19,7 +19,7 @@ import {ReservationReq} from "../../models/reservation-req";
 })
 export class AttendanceService {
 
-  private base_url = "http://192.168.99.100:8080";
+  private base_url = "http://localhost:8080";
   constructor(private http: HttpClient) {
   }
 

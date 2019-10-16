@@ -4,6 +4,7 @@ import {BehaviorSubject, Observable} from "rxjs";
 import {Event} from "../../models/event"
 import {HttpClient} from "@angular/common/http";
 import {take} from "rxjs/operators";
+import {AuthService} from "../auth/auth.service";
 
 @Injectable({
   providedIn: 'root'
@@ -15,10 +16,23 @@ export class EventsService implements OnInit{
 
   notifications: Event[] = [];
 
-  constructor(private _zone: NgZone, private _sseService: SseService, private http: HttpClient) { }
+  constructor(private _zone: NgZone, private _sseService: SseService, private http: HttpClient, private auth: AuthService) {
+    this.auth.isLoggedIn$.subscribe((loggedIn) =>{
+      if(loggedIn){
+        this.getServerSentEvent("http://localhost:8080/events/stream").subscribe( notification => {
+          this._zone.run(() => {
+            if(!notification.read){
+              this.notifications.push(notification);
+              this.notificationSource.next(this.notifications);
+            }
+          })
+        });
+      }
+    });
+  }
 
   ngOnInit(): void {
-    this.getServerSentEvent("http://192.168.99.100:8080/events/stream").subscribe(() => {});
+
   }
 
   getServerSentEvent(url: string): Observable<Event>{
@@ -27,11 +41,6 @@ export class EventsService implements OnInit{
       eventSource.onmessage = event => {
         this._zone.run(() => {
           observer.next(JSON.parse(event.data));
-          let notification = JSON.parse(event.data);
-          if(!notification.read) {
-            this.notifications.push(notification);
-            this.notificationSource.next(this.notifications);
-          }
         });
       };
 
@@ -44,7 +53,7 @@ export class EventsService implements OnInit{
   }
 
   setNotificationRead(notId: string): Observable<any> {
-    let obs = this.http.post(`http://192.168.99.100:8080/events/read`, notId);
+    let obs = this.http.post(`http://localhost:8080/events/read`, notId);
     obs.pipe(take(1)).subscribe(() => {
       this.notifications = this.notifications.filter(notification => notification.id !== notId);
       this.notificationSource.next(this.notifications);

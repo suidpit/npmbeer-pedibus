@@ -12,7 +12,7 @@ export class NotificationPanelComponent implements OnInit {
 
   ngOnInit() {
     this._eventsService.currentNotification.subscribe((notifications) => this.notifications = notifications);
-    // this._eventsService.getServerSentEvent('http://192.168.99.100:8080/events/stream').subscribe({
+    // this._eventsService.getServerSentEvent('http://localhost:8080/events/stream').subscribe({
     //   next: notification => {
     //     this._zone.run(() => {
     //       this.notifications.push(notification)
@@ -23,7 +23,7 @@ export class NotificationPanelComponent implements OnInit {
   }
 
   onNotClick(notification) {
-    this._eventsService.setNotificationRead(notification.id).subscribe((result) => {
+      this._eventsService.setNotificationRead(notification.id).subscribe((result) => {
     });
   }
 

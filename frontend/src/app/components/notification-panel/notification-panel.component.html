@@ -34,7 +34,7 @@
 </mat-table>
 -->
             <mat-list class="notifications">
-                <mat-list-item class='clickable' [ngClass]="{'highlight': !not.read}" *ngFor="let not of notifications | async"
+                <mat-list-item class='clickable' [ngClass]="{'highlight': !not.read}" *ngFor="let not of _eventsService.currentNotification | async"
                 (click)="onNotClick(not)">
                     <h3 matLine>{{not.body}}</h3>
                     <p matLine>

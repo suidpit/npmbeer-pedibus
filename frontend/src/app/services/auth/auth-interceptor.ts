@@ -33,7 +33,7 @@ export class AuthInterceptor implements HttpInterceptor {
             return request;
         }
         // If you are calling an outside domain then do not add the token.
-        if (!request.url.match(/192.168.99.100:8080\//)) {
+        if (!request.url.match(/localhost:8080\//)) {
             return request;
         }
         return request.clone({
