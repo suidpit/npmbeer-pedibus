@@ -17,7 +17,7 @@ import {UserProfile} from "../../models/userProfile";
 export class AuthService {
 
 
-  login_url = "http://192.168.99.100:8080/login";  // http://localhost:4200/backend/login";
+  login_url = "http://192.168.99.100:8080/login";  // http://localhost:9000/backend/login";
   register_url = "http://192.168.99.100:8080/register";
   email_check_url = "http://192.168.99.100:8080/exists";
   register_email_url = "http://192.168.99.100:8080/users/addNewUser";
