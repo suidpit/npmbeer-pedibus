@@ -63,7 +63,7 @@ public class GeneralConfiguration {
         logger.info("Inside general configuration");
 
 
-        MongoClient mc = new MongoClient("localhost", 27017);
+        MongoClient mc = new MongoClient("db", 27017);
         MongoDatabase collections = mc.getDatabase("test");
         boolean checkR = true;
         boolean checkP = true;
